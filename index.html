@@ -396,30 +396,94 @@ select:focus{outline:none;border-color:#8B6F47;}
 
 /* ── RESPONSIVE ── */
 @media(max-width:768px){
-    header{padding:0.5rem 1rem;gap:0.75rem;}
-    .logo{font-size:1.1rem;}
+    /* ── MOBILE HEADER ── */
+    header{padding:0.5rem 0.75rem;gap:0.5rem;flex-wrap:wrap;}
+    .logo{font-size:1rem;flex:0 0 auto;}
+    .search-wrap{flex:1;min-width:120px;max-width:none;order:1;}
+    .filter-toggle{order:2;font-size:0.72rem;padding:0.25rem 0.5rem;}
     .filter-bar{display:none!important;}
-    .view-bar{padding-left:1rem;padding-right:1rem;}
-    .detail{width:100%;border-left:none;}
+    .view-bar{padding:0.3rem 0.75rem;}
+
+    /* Hide nav-links and suggest, show hamburger */
+    .nav-links{display:none!important;}
+    .suggest-btn{display:none!important;}
+    .mob-menu-btn{display:flex!important;}
+
+    /* Mobile menu drawer */
+    .mob-menu{
+        display:none;position:fixed;top:0;right:0;width:260px;height:100%;
+        background:#fff;z-index:600;box-shadow:-4px 0 20px rgba(0,0,0,0.1);
+        flex-direction:column;padding:1rem;
+        transform:translateX(100%);transition:transform 0.3s ease;
+    }
+    .mob-menu.open{display:flex;transform:translateX(0);}
+    .mob-menu-close{align-self:flex-end;background:none;border:none;font-size:1.5rem;cursor:pointer;color:#999;padding:0.3rem;}
+    .mob-menu-items{display:flex;flex-direction:column;gap:0.5rem;margin-top:1rem;}
+    .mob-menu-items button{
+        width:100%;padding:0.65rem 0.8rem;border:1px solid #e8e4de;border-radius:8px;
+        background:#fff;font-size:0.88rem;color:#333;cursor:pointer;text-align:left;
+        font-family:'Inter',sans-serif;transition:all 0.15s;
+    }
+    .mob-menu-items button:hover{background:#f8f6f3;border-color:#8B6F47;color:#8B6F47;}
+    .mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:599;}
+    .mob-overlay.open{display:block;}
+
+    /* ── MOBILE DETAIL: bottom sheet ── */
+    .detail{
+        width:100%!important;height:auto!important;max-height:75vh;
+        top:auto!important;bottom:0!important;right:0!important;left:0!important;
+        border-left:none!important;border-radius:16px 16px 0 0;
+        transform:translateY(100%)!important;
+        box-shadow:0 -4px 24px rgba(0,0,0,0.12);
+    }
+    .detail.open{transform:translateY(0)!important;}
     .dnav{padding:0.5rem 0.8rem;}
+    .dnav::before{
+        content:'';display:block;width:36px;height:4px;background:#ddd;border-radius:2px;
+        margin:0 auto 0.4rem;
+    }
     .dclose{font-size:1.6rem;padding:0.4rem 0.6rem;}
-    .dhead{padding:0.8rem 1rem 0.4rem;}
-    .dbody{padding:0 1rem 4rem;}
-    .itin{width:calc(100% - 32px);left:16px;right:16px;bottom:8px;max-height:55vh;}
-    .itin-export-grid{flex-direction:column;}
-    .itin-export-btn{justify-content:center;}
-    .grid-view{padding:1rem;}
-    .grid-inner{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.75rem;}
+    .dhead{padding:0.6rem 1rem 0.3rem;}
+    .dhead h2{font-size:1.1rem;}
+    .dimg{height:150px;}
+    .dbody{padding:0 1rem 2rem;}
+
+    /* ── MOBILE ITINERARY ── */
+    .itin{width:100%!important;left:0!important;right:0!important;bottom:0!important;
+        max-height:60vh;border-radius:16px 16px 0 0;
+        box-shadow:0 -4px 24px rgba(0,0,0,0.12);
+    }
+    .itin-export-grid{flex-direction:row;}
+    .itin-export-btn{flex:1;justify-content:center;font-size:0.8rem;}
+
+    /* ── MOBILE GRID ── */
+    .grid-view{padding:0.75rem;}
+    .grid-inner{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0.6rem;}
+    .ccard-map-btn{font-size:0.7rem;padding:0.3rem;}
+
+    /* ── MOBILE MISC ── */
     .mleg{display:none;}
-    .nav-links{gap:0.2rem;}
-    .nav-link{font-size:0.72rem;padding:0.25rem 0.4rem;}
-    .suggest-btn{font-size:0;padding:0.3rem 0.5rem;}
-    .suggest-btn::before{content:'+';font-size:0.85rem;}
     .geo-prompt{padding:1.5rem;max-width:calc(100% - 2rem);}
-    /* Touch CSS */
+    .alpha-index{gap:0.2rem;}
+    .alpha-btn{width:26px;height:26px;font-size:0.7rem;}
+
+    /* Touch */
     .detail,.itin,.filter-sheet,.grid-view{-webkit-overflow-scrolling:touch;touch-action:pan-y;}
     body{touch-action:manipulation;}
 }
+
+/* Hamburger button - hidden on desktop */
+.mob-menu-btn{
+    display:none;align-items:center;justify-content:center;
+    width:34px;height:34px;background:none;border:1px solid #e8e4de;
+    border-radius:8px;cursor:pointer;flex-shrink:0;order:3;
+}
+.mob-menu-btn span{display:block;width:18px;height:2px;background:#8B6F47;position:relative;}
+.mob-menu-btn span::before,.mob-menu-btn span::after{
+    content:'';position:absolute;width:18px;height:2px;background:#8B6F47;left:0;
+}
+.mob-menu-btn span::before{top:-5px;}
+.mob-menu-btn span::after{top:5px;}
 /* ── NAV BUTTONS ── */
 .nav-links{display:flex;gap:0.4rem;align-items:center;}
 .nav-link{
@@ -550,6 +614,7 @@ select:focus{outline:none;border-color:#8B6F47;}
             <button class="nav-link itin-nav-btn" id="itinNavBtn" onclick="window._toggleItin()">🧀 Mon itinéraire <span class="itin-badge" id="itinBadge"></span><span class="itin-tip show" id="itinTip">Cliquez sur un producteur pour l'ajouter à votre tournée</span></button>
         </div>
         <button class="suggest-btn" onclick="window._openPage('suggest')" title="Suggérer un fromage">+ Suggérer un fromage</button>
+        <button class="mob-menu-btn" id="mobMenuBtn" onclick="window._openMobMenu()"><span></span></button>
     </header>
     <div class="filter-bar" id="filterBar">
         <span class="bar-label">Filtrer par</span>
@@ -685,6 +750,18 @@ select:focus{outline:none;border-color:#8B6F47;}
                 <button type="submit" class="form-submit">Envoyer la suggestion</button>
             </form>
         </div>
+    </div>
+</div>
+
+<!-- Mobile menu drawer -->
+<div class="mob-overlay" id="mobOverlay" onclick="window._closeMobMenu()"></div>
+<div class="mob-menu" id="mobMenu">
+    <button class="mob-menu-close" onclick="window._closeMobMenu()">&times;</button>
+    <div class="mob-menu-items">
+        <button onclick="window._toggleItin();window._closeMobMenu();">Mon itinéraire <span id="mobItinCount"></span></button>
+        <button onclick="window._openPage('suggest');window._closeMobMenu();">Suggérer un fromage</button>
+        <button onclick="window._openPage('about');window._closeMobMenu();">À propos</button>
+        <button onclick="window._openPage('contact');window._closeMobMenu();">Contact</button>
     </div>
 </div>
 
@@ -868,8 +945,10 @@ function initMap(){
     });
 
     // Show/hide permanent labels based on zoom
-    S.map.on('zoomend',function(){updateLabels();});
-    S.map.on('moveend',function(){updateLabels();});
+    var _labelTimer=null;
+    function debouncedLabels(){if(_labelTimer)clearTimeout(_labelTimer);_labelTimer=setTimeout(updateLabels,200);}
+    S.map.on('zoomend',debouncedLabels);
+    S.map.on('moveend',debouncedLabels);
 
     S.map.on('click',function(e){
         if(S.focus!==null&&!e.originalEvent._fromMarker){
@@ -1396,7 +1475,7 @@ window._focus=function(idx){
             if(c.pr)c.pr.forEach(function(p){if(p.la&&p.lo){clat+=p.la;clon+=p.lo;cn2++;}});
             if(cn2>0){
                 clat/=cn2;clon/=cn2;
-                var targetZoom=Math.max(S.map.getZoom(),8);
+                var targetZoom=Math.min(Math.max(S.map.getZoom(),8),11);
                 var point=S.map.project([clat,clon],targetZoom);
                 point.x-=panelPx;
                 var offsetLL=S.map.unproject(point,targetZoom);
@@ -1979,8 +2058,21 @@ window._sendSuggestion=function(form){
     window.location.href='mailto:lesfromagesdubonheur@gmail.com?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
     window._closePage();
 };
+// Mobile menu
+window._openMobMenu=function(){
+    document.getElementById('mobMenu').classList.add('open');
+    document.getElementById('mobOverlay').classList.add('open');
+    // Update itinerary count
+    var cnt=S.itin?S.itin.filter(function(s){return !s.isGeo;}).length:0;
+    var el=document.getElementById('mobItinCount');
+    if(el)el.textContent=cnt>0?' ('+cnt+')':'';
+};
+window._closeMobMenu=function(){
+    document.getElementById('mobMenu').classList.remove('open');
+    document.getElementById('mobOverlay').classList.remove('open');
+};
 document.addEventListener('keydown',function(e){
-    if(e.key==='Escape'){window._closePage();window._goHome();}
+    if(e.key==='Escape'){window._closePage();window._goHome();window._closeMobMenu();}
 });
 
 })();
