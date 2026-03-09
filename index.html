@@ -378,10 +378,18 @@ select:focus{outline:none;border-color:#8B6F47;}
 .cheese-tooltip::before{border-top-color:#e8e4de!important;}
 .cheese-tooltip.perm-label{background:rgba(255,255,255,0.95)!important;font-size:0.72rem!important;padding:0.2rem 0.5rem!important;box-shadow:0 1px 4px rgba(0,0,0,0.1)!important;pointer-events:none!important;font-weight:500!important;letter-spacing:0.01em!important;}
 .group-label{
-    background:#8B6F47;color:#fff;padding:0.2rem 0.55rem;border-radius:10px;
-    font-size:0.7rem;font-weight:600;font-family:'Inter',sans-serif;
-    white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.15);cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;cursor:pointer;
     transition:transform 0.15s;
+}
+.group-label .gl-num{
+    background:#8B6F47;color:#fff;border-radius:50%;width:32px;height:32px;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:11px;font-family:'Inter',sans-serif;
+    box-shadow:0 2px 6px rgba(139,111,71,0.3);border:2px solid #fff;
+}
+.group-label .gl-txt{
+    color:#8B6F47;font-size:9px;font-weight:600;font-family:'Inter',sans-serif;
+    margin-top:2px;text-shadow:0 0 3px #fff,0 0 3px #fff;
 }
 .group-label:hover{transform:scale(1.1);}
 .group-tooltip{max-width:250px!important;pointer-events:auto!important;}
@@ -431,34 +439,16 @@ select:focus{outline:none;border-color:#8B6F47;}
     .filter-bar{display:none!important;}
     .view-bar{padding:0.3rem 0.75rem;}
 
-    /* Hide nav-links and suggest, show hamburger */
+    /* Hide desktop nav, show bottom tab bar */
     .nav-links{display:none!important;}
     .suggest-btn{display:none!important;}
-    .mob-menu-btn{display:flex!important;}
-
-    /* Mobile menu drawer */
-    .mob-menu{
-        display:none;position:fixed;top:0;right:0;width:260px;height:100%;
-        background:#fff;z-index:600;box-shadow:-4px 0 20px rgba(0,0,0,0.1);
-        flex-direction:column;padding:1rem;
-        transform:translateX(100%);transition:transform 0.3s ease;
-    }
-    .mob-menu.open{display:flex;transform:translateX(0);}
-    .mob-menu-close{align-self:flex-end;background:none;border:none;font-size:1.5rem;cursor:pointer;color:#999;padding:0.3rem;}
-    .mob-menu-items{display:flex;flex-direction:column;gap:0.5rem;margin-top:1rem;}
-    .mob-menu-items button{
-        width:100%;padding:0.65rem 0.8rem;border:1px solid #e8e4de;border-radius:8px;
-        background:#fff;font-size:0.88rem;color:#333;cursor:pointer;text-align:left;
-        font-family:'Inter',sans-serif;transition:all 0.15s;
-    }
-    .mob-menu-items button:hover{background:#f8f6f3;border-color:#8B6F47;color:#8B6F47;}
-    .mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:599;}
-    .mob-overlay.open{display:block;}
+    .mob-menu-btn{display:none!important;}
+    .mob-tab-bar{display:flex!important;}
 
     /* ── MOBILE DETAIL: bottom sheet ── */
     .detail{
-        width:100%!important;height:auto!important;max-height:75vh;
-        top:auto!important;bottom:0!important;right:0!important;left:0!important;
+        width:100%!important;height:auto!important;max-height:70vh;
+        top:auto!important;bottom:56px!important;right:0!important;left:0!important;
         border-left:none!important;border-radius:16px 16px 0 0;
         transform:translateY(100%)!important;
         box-shadow:0 -4px 24px rgba(0,0,0,0.12);
@@ -476,15 +466,15 @@ select:focus{outline:none;border-color:#8B6F47;}
     .dbody{padding:0 1rem 2rem;}
 
     /* ── MOBILE ITINERARY ── */
-    .itin{width:100%!important;left:0!important;right:0!important;bottom:0!important;
-        max-height:60vh;border-radius:16px 16px 0 0;
+    .itin{width:100%!important;left:0!important;right:0!important;bottom:56px!important;
+        max-height:55vh;border-radius:16px 16px 0 0;
         box-shadow:0 -4px 24px rgba(0,0,0,0.12);
     }
     .itin-export-grid{flex-direction:row;}
     .itin-export-btn{flex:1;justify-content:center;font-size:0.8rem;}
 
     /* ── MOBILE GRID ── */
-    .grid-view{padding:0.75rem;}
+    .grid-view{padding:0.75rem;padding-bottom:60px;}
     .grid-inner{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0.6rem;}
     .ccard-map-btn{font-size:0.7rem;padding:0.3rem;}
 
@@ -493,11 +483,62 @@ select:focus{outline:none;border-color:#8B6F47;}
     .geo-prompt{padding:1.5rem;max-width:calc(100% - 2rem);}
     .alpha-index{gap:0.2rem;}
     .alpha-btn{width:26px;height:26px;font-size:0.7rem;}
+    .app{padding-bottom:56px;}
 
     /* Touch */
     .detail,.itin,.filter-sheet,.grid-view{-webkit-overflow-scrolling:touch;touch-action:pan-y;}
     body{touch-action:manipulation;}
 }
+
+/* ── MOBILE TAB BAR ── */
+.mob-tab-bar{
+    display:none;
+    position:fixed;bottom:0;left:0;right:0;z-index:600;
+    background:rgba(255,255,255,0.97);
+    backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    border-top:1px solid rgba(0,0,0,0.08);
+    height:56px;
+    align-items:stretch;justify-content:space-around;
+    padding:0;padding-bottom:env(safe-area-inset-bottom,0);
+}
+.mob-tab{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:2px;background:none;border:none;cursor:pointer;
+    color:#999;font-family:'Inter',sans-serif;font-size:0.62rem;font-weight:500;
+    transition:color 0.2s;position:relative;padding:4px 0;
+    -webkit-tap-highlight-color:transparent;
+}
+.mob-tab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.mob-tab.active{color:#8B6F47;}
+.mob-tab .tab-badge{
+    position:absolute;top:4px;right:calc(50% - 16px);
+    background:#c0392b;color:#fff;font-size:0.55rem;font-weight:700;
+    min-width:16px;height:16px;border-radius:8px;
+    display:none;align-items:center;justify-content:center;padding:0 4px;
+}
+.mob-tab .tab-badge.has-items{display:flex;}
+
+/* "Plus" popup from tab bar */
+.mob-plus-overlay{
+    display:none;position:fixed;top:0;left:0;right:0;bottom:0;
+    background:rgba(0,0,0,0.3);z-index:590;
+}
+.mob-plus-overlay.open{display:block;}
+.mob-plus-menu{
+    display:none;position:fixed;bottom:60px;right:8px;
+    background:#fff;border-radius:12px;
+    box-shadow:0 8px 30px rgba(0,0,0,0.15);
+    z-index:595;overflow:hidden;min-width:200px;
+}
+.mob-plus-menu.open{display:block;}
+.mob-plus-menu button{
+    display:block;width:100%;text-align:left;
+    padding:0.75rem 1rem;background:none;border:none;
+    font-family:'Inter',sans-serif;font-size:0.88rem;color:#333;
+    cursor:pointer;border-bottom:1px solid #f0ede8;
+}
+.mob-plus-menu button:last-child{border-bottom:none;}
+.mob-plus-menu button:active{background:#f8f6f3;}
 
 /* Hamburger button - hidden on desktop */
 .mob-menu-btn{
@@ -797,6 +838,35 @@ select:focus{outline:none;border-color:#8B6F47;}
     </div>
 </div>
 
+<!-- Mobile bottom tab bar -->
+<nav class="mob-tab-bar" id="mobTabBar">
+    <button class="mob-tab active" id="tabCarte" onclick="window._mobTab('map')">
+        <svg viewBox="0 0 24 24"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z"/><path d="M8 2v16"/><path d="M16 6v16"/></svg>
+        <span>Carte</span>
+    </button>
+    <button class="mob-tab" id="tabFromages" onclick="window._mobTab('grid')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span>Fromages</span>
+    </button>
+    <button class="mob-tab" id="tabItin" onclick="window._mobTab('itin')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+        <span>Itinéraire</span>
+        <span class="tab-badge" id="tabItinBadge">0</span>
+    </button>
+    <button class="mob-tab" id="tabPlus" onclick="window._mobTab('plus')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+        <span>Plus</span>
+    </button>
+</nav>
+
+<!-- Mobile "Plus" menu overlay -->
+<div class="mob-plus-overlay" id="mobPlusOverlay" onclick="window._closeMobPlus()"></div>
+<div class="mob-plus-menu" id="mobPlusMenu">
+    <button onclick="window._openPage('suggest');window._closeMobPlus();">Suggérer un fromage</button>
+    <button onclick="window._openPage('about');window._closeMobPlus();">À propos</button>
+    <button onclick="window._openPage('contact');window._closeMobPlus();">Contact</button>
+</div>
+
 <footer class="site-footer">
     &copy; 2025–2026 <a href="mailto:lesfromagesdubonheur@gmail.com">Les Fromages du Bonheur</a> · Carte interactive des fromages de France · Plus de 260 fromages, producteurs et itinéraires fromagers · Données compilées à la main avec amour
 </footer>
@@ -829,7 +899,7 @@ var FLAG_SVG='<svg width="12" height="12" viewBox="0 0 24 24" fill="white" strok
 
 var S={
     data:null,map:null,cluster:null,markers:[],focus:null,
-    filtered:[],itin:[],depts:null,
+    filtered:[],itin:[],depts:null,currentView:'map',
     zoneL:null,localL:null,focusL:null,routeL:null,
     zoneOn:false,pateNames:{},userLoc:null,geoMarker:null,
     communeCache:{},communeLoading:{},
@@ -961,8 +1031,8 @@ function initMap(){
         iconCreateFunction:function(cl){
             var n=cl.getChildCount(),sz=n>50?46:n>20?40:34;
             return L.divIcon({
-                html:'<div style="background:#8B6F47;color:#fff;border-radius:50%;width:'+sz+'px;height:'+sz+'px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:'+(sz>40?12:10)+'px;box-shadow:0 2px 8px rgba(139,111,71,0.3);">'+n+'</div>',
-                iconSize:[sz,sz],className:''
+                html:'<div style="display:flex;flex-direction:column;align-items:center;"><div style="background:#8B6F47;color:#fff;border-radius:50%;width:'+sz+'px;height:'+sz+'px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:'+(sz>40?13:11)+'px;box-shadow:0 2px 8px rgba(139,111,71,0.3);border:2px solid #fff;">'+n+'</div><span style="color:#8B6F47;font-size:9px;font-weight:600;font-family:Inter,sans-serif;margin-top:2px;text-shadow:0 0 3px #fff,0 0 3px #fff;">fromages</span></div>',
+                iconSize:[sz,sz+16],iconAnchor:[sz/2,(sz+16)/2],className:''
             });
         }
     }).addTo(S.map);
@@ -1243,7 +1313,7 @@ function updateLabels(){
             var listHtml=names.map(function(n){return '<div style="padding:1px 0;">'+n+'</div>';}).join('');
             var label=L.marker(ll,{
                 icon:L.divIcon({
-                    html:'<div class="group-label">'+g.length+' fromages</div>',
+                    html:'<div class="group-label"><div class="gl-num">'+g.length+'</div><span class="gl-txt">fromages</span></div>',
                     className:'',iconSize:[0,0],iconAnchor:[0,12]
                 }),
                 interactive:true,zIndexOffset:1000
@@ -1629,6 +1699,7 @@ function highlightZone(idx, doneCb){
 
 // ── VIEW SWITCH ──
 window._view=function(v){
+    S.currentView=v;
     var m=document.getElementById('map'),g=document.getElementById('gridView'),btns=document.querySelectorAll('.vbtn');
     if(v==='map'){m.style.display='block';g.classList.remove('active');btns[0].classList.add('active');btns[1].classList.remove('active');setTimeout(function(){S.map.invalidateSize();},0);}
     else{m.style.display='none';g.classList.add('active');btns[0].classList.remove('active');btns[1].classList.add('active');renderGrid();g.scrollTop=0;}
@@ -1816,6 +1887,7 @@ window._toggleItin=function(){
     else{el.classList.add('open');renderItin();drawRoute();}
 };
 function updateItinBadge(){
+    if(window._updateTabBadge) window._updateTabBadge();
     var badge=document.getElementById('itinBadge');
     var tip=document.getElementById('itinTip');
     if(!badge)return;
@@ -2090,18 +2162,52 @@ window._sendSuggestion=function(form){
     window.location.href='mailto:lesfromagesdubonheur@gmail.com?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
     window._closePage();
 };
-// Mobile menu
-window._openMobMenu=function(){
-    document.getElementById('mobMenu').classList.add('open');
-    document.getElementById('mobOverlay').classList.add('open');
-    // Update itinerary count
-    var cnt=S.itin?S.itin.filter(function(s){return !s.isGeo;}).length:0;
-    var el=document.getElementById('mobItinCount');
-    if(el)el.textContent=cnt>0?' ('+cnt+')':'';
+// Mobile menu (legacy - kept for compatibility)
+window._openMobMenu=function(){};
+window._closeMobMenu=function(){};
+
+// Mobile bottom tab bar
+window._mobTab=function(tab){
+    // Update active state
+    var tabs=document.querySelectorAll('.mob-tab');
+    tabs.forEach(function(t){t.classList.remove('active');});
+
+    if(tab==='map'){
+        document.getElementById('tabCarte').classList.add('active');
+        window._view('map');
+        window._closeMobPlus();
+    }else if(tab==='grid'){
+        document.getElementById('tabFromages').classList.add('active');
+        window._view('grid');
+        window._closeMobPlus();
+    }else if(tab==='itin'){
+        document.getElementById('tabItin').classList.add('active');
+        window._view('map');
+        window._toggleItin();
+        window._closeMobPlus();
+    }else if(tab==='plus'){
+        document.getElementById('tabPlus').classList.add('active');
+        document.getElementById('mobPlusMenu').classList.add('open');
+        document.getElementById('mobPlusOverlay').classList.add('open');
+    }
 };
-window._closeMobMenu=function(){
-    document.getElementById('mobMenu').classList.remove('open');
-    document.getElementById('mobOverlay').classList.remove('open');
+window._closeMobPlus=function(){
+    document.getElementById('mobPlusMenu').classList.remove('open');
+    document.getElementById('mobPlusOverlay').classList.remove('open');
+    // Restore active tab based on current view
+    var tabs=document.querySelectorAll('.mob-tab');
+    tabs.forEach(function(t){t.classList.remove('active');});
+    if(S.currentView==='grid') document.getElementById('tabFromages').classList.add('active');
+    else document.getElementById('tabCarte').classList.add('active');
+};
+// Update itinerary badge on tab bar
+window._updateTabBadge=function(){
+    var cnt=S.itin?S.itin.filter(function(s){return !s.isGeo;}).length:0;
+    var badge=document.getElementById('tabItinBadge');
+    if(badge){
+        badge.textContent=cnt;
+        badge.classList.toggle('has-items',cnt>0);
+    }
 };
 document.addEventListener('keydown',function(e){
     if(e.key==='Escape'){window._closePage();window._goHome();window._closeMobMenu();}
