@@ -1123,30 +1123,33 @@ function initMap(){
         }
     }).addTo(S.map);
 
-    // Custom cluster click: zoom in OR show selector if all at same spot
+    // Custom cluster click: always show cheese selector list
     S.cluster.on('clusterclick',function(ev){
         var childMarkers=ev.layer.getAllChildMarkers();
         var filtered=childMarkers.filter(function(m){return S.filtered.indexOf(m.cheeseIdx)>=0;});
-        if(filtered.length===0){
-            // Fallback: zoom to cluster bounds
-            S.map.fitBounds(ev.layer.getBounds(),{padding:[30,30]});
+        if(filtered.length===0)return;
+        if(filtered.length===1){
+            window._focus(filtered[0].cheeseIdx);
             return;
         }
-        // Check if all child markers are at same coords (within ~100m)
-        var ref=filtered[0];
-        var allSameSpot=filtered.every(function(m){
-            return Math.abs(m._chLat-ref._chLat)<0.001&&Math.abs(m._chLon-ref._chLon)<0.001;
-        });
-        if(allSameSpot){
-            // All co-located: show selector immediately, no zoom
-            if(filtered.length===1){
-                window._focus(filtered[0].cheeseIdx);
-            }else{
-                window._showCheeseSelector(filtered,L.latLng(ref._chLat,ref._chLon));
+        // Group markers by location (within ~100m)
+        var groups=[];
+        filtered.forEach(function(m){
+            var found=false;
+            for(var g=0;g<groups.length;g++){
+                if(Math.abs(groups[g][0]._chLat-m._chLat)<0.001&&Math.abs(groups[g][0]._chLon-m._chLon)<0.001){
+                    groups[g].push(m);found=true;break;
+                }
             }
+            if(!found)groups.push([m]);
+        });
+        if(filtered.length<=20||groups.length<=5){
+            // Manageable number: always show selector
+            window._showCheeseSelector(filtered,ev.latlng);
         }else{
-            // Different locations: zoom to cluster bounds
-            S.map.fitBounds(ev.layer.getBounds(),{padding:[30,30]});
+            // Too many: zoom in to reduce cluster size
+            var curZoom=S.map.getZoom();
+            S.map.setView(ev.latlng,Math.min(curZoom+2,18),{animate:true});
         }
     });
 
