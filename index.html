@@ -741,6 +741,8 @@ select:focus{outline:none;border-color:#8B6F47;}
             Filtres <span class="arrow" id="filterArrow">▼</span>
         </button>
         <div class="nav-links">
+            <button class="nav-link" onclick="window._openPage('defs')">Définitions</button>
+            <button class="nav-link" onclick="window._openPage('reco')">Recommandations</button>
             <button class="nav-link" onclick="window._openPage('about')">À propos</button>
             <button class="nav-link" onclick="window._openPage('contact')">Contact</button>
             <button class="nav-link itin-nav-btn" id="itinNavBtn" onclick="window._toggleItin()">🧀 Mon itinéraire <span class="itin-badge" id="itinBadge"></span><span class="itin-tip show" id="itinTip">Cliquez sur un producteur pour l'ajouter à votre tournée</span></button>
@@ -841,6 +843,26 @@ select:focus{outline:none;border-color:#8B6F47;}
     </div>
 </div>
 
+<!-- ── FULL PAGE: DÉFINITIONS ── -->
+<div class="full-page" id="pageDefs">
+    <div class="full-page-inner">
+        <div class="page-content">
+            <h2 style="font-family:'Playfair Display',serif;text-align:center;margin:1.5rem 0 0.5rem;color:#8B6F47;">Définitions</h2>
+            <p style="text-align:center;color:#999;font-size:1rem;padding:2rem 0;">Section en construction — à venir prochainement !</p>
+        </div>
+    </div>
+</div>
+
+<!-- ── FULL PAGE: RECOMMANDATIONS D'ITINÉRAIRE ── -->
+<div class="full-page" id="pageReco">
+    <div class="full-page-inner">
+        <div class="page-content">
+            <h2 style="font-family:'Playfair Display',serif;text-align:center;margin:1.5rem 0 0.5rem;color:#8B6F47;">Recommandations d'itinéraire</h2>
+            <p style="text-align:center;color:#999;font-size:1rem;padding:2rem 0;">Section en construction — à venir prochainement !</p>
+        </div>
+    </div>
+</div>
+
 <!-- ── FULL PAGE: À PROPOS ── -->
 <div class="full-page" id="pageAbout">
     <div class="full-page-inner">
@@ -893,6 +915,8 @@ select:focus{outline:none;border-color:#8B6F47;}
     <div class="mob-menu-items">
         <button onclick="window._toggleItin();window._closeMobMenu();">Mon itinéraire <span id="mobItinCount"></span></button>
         <button onclick="window._openPage('suggest');window._closeMobMenu();">Suggérer un fromage</button>
+        <button onclick="window._openPage('defs');window._closeMobMenu();">Définitions</button>
+        <button onclick="window._openPage('reco');window._closeMobMenu();">Recommandations</button>
         <button onclick="window._openPage('about');window._closeMobMenu();">À propos</button>
         <button onclick="window._openPage('contact');window._closeMobMenu();">Contact</button>
     </div>
@@ -923,6 +947,8 @@ select:focus{outline:none;border-color:#8B6F47;}
 <div class="mob-plus-overlay" id="mobPlusOverlay" onclick="window._closeMobPlus()"></div>
 <div class="mob-plus-menu" id="mobPlusMenu">
     <button onclick="window._openPage('suggest');window._closeMobPlus();">Suggérer un fromage</button>
+    <button onclick="window._openPage('defs');window._closeMobPlus();">Définitions</button>
+    <button onclick="window._openPage('reco');window._closeMobPlus();">Recommandations</button>
     <button onclick="window._openPage('about');window._closeMobPlus();">À propos</button>
     <button onclick="window._openPage('contact');window._closeMobPlus();">Contact</button>
 </div>
@@ -1009,7 +1035,7 @@ function initFilterToggle(){
 }
 
 // ── MOBILE FILTER SHEET ──
-function openFilterSheet(){
+window._openFilterSheet=function(){
     // Sync desktop→mobile
     document.getElementById('fAnimalM').value=document.getElementById('fAnimal').value;
     document.getElementById('fLabelM').value=document.getElementById('fLabel').value;
@@ -1025,7 +1051,7 @@ function openFilterSheet(){
     sheet.style.display='flex';
     overlay.classList.add('active');
     requestAnimationFrame(function(){sheet.classList.add('open');});
-}
+};
 window._closeFilterSheet=function(){
     var sheet=document.getElementById('filterSheet');
     var overlay=document.getElementById('fsOverlay');
@@ -1097,6 +1123,18 @@ function initMap(){
             });
         }
     }).addTo(S.map);
+
+    // When clicking a cluster at max zoom, show cheese selector instead of spiderfying
+    S.cluster.on('clusterclick',function(ev){
+        var z=S.map.getZoom();
+        if(z>=ZT-1){
+            var childMarkers=ev.layer.getAllChildMarkers();
+            var filtered=childMarkers.filter(function(m){return S.filtered.indexOf(m.cheeseIdx)>=0;});
+            if(filtered.length>0){
+                window._showCheeseSelector(filtered,ev.latlng);
+            }
+        }
+    });
 
     addGeoCtrl();addZoneCtrl();addLegend();
 
@@ -1507,6 +1545,8 @@ function handleHash(){
 window._focus=function(idx){
     S.focus=idx;
     var c=S.data.cheeses[idx];
+    // Track cheese view in GA
+    if(typeof gtag==='function')gtag('event','cheese_view',{cheese_name:c.nm,cheese_label:c.lb||'',event_category:'engagement'});
     document.getElementById('dName').textContent=c.nm;
     document.getElementById('dLabel').textContent=c.lb||'';
     var dimg=document.getElementById('dImg');
@@ -1838,6 +1878,8 @@ window._addItin=function(pr,cn){
         showToast('Déjà dans l\'itinéraire');return;
     }
     S.itin.push({pr:pr,cn:cn});
+    // Track itinerary addition in GA
+    if(typeof gtag==='function')gtag('event','itinerary_add',{producer_name:pr.n,commune:cn,itinerary_size:S.itin.length,event_category:'itinerary'});
     renderItin();
     document.getElementById('itin').classList.add('open');
     updateItinBadge();
@@ -1916,6 +1958,9 @@ function renderItin(){
 
 window._exportItin=function(mode){
     if(S.itin.length<2){showToast('Ajoutez au moins 2 étapes');return;}
+    // Track itinerary export in GA
+    var stops=S.itin.map(function(s){return s.pr.n;}).join(' → ');
+    if(typeof gtag==='function')gtag('event','itinerary_export',{export_mode:mode,stops_count:S.itin.length,itinerary_stops:stops,event_category:'itinerary'});
     var pts=S.itin.map(function(s){return s.pr.la+','+s.pr.lo;});
 
     if(mode==='driving'||mode==='walking'){
@@ -2184,6 +2229,8 @@ function highlightMatch(text,q){
 }
 
 function selectSuggestion(m){
+    // Track search selection in GA
+    if(typeof gtag==='function')gtag('event','search_select',{search_type:m.type,search_term:m.nm,event_category:'search'});
     sugBox.classList.remove('active');sugBox.innerHTML='';
     if(m.type==='cheese'){
         // Navigate to this specific cheese
@@ -2250,9 +2297,9 @@ try{
 }
 // ── PAGE NAVIGATION ──
 window._openPage=function(page){
-    if(page==='about'){
-        // Full page navigation
-        document.getElementById('pageAbout').classList.add('active');
+    var fullPages={about:'pageAbout',defs:'pageDefs',reco:'pageReco'};
+    if(fullPages[page]){
+        document.getElementById(fullPages[page]).classList.add('active');
         document.getElementById('homeBtn').classList.add('visible');
     }else{
         // Overlay for contact/suggest
@@ -2266,7 +2313,7 @@ window._closePage=function(){
     document.body.style.overflow='';
 };
 window._goHome=function(){
-    document.getElementById('pageAbout').classList.remove('active');
+    document.querySelectorAll('.full-page.active').forEach(function(el){el.classList.remove('active');});
     document.getElementById('homeBtn').classList.remove('visible');
 };
 window._sendSuggestion=function(form){
