@@ -31,6 +31,8 @@
 <!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-130CX45T2T"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-130CX45T2T');</script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧀</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧀</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css"/>
@@ -257,6 +259,26 @@ select:focus{outline:none;border-color:#8B6F47;}
 .ditem-l{font-size:0.65rem;color:#bbb;text-transform:uppercase;margin-bottom:0.1rem;}
 .ditem-v{font-size:0.85rem;color:#333;}
 .dtext{line-height:1.55;color:#666;font-size:0.85rem;}
+.dlegend{
+    margin-top:1rem;padding:0.6rem 0.75rem;
+    background:#f8f6f3;border-radius:8px;
+    display:flex;flex-wrap:wrap;gap:0.5rem 1rem;
+    align-items:center;
+}
+.dleg-title{
+    width:100%;font-size:0.7rem;font-weight:600;color:#999;
+    text-transform:uppercase;letter-spacing:0.3px;margin-bottom:0.1rem;
+}
+.dleg-row{
+    display:flex;align-items:center;gap:0.3rem;
+    font-size:0.75rem;color:#555;white-space:nowrap;
+}
+.dleg-dot{
+    width:16px;height:16px;border-radius:50%;
+    border:1.5px solid #fff;box-shadow:0 0 0 0.5px #ddd;
+    display:flex;align-items:center;justify-content:center;
+    font-size:8px;flex-shrink:0;
+}
 .prlist{list-style:none;}
 .pritem{
     background:#f8f6f3;padding:0.5rem 0.65rem;border-radius:6px;
@@ -1592,6 +1614,15 @@ window._focus=function(idx){
             inner.appendChild(t6);
         }));
     }
+
+    // Inline legend
+    var leg=document.createElement('div');leg.className='dlegend';
+    leg.innerHTML='<div class="dleg-title">Légende carte</div>'+
+        '<div class="dleg-row"><span class="dleg-dot" style="background:#8B6F47;font-size:9px;line-height:1;">'+CHEESE_EMOJI+'</span> Fromage</div>'+
+        '<div class="dleg-row"><span class="dleg-dot" style="background:#E8836B;">'+HOUSE_SVG.replace(/width="\d+"/g,'width="9"').replace(/height="\d+"/g,'height="9"')+'</span> Producteur</div>'+
+        '<div class="dleg-row"><span class="dleg-dot" style="background:#5D4037;">'+FLAG_SVG.replace(/width="\d+"/g,'width="9"').replace(/height="\d+"/g,'height="9"')+'</span> Commune éponyme</div>'+
+        '<div class="dleg-row"><span class="dleg-dot" style="background:#66BB6A;"></span> Zone de production</div>';
+    db.appendChild(leg);
 
     document.getElementById('detail').classList.add('open');
     document.getElementById('detailOverlay').classList.add('active');
