@@ -458,19 +458,19 @@ select:focus{outline:none;border-color:#8B6F47;}
     margin:0.6rem auto;
 }
 .filter-sheet-head{
-    padding:0.5rem 1rem;display:flex;justify-content:space-between;align-items:center;
-    border-bottom:1px solid #f0ede8;
+    padding:0.5rem 1rem;display:flex;align-items:center;gap:0.5rem;
+    border-bottom:1px solid #f0ede8;flex-shrink:0;
 }
-.filter-sheet-head h3{font-size:0.95rem;color:#333;font-weight:600;}
+.filter-sheet-head h3{font-size:0.95rem;color:#333;font-weight:600;margin-right:auto;}
+.filter-sheet-head-btns{display:flex;gap:0.4rem;}
 .filter-sheet-close{background:none;border:none;cursor:pointer;color:#bbb;font-size:1.4rem;padding:0.2rem;}
+.mbtn-sm{padding:0.3rem 0.7rem!important;font-size:0.75rem!important;min-height:auto!important;}
 .filter-sheet-body{padding:1rem;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;min-height:0;overscroll-behavior:contain;}
 .filter-sheet-body .fs-group{margin-bottom:1rem;}
 .filter-sheet-body .fs-label{font-size:0.75rem;color:#8B6F47;font-weight:600;text-transform:uppercase;letter-spacing:0.3px;margin-bottom:0.4rem;display:block;}
 .filter-sheet-body select{width:100%;padding:0.5rem;font-size:0.9rem;border-radius:8px;}
 .filter-sheet-body .fs-pills{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.3rem;}
 .filter-sheet-body .pill{font-size:0.85rem;padding:0.4rem 0.8rem;}
-.filter-sheet-btns{padding:0.75rem 1rem;display:flex;gap:0.5rem;border-top:1px solid #f0ede8;flex-shrink:0;padding-bottom:calc(0.75rem + env(safe-area-inset-bottom,0px));}
-.filter-sheet-btns .mbtn{margin-top:0;}
 
 /* ── RESPONSIVE ── */
 @media(max-width:768px){
@@ -526,7 +526,6 @@ select:focus{outline:none;border-color:#8B6F47;}
 
     /* ── MOBILE FILTER SHEET ── */
     .filter-sheet{bottom:56px!important;max-height:calc(80vh - 56px)!important;}
-    .filter-sheet-btns{padding-bottom:calc(0.75rem + env(safe-area-inset-bottom,0px))!important;background:#fff;position:sticky;bottom:0;z-index:1;}
 
     /* ── MOBILE MISC ── */
     .mleg{font-size:0.65rem;padding:0.35rem 0.5rem;line-height:1.5;margin-bottom:56px!important;}
@@ -742,7 +741,7 @@ select:focus{outline:none;border-color:#8B6F47;}
         </button>
         <div class="nav-links">
             <button class="nav-link" onclick="window._openPage('defs')">Définitions</button>
-            <button class="nav-link" onclick="window._openPage('reco')">Recommandations</button>
+            <button class="nav-link" onclick="window._openPage('reco')">Suggestions d'itinéraires</button>
             <button class="nav-link" onclick="window._openPage('about')">À propos</button>
             <button class="nav-link" onclick="window._openPage('contact')">Contact</button>
             <button class="nav-link itin-nav-btn" id="itinNavBtn" onclick="window._toggleItin()">🧀 Mon itinéraire <span class="itin-badge" id="itinBadge"></span><span class="itin-tip show" id="itinTip">Cliquez sur un producteur pour l'ajouter à votre tournée</span></button>
@@ -810,6 +809,10 @@ select:focus{outline:none;border-color:#8B6F47;}
     <div class="filter-sheet-handle"></div>
     <div class="filter-sheet-head">
         <h3>Filtres</h3>
+        <div class="filter-sheet-head-btns">
+            <button class="mbtn mbtn-sm mbtn-outline" onclick="window._resetFilters()">Réinitialiser</button>
+            <button class="mbtn mbtn-sm" onclick="window._applyMobileFilters()">Appliquer</button>
+        </div>
         <button class="filter-sheet-close" onclick="window._closeFilterSheet()">&times;</button>
     </div>
     <div class="filter-sheet-body">
@@ -837,10 +840,6 @@ select:focus{outline:none;border-color:#8B6F47;}
             </div>
         </div>
     </div>
-    <div class="filter-sheet-btns">
-        <button class="mbtn mbtn-outline" onclick="window._resetFilters()">Réinitialiser</button>
-        <button class="mbtn" onclick="window._applyMobileFilters()">Appliquer</button>
-    </div>
 </div>
 
 <!-- ── FULL PAGE: DÉFINITIONS ── -->
@@ -857,7 +856,7 @@ select:focus{outline:none;border-color:#8B6F47;}
 <div class="full-page" id="pageReco">
     <div class="full-page-inner">
         <div class="page-content">
-            <h2 style="font-family:'Playfair Display',serif;text-align:center;margin:1.5rem 0 0.5rem;color:#8B6F47;">Recommandations d'itinéraire</h2>
+            <h2 style="font-family:'Playfair Display',serif;text-align:center;margin:1.5rem 0 0.5rem;color:#8B6F47;">Suggestions d'itinéraires</h2>
             <p style="text-align:center;color:#999;font-size:1rem;padding:2rem 0;">Section en construction — à venir prochainement !</p>
         </div>
     </div>
@@ -916,7 +915,7 @@ select:focus{outline:none;border-color:#8B6F47;}
         <button onclick="window._toggleItin();window._closeMobMenu();">Mon itinéraire <span id="mobItinCount"></span></button>
         <button onclick="window._openPage('suggest');window._closeMobMenu();">Suggérer un fromage</button>
         <button onclick="window._openPage('defs');window._closeMobMenu();">Définitions</button>
-        <button onclick="window._openPage('reco');window._closeMobMenu();">Recommandations</button>
+        <button onclick="window._openPage('reco');window._closeMobMenu();">Suggestions d'itinéraires</button>
         <button onclick="window._openPage('about');window._closeMobMenu();">À propos</button>
         <button onclick="window._openPage('contact');window._closeMobMenu();">Contact</button>
     </div>
@@ -948,7 +947,7 @@ select:focus{outline:none;border-color:#8B6F47;}
 <div class="mob-plus-menu" id="mobPlusMenu">
     <button onclick="window._openPage('suggest');window._closeMobPlus();">Suggérer un fromage</button>
     <button onclick="window._openPage('defs');window._closeMobPlus();">Définitions</button>
-    <button onclick="window._openPage('reco');window._closeMobPlus();">Recommandations</button>
+    <button onclick="window._openPage('reco');window._closeMobPlus();">Suggestions d'itinéraires</button>
     <button onclick="window._openPage('about');window._closeMobPlus();">À propos</button>
     <button onclick="window._openPage('contact');window._closeMobPlus();">Contact</button>
 </div>
@@ -1124,16 +1123,24 @@ function initMap(){
         }
     }).addTo(S.map);
 
-    // When clicking a cluster at max zoom, show cheese selector instead of spiderfying
+    // When clicking a cluster, check if all markers are at same location
+    // If yes → show cheese selector; if no → default zoom behavior
     S.cluster.on('clusterclick',function(ev){
-        var z=S.map.getZoom();
-        if(z>=ZT-1){
-            var childMarkers=ev.layer.getAllChildMarkers();
-            var filtered=childMarkers.filter(function(m){return S.filtered.indexOf(m.cheeseIdx)>=0;});
-            if(filtered.length>0){
-                window._showCheeseSelector(filtered,ev.latlng);
-            }
+        var childMarkers=ev.layer.getAllChildMarkers();
+        var filtered=childMarkers.filter(function(m){return S.filtered.indexOf(m.cheeseIdx)>=0;});
+        if(filtered.length===0)return;
+        // Check if all child markers are at roughly the same coords (within ~50m)
+        var ref=filtered[0];
+        var allSameSpot=filtered.every(function(m){
+            return Math.abs(m._chLat-ref._chLat)<0.001&&Math.abs(m._chLon-ref._chLon)<0.001;
+        });
+        if(allSameSpot){
+            // All at same location → selector popup (no point zooming further)
+            ev.layer._group.zoomToShowLayer(filtered[0],function(){
+                window._showCheeseSelector(filtered,L.latLng(ref._chLat,ref._chLon));
+            });
         }
+        // else: default behavior (zoom in) handled by Leaflet.markercluster
     });
 
     addGeoCtrl();addZoneCtrl();addLegend();
@@ -1283,10 +1290,10 @@ function renderMap(){
         mk._chLat=lat;mk._chLon=lon;
         mk.on('click',function(e){
             if(e.originalEvent)e.originalEvent._fromMarker=true;
-            // Check if other cheeses share the same coords (within 50m)
+            // Check if other cheeses share the same coords (within ~100m)
             var colocated=S.markers.filter(function(m2){
                 if(S.filtered.indexOf(m2.cheeseIdx)<0) return false;
-                return Math.abs(m2._chLat-lat)<0.0005&&Math.abs(m2._chLon-lon)<0.0005;
+                return Math.abs(m2._chLat-lat)<0.001&&Math.abs(m2._chLon-lon)<0.001;
             });
             if(colocated.length>1){
                 window._showCheeseSelector(colocated,e.latlng);
