@@ -393,6 +393,27 @@ select:focus{outline:none;border-color:#8B6F47;}
 }
 .group-label:hover{transform:scale(1.1);}
 .group-tooltip{max-width:250px!important;pointer-events:auto!important;}
+
+/* ── CHEESE SELECTOR POPUP ── */
+.cheese-selector{
+    min-width:180px;max-width:260px;
+}
+.cheese-selector-title{
+    font-size:0.72rem;color:#999;font-weight:500;margin-bottom:0.4rem;
+    padding-bottom:0.3rem;border-bottom:1px solid #f0ede8;
+}
+.cheese-selector-item{
+    display:block;width:100%;text-align:left;
+    padding:0.45rem 0.5rem;margin:2px 0;
+    background:none;border:none;border-radius:6px;
+    font-family:'Inter',sans-serif;font-size:0.85rem;color:#333;
+    cursor:pointer;transition:background 0.15s;
+}
+.cheese-selector-item:hover{background:#f8f6f3;}
+.cheese-selector-item .cs-label{
+    display:inline-block;font-size:0.65rem;color:#8B6F47;
+    background:#f8f6f3;padding:1px 5px;border-radius:3px;margin-left:0.3rem;
+}
 .group-list{font-size:0.78rem!important;line-height:1.6!important;text-align:left!important;}
 
 /* ── MOBILE BOTTOM SHEET for filters ── */
@@ -1181,9 +1202,18 @@ function renderMap(){
         var mk=L.marker([lat,lon],{icon:icon});
         mk.bindTooltip(c.nm,{direction:'auto',offset:[0,-14],className:'cheese-tooltip',permanent:false});
         mk.cheeseIdx=idx;
+        mk._chLat=lat;mk._chLon=lon;
         mk.on('click',function(e){
             if(e.originalEvent)e.originalEvent._fromMarker=true;
-            window._focus(idx);
+            // Check if other cheeses share the same coords
+            var colocated=S.markers.filter(function(m2){
+                return m2._chLat===lat&&m2._chLon===lon&&S.filtered.indexOf(m2.cheeseIdx)>=0;
+            });
+            if(colocated.length>1){
+                window._showCheeseSelector(colocated,e.latlng);
+            }else{
+                window._focus(idx);
+            }
         });
         S.markers.push(mk);S.cluster.addLayer(mk);
     });
@@ -1237,7 +1267,16 @@ function drawLocal(){
                 var tip=(f.properties.nom||code)+' — '+n+' fromage'+(n>1?'s':'')+' :\n'+names.slice(0,5).join(', ')+(names.length>5?' …':'');
                 L.geoJSON(f,{style:function(){return{color:cl,weight:0.8,opacity:0.5,fillColor:cl,fillOpacity:op};}})
                 .bindTooltip(tip,{sticky:true,className:'zone-tip'})
-                .on('click',function(){if(cheeses.length===1)window._focus(cheeses[0]);})
+                .on('click',function(e){
+                    if(cheeses.length===1){window._focus(cheeses[0]);}
+                    else{
+                        var items=cheeses.map(function(i){var c2=S.data.cheeses[i];return{idx:i,nm:c2.nm,label:c2.lb||''};}).sort(function(a,b){return a.nm.localeCompare(b.nm);});
+                        var html='<div class="cheese-selector"><div class="cheese-selector-title">'+items.length+' fromages dans cette commune</div>';
+                        items.forEach(function(it){html+='<button class="cheese-selector-item" onclick="window._focus('+it.idx+');this.closest(\'.leaflet-popup\').querySelector(\'.leaflet-popup-close-button\').click();">'+it.nm+(it.label?' <span class=\"cs-label\">'+it.label+'</span>':'')+'</button>';});
+                        html+='</div>';
+                        L.popup({maxWidth:280}).setLatLng(e.latlng).setContent(html).openOn(S.map);
+                    }
+                })
                 .addTo(S.localL);
             });
         });
@@ -1585,6 +1624,29 @@ window._focus=function(idx){
             }
         },600);
     });
+};
+
+// Cheese selector popup for co-located markers
+window._showCheeseSelector=function(markers,latlng){
+    var items=markers.map(function(m){
+        var c=S.data.cheeses[m.cheeseIdx];
+        var label=c.lb||'';
+        return {idx:m.cheeseIdx, nm:c.nm, label:label};
+    }).sort(function(a,b){return a.nm.localeCompare(b.nm);});
+
+    var html='<div class="cheese-selector">';
+    html+='<div class="cheese-selector-title">'+items.length+' fromages à cet endroit</div>';
+    items.forEach(function(it){
+        html+='<button class="cheese-selector-item" onclick="window._focus('+it.idx+');this.closest(\'.leaflet-popup\').querySelector(\'.leaflet-popup-close-button\').click();">'+it.nm;
+        if(it.label) html+=' <span class="cs-label">'+it.label+'</span>';
+        html+='</button>';
+    });
+    html+='</div>';
+
+    L.popup({maxWidth:280,className:'cheese-selector-popup'})
+        .setLatLng(latlng)
+        .setContent(html)
+        .openOn(S.map);
 };
 
 window._zoomProducer=function(p,cheeseName){
