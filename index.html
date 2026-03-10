@@ -1123,8 +1123,10 @@ function initMap(){
         }
     }).addTo(S.map);
 
-    // Custom cluster click: always show cheese selector list
+    // Custom cluster click: ALWAYS show cheese selector, never zoom
     S.cluster.on('clusterclick',function(ev){
+        // Block all default cluster behavior
+        if(ev.originalEvent){try{ev.originalEvent.stopPropagation();ev.originalEvent.preventDefault();}catch(ex){}}
         var childMarkers=ev.layer.getAllChildMarkers();
         var filtered=childMarkers.filter(function(m){return S.filtered.indexOf(m.cheeseIdx)>=0;});
         if(filtered.length===0)return;
@@ -1132,25 +1134,8 @@ function initMap(){
             window._focus(filtered[0].cheeseIdx);
             return;
         }
-        // Group markers by location (within ~100m)
-        var groups=[];
-        filtered.forEach(function(m){
-            var found=false;
-            for(var g=0;g<groups.length;g++){
-                if(Math.abs(groups[g][0]._chLat-m._chLat)<0.001&&Math.abs(groups[g][0]._chLon-m._chLon)<0.001){
-                    groups[g].push(m);found=true;break;
-                }
-            }
-            if(!found)groups.push([m]);
-        });
-        if(filtered.length<=20||groups.length<=5){
-            // Manageable number: always show selector
-            window._showCheeseSelector(filtered,ev.latlng);
-        }else{
-            // Too many: zoom in to reduce cluster size
-            var curZoom=S.map.getZoom();
-            S.map.setView(ev.latlng,Math.min(curZoom+2,18),{animate:true});
-        }
+        // Always show selector - no more zooming
+        window._showCheeseSelector(filtered,ev.latlng);
     });
 
     addGeoCtrl();addZoneCtrl();addLegend();
