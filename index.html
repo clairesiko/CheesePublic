@@ -237,6 +237,8 @@ select:focus{outline:none;border-color:#8B6F47;}
     -webkit-overflow-scrolling:touch;
 }
 .detail.open{transform:translateX(0);pointer-events:auto;}
+/* Shrink map when detail panel is open on desktop */
+.app.detail-open #map{margin-right:380px;transition:margin-right 0.3s cubic-bezier(.4,0,.2,1);}
 .dnav{
     position:sticky;top:0;z-index:10;
     display:flex;justify-content:space-between;align-items:center;
@@ -490,6 +492,9 @@ select:focus{outline:none;border-color:#8B6F47;}
     .suggest-btn{display:none!important;}
     .mob-menu-btn{display:none!important;}
     .mob-tab-bar{display:flex!important;}
+
+    /* No map shrink on mobile */
+    .app.detail-open #map{margin-right:0!important;}
 
     /* ── MOBILE DETAIL: bottom sheet ── */
     .detail{
@@ -1111,32 +1116,8 @@ function initMap(){
     S.focusL=L.layerGroup().addTo(S.map);
     S.routeL=L.layerGroup().addTo(S.map);
 
-    S.cluster=L.markerClusterGroup({
-        disableClusteringAtZoom:ZT,maxClusterRadius:50,
-        spiderfyOnMaxZoom:false,zoomToBoundsOnClick:false,
-        iconCreateFunction:function(cl){
-            var n=cl.getChildCount(),sz=n>50?46:n>20?40:34;
-            return L.divIcon({
-                html:'<div style="display:flex;flex-direction:column;align-items:center;"><div style="background:#8B6F47;color:#fff;border-radius:50%;width:'+sz+'px;height:'+sz+'px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:'+(sz>40?13:11)+'px;box-shadow:0 2px 8px rgba(139,111,71,0.3);border:2px solid #fff;">'+n+'</div><span style="color:#8B6F47;font-size:9px;font-weight:600;font-family:Inter,sans-serif;margin-top:2px;text-shadow:0 0 3px #fff,0 0 3px #fff;">fromages</span></div>',
-                iconSize:[sz,sz+16],iconAnchor:[sz/2,(sz+16)/2],className:''
-            });
-        }
-    }).addTo(S.map);
-
-    // Custom cluster click: ALWAYS show cheese selector, never zoom
-    S.cluster.on('clusterclick',function(ev){
-        // Block all default cluster behavior
-        if(ev.originalEvent){try{ev.originalEvent.stopPropagation();ev.originalEvent.preventDefault();}catch(ex){}}
-        var childMarkers=ev.layer.getAllChildMarkers();
-        var filtered=childMarkers.filter(function(m){return S.filtered.indexOf(m.cheeseIdx)>=0;});
-        if(filtered.length===0)return;
-        if(filtered.length===1){
-            window._focus(filtered[0].cheeseIdx);
-            return;
-        }
-        // Always show selector - no more zooming
-        window._showCheeseSelector(filtered,ev.latlng);
-    });
+    // No clustering — 261 markers is fine for Leaflet, and cluster click was unreliable
+    S.cluster=L.featureGroup().addTo(S.map);
 
     addGeoCtrl();addZoneCtrl();addLegend();
 
@@ -1687,11 +1668,13 @@ window._focus=function(idx){
 
     document.getElementById('detail').classList.add('open');
     document.getElementById('detailOverlay').classList.add('active');
+    document.getElementById('app').classList.add('detail-open');
     // Scroll detail panel to top
     var detailEl=document.getElementById('detail');
     detailEl.scrollTop=0;
     var dbodyEl=document.getElementById('dBody');
     if(dbodyEl)dbodyEl.scrollTop=0;
+    setTimeout(function(){S.map.invalidateSize();},50);
     setTimeout(function(){S.map.invalidateSize();},350);
 
     // Draw zone highlight but only recenter if user is zoomed out
@@ -1789,9 +1772,11 @@ window._closeDetail=function(){
     S.focus=null;
     document.getElementById('detail').classList.remove('open');
     document.getElementById('detailOverlay').classList.remove('active');
+    document.getElementById('app').classList.remove('detail-open');
     S.focusL.clearLayers();
     // Clear hash
     history.replaceState(null,null,window.location.pathname+window.location.search);
+    setTimeout(function(){S.map.invalidateSize();},50);
     setTimeout(function(){S.map.invalidateSize();},350);
 };
 
