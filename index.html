@@ -1113,7 +1113,7 @@ function initMap(){
 
     S.cluster=L.markerClusterGroup({
         disableClusteringAtZoom:ZT,maxClusterRadius:50,
-        spiderfyOnMaxZoom:true,zoomToBoundsOnClick:true,
+        spiderfyOnMaxZoom:false,zoomToBoundsOnClick:false,
         iconCreateFunction:function(cl){
             var n=cl.getChildCount(),sz=n>50?46:n>20?40:34;
             return L.divIcon({
@@ -1123,24 +1123,31 @@ function initMap(){
         }
     }).addTo(S.map);
 
-    // When clicking a cluster, check if all markers are at same location
-    // If yes → show cheese selector; if no → default zoom behavior
+    // Custom cluster click: zoom in OR show selector if all at same spot
     S.cluster.on('clusterclick',function(ev){
         var childMarkers=ev.layer.getAllChildMarkers();
         var filtered=childMarkers.filter(function(m){return S.filtered.indexOf(m.cheeseIdx)>=0;});
-        if(filtered.length===0)return;
-        // Check if all child markers are at roughly the same coords (within ~50m)
+        if(filtered.length===0){
+            // Fallback: zoom to cluster bounds
+            S.map.fitBounds(ev.layer.getBounds(),{padding:[30,30]});
+            return;
+        }
+        // Check if all child markers are at same coords (within ~100m)
         var ref=filtered[0];
         var allSameSpot=filtered.every(function(m){
             return Math.abs(m._chLat-ref._chLat)<0.001&&Math.abs(m._chLon-ref._chLon)<0.001;
         });
         if(allSameSpot){
-            // All at same location → selector popup (no point zooming further)
-            ev.layer._group.zoomToShowLayer(filtered[0],function(){
+            // All co-located: show selector immediately, no zoom
+            if(filtered.length===1){
+                window._focus(filtered[0].cheeseIdx);
+            }else{
                 window._showCheeseSelector(filtered,L.latLng(ref._chLat,ref._chLon));
-            });
+            }
+        }else{
+            // Different locations: zoom to cluster bounds
+            S.map.fitBounds(ev.layer.getBounds(),{padding:[30,30]});
         }
-        // else: default behavior (zoom in) handled by Leaflet.markercluster
     });
 
     addGeoCtrl();addZoneCtrl();addLegend();
@@ -1699,11 +1706,25 @@ window._focus=function(idx){
     if(dbodyEl)dbodyEl.scrollTop=0;
     setTimeout(function(){S.map.invalidateSize();},350);
 
-    // Recenter map: prefer zone bounds, fallback to producer coords
+    // Draw zone highlight but only recenter if user is zoomed out
     highlightZone(idx, function(){
-        // After zone layers drawn, fit to focusL bounds OR producer center
         setTimeout(function(){
+            var curZoom=S.map.getZoom();
             var panelPx=isMobile()?0:190;
+            // If user is already zoomed in close (>=ZT), just pan to the cheese, don't zoom out
+            if(curZoom>=ZT){
+                var clat=0,clon=0,cn2=0;
+                if(c.pr)c.pr.forEach(function(p){if(p.la&&p.lo){clat+=p.la;clon+=p.lo;cn2++;}});
+                if(cn2>0){
+                    clat/=cn2;clon/=cn2;
+                    var point=S.map.project([clat,clon],curZoom);
+                    point.x-=panelPx;
+                    var offsetLL=S.map.unproject(point,curZoom);
+                    S.map.panTo(offsetLL,{animate:true});
+                }
+                return;
+            }
+            // Zoomed out: fit to zone bounds or producer center
             if(S.focusL.getLayers().length>0){
                 try{
                     var b=S.focusL.getBounds();
@@ -1713,16 +1734,15 @@ window._focus=function(idx){
                     }
                 }catch(ex){}
             }
-            // Fallback: center on producers
-            var clat=0,clon=0,cn2=0;
-            if(c.pr)c.pr.forEach(function(p){if(p.la&&p.lo){clat+=p.la;clon+=p.lo;cn2++;}});
-            if(cn2>0){
-                clat/=cn2;clon/=cn2;
-                var targetZoom=Math.min(Math.max(S.map.getZoom(),8),11);
-                var point=S.map.project([clat,clon],targetZoom);
-                point.x-=panelPx;
-                var offsetLL=S.map.unproject(point,targetZoom);
-                S.map.setView(offsetLL,targetZoom,{animate:true});
+            var clat2=0,clon2=0,cn3=0;
+            if(c.pr)c.pr.forEach(function(p){if(p.la&&p.lo){clat2+=p.la;clon2+=p.lo;cn3++;}});
+            if(cn3>0){
+                clat2/=cn3;clon2/=cn3;
+                var targetZoom=Math.min(Math.max(curZoom,8),11);
+                var point2=S.map.project([clat2,clon2],targetZoom);
+                point2.x-=panelPx;
+                var offsetLL2=S.map.unproject(point2,targetZoom);
+                S.map.setView(offsetLL2,targetZoom,{animate:true});
             }
         },600);
     });
