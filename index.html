@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Carte interactive des fromages de France — Les Fromages du Bonheur</title>
-<meta name="description" content="La carte interactive la plus exhaustive des fromages de France : plus de 390 fromages fermiers et artisanaux, producteurs, fromageries, itinéraires fromagers. Explorez les AOP, AOC, IGP et créez votre tournée des fromages.">
+<meta name="description" content="La carte interactive la plus exhaustive des fromages de France : plus de 402 fromages fermiers et artisanaux, producteurs, fromageries, itinéraires fromagers. Explorez les AOP, AOC, IGP et créez votre tournée des fromages.">
 <meta name="keywords" content="carte fromage France, carte interactive fromage, itinéraire fromager, fromage fermier, fromage artisanal, fromagerie France, producteur fromage, AOP fromage, AOC fromage, IGP fromage, tournée fromage, guide fromage France, fromage français carte, terroir France, fromage exhaustif, route des fromages, fromage de France liste">
 <meta name="author" content="Les Fromages du Bonheur">
 <meta name="robots" content="index, follow">
@@ -17,7 +17,7 @@
 <link rel="canonical" href="https://www.lesfromagesdubonheur.com/">
 
 <!-- Open Graph (Facebook, LinkedIn, WhatsApp) -->
-<meta property="og:title" content="Carte interactive des fromages de France — 390+ fromages, producteurs et itinéraires">
+<meta property="og:title" content="Carte interactive des fromages de France — 402+ fromages, producteurs et itinéraires">
 <meta property="og:description" content="La carte la plus exhaustive des fromages français : fermiers, artisanaux, AOP, AOC, IGP. Trouvez les producteurs, créez votre itinéraire fromager et explorez le terroir.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.lesfromagesdubonheur.com/">
@@ -26,12 +26,12 @@
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Carte interactive des fromages de France — 390+ fromages et producteurs">
+<meta name="twitter:title" content="Carte interactive des fromages de France — 402+ fromages et producteurs">
 <meta name="twitter:description" content="La carte la plus exhaustive des fromages français : fermiers, artisanaux, AOP. Trouvez les producteurs et créez votre itinéraire fromager.">
 
 <!-- Structured Data (Google Rich Results) -->
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebSite","name":"Les Fromages du Bonheur","alternateName":"Carte interactive des fromages de France","url":"https://www.lesfromagesdubonheur.com/","description":"La carte interactive la plus exhaustive des fromages de France : plus de 390 fromages fermiers et artisanaux, producteurs, fromageries et itinéraires fromagers.","inLanguage":"fr","potentialAction":{"@type":"SearchAction","target":"https://www.lesfromagesdubonheur.com/#fromage={search_term_string}","query-input":"required name=search_term_string"},"about":{"@type":"Thing","name":"Fromages de France","description":"Guide exhaustif des fromages français avec carte interactive, producteurs fermiers, AOP, AOC, IGP et itinéraires fromagers"}}
+{"@context":"https://schema.org","@type":"WebSite","name":"Les Fromages du Bonheur","alternateName":"Carte interactive des fromages de France","url":"https://www.lesfromagesdubonheur.com/","description":"La carte interactive la plus exhaustive des fromages de France : plus de 402 fromages fermiers et artisanaux, producteurs, fromageries et itinéraires fromagers.","inLanguage":"fr","potentialAction":{"@type":"SearchAction","target":"https://www.lesfromagesdubonheur.com/#fromage={search_term_string}","query-input":"required name=search_term_string"},"about":{"@type":"Thing","name":"Fromages de France","description":"Guide exhaustif des fromages français avec carte interactive, producteurs fermiers, AOP, AOC, IGP et itinéraires fromagers"}}
 </script>
 
 <!-- Copyright & Legal -->
@@ -62,7 +62,7 @@
 
 <div class="seo-text">
 <h1>Carte interactive des fromages de France</h1>
-<p>Les Fromages du Bonheur : la carte interactive la plus exhaustive des fromages français. Découvrez plus de 390 fromages fermiers et artisanaux, localisez les producteurs et fromageries sur la carte, créez votre itinéraire fromager personnalisé. Explorez les fromages AOP, AOC et IGP de toutes les régions de France. Guide complet du terroir fromager français avec fiches détaillées, photos et informations sur chaque fromage. Planifiez votre route des fromages en voiture, à vélo ou à pied.</p>
+<p>Les Fromages du Bonheur : la carte interactive la plus exhaustive des fromages français. Découvrez plus de 402 fromages fermiers et artisanaux, localisez les producteurs et fromageries sur la carte, créez votre itinéraire fromager personnalisé. Explorez les fromages AOP, AOC et IGP de toutes les régions de France. Guide complet du terroir fromager français avec fiches détaillées, photos et informations sur chaque fromage. Planifiez votre route des fromages en voiture, à vélo ou à pied.</p>
 </div>
 
 <div class="top-bar" id="topBar">
@@ -70,7 +70,7 @@
         <button class="home-btn" id="homeBtn" onclick="window._goHome()">← Page principale</button>
         <div class="logo">Les Fromages du Bonheur</div>
         <div class="search-wrap">
-            <input type="text" id="searchInput" placeholder="Chercher un fromage..." autocomplete="off">
+            <input type="text" id="searchInput" placeholder="Chercher un fromage..." autocomplete="off" aria-label="Rechercher un fromage">
             <div class="search-suggest" id="searchSuggest"></div>
         </div>
         <button class="filter-toggle" id="filterToggle">
@@ -81,6 +81,7 @@
             <button class="nav-link" onclick="window._openPage('contact')">Contact</button>
             <button class="nav-link itin-nav-btn" id="itinNavBtn" onclick="window._toggleItin()"> Mon itinéraire <span class="itin-badge" id="itinBadge"></span><span class="itin-tip show" id="itinTip">Cliquez sur un producteur pour l'ajouter à votre tournée</span></button>
         </div>
+        <button class="itin-gen-btn" onclick="window._openItinGen()" title="Créer un itinéraire fromager">Créer un itinéraire</button>
         <button class="suggest-btn" onclick="window._openPage('suggest')" title="Suggérer un fromage">+ Suggérer un fromage</button>
         <button class="mob-menu-btn" id="mobMenuBtn" onclick="window._openMobMenu()"><span></span></button>
     </header>
@@ -105,6 +106,9 @@
     </div>
 </div>
 
+<!-- Mobile: floating reset button when filters are active -->
+<button class="mob-filter-reset" id="mobFilterReset" onclick="window._mobResetFilters()">✕ Réinitialiser filtres</button>
+
 <div class="app" id="app">
     <div id="map"></div>
     <div class="grid-view" id="gridView"></div>
@@ -112,13 +116,13 @@
 
 <!-- Floating zoom buttons: OUTSIDE the panel to avoid stacking/overflow issues -->
 <div class="panel-zoom-float" id="panelZoomFloat">
-    <button type="button" class="pzf-btn" onclick="if(window._panelZoom)window._panelZoom(1)" title="Zoomer">+</button>
-    <button type="button" class="pzf-btn" onclick="if(window._panelZoom)window._panelZoom(-1)" title="Dézoomer">&minus;</button>
+    <button type="button" class="pzf-btn" onclick="if(window._panelZoom)window._panelZoom(1)" title="Zoomer" aria-label="Zoomer la carte">+</button>
+    <button type="button" class="pzf-btn" onclick="if(window._panelZoom)window._panelZoom(-1)" title="Dézoomer" aria-label="Dézoomer la carte">&minus;</button>
 </div>
 
 <div class="detail" id="detail">
     <div class="dnav">
-        <button class="dclose" onclick="window._closeDetail()">&times;</button>
+        <button class="dclose" onclick="window._closeDetail()" aria-label="Fermer le détail">&times;</button>
     </div>
     <div class="dimg" id="dImg"></div>
     <div class="dhead"><h2 id="dName"></h2><div class="dhead-sub" id="dLabel"></div></div>
@@ -148,7 +152,7 @@
     <div class="filter-sheet-handle"></div>
     <div class="filter-sheet-head">
         <h3>Filtres</h3>
-        <button class="filter-sheet-close" onclick="window._closeFilterSheet()">&times;</button>
+        <button class="filter-sheet-close" onclick="window._closeFilterSheet()" aria-label="Fermer les filtres">&times;</button>
     </div>
     <div class="filter-sheet-body">
         <div class="fs-group">
@@ -270,9 +274,85 @@
 <!-- Mobile "Plus" menu overlay -->
 <div class="mob-plus-overlay" id="mobPlusOverlay" onclick="window._closeMobPlus()"></div>
 <div class="mob-plus-menu" id="mobPlusMenu">
+    <button onclick="window._openItinGen();window._closeMobPlus();">Créer un itinéraire</button>
     <button onclick="window._openPage('suggest');window._closeMobPlus();">Suggérer un fromage</button>
     <button onclick="window._openPage('about');window._closeMobPlus();">À propos</button>
     <button onclick="window._openPage('contact');window._closeMobPlus();">Contact</button>
+</div>
+
+<!-- ── ITINERARY GENERATOR MODAL ── -->
+<div class="ig-overlay" id="itinGenModal" style="display:none;" onclick="if(event.target===this)window._closeItinGen()">
+<div class="ig-modal">
+    <div class="ig-header">
+        <h2>Votre itinéraire fromager</h2>
+        <p>En quelques clics, on vous prépare une tournée sur mesure</p>
+        <button class="ig-close" onclick="window._closeItinGen()">&times;</button>
+    </div>
+    <div class="ig-body">
+        <div class="ig-dots">
+            <div class="ig-dot active" id="igDot0"></div>
+            <div class="ig-dot" id="igDot1"></div>
+            <div class="ig-dot" id="igDot2"></div>
+            <div class="ig-dot" id="igDot3"></div>
+        </div>
+        <!-- Step 1: Location -->
+        <div class="ig-step active" id="igStep0">
+            <div class="ig-title">Où êtes-vous ?</div>
+            <div class="ig-loc-options">
+                <button class="ig-loc-btn" onclick="window._igSelectLoc(this,'geo')">
+                    <span class="ig-loc-icon">📍</span>
+                    <div><div class="ig-loc-label">Ma position actuelle</div><div class="ig-loc-sub">Utiliser la géolocalisation</div></div>
+                </button>
+                <button class="ig-loc-btn" onclick="window._igSelectLoc(this,'city')">
+                    <span class="ig-loc-icon">🏙️</span>
+                    <div><div class="ig-loc-label">Entrer une ville</div><div class="ig-loc-sub">Tapez votre point de départ</div></div>
+                </button>
+                <input class="ig-city-input" id="igCityInput" type="text" placeholder="Ex : Lyon, Dijon, Strasbourg..." list="igCityList">
+                <datalist id="igCityList"></datalist>
+            </div>
+        </div>
+        <!-- Step 2: Duration -->
+        <div class="ig-step" id="igStep1">
+            <div class="ig-title">Combien de temps ?</div>
+            <div class="ig-dur-grid">
+                <div class="ig-pill" onclick="window._igSelectPill(this)" data-dur="Demi-journée" data-radius="80" data-stops="4"><span class="ig-pill-emoji">☀️</span><span class="ig-pill-label">Demi-journée</span><span class="ig-pill-detail">2-4 étapes</span></div>
+                <div class="ig-pill" onclick="window._igSelectPill(this)" data-dur="Journée" data-radius="150" data-stops="6"><span class="ig-pill-emoji">🌅</span><span class="ig-pill-label">Journée</span><span class="ig-pill-detail">4-6 étapes</span></div>
+                <div class="ig-pill" onclick="window._igSelectPill(this)" data-dur="Week-end" data-radius="300" data-stops="10"><span class="ig-pill-emoji">🏕️</span><span class="ig-pill-label">Week-end</span><span class="ig-pill-detail">2 jours · 6-10 étapes</span></div>
+                <div class="ig-pill" onclick="window._igSelectPill(this)" data-dur="Vacances" data-radius="500" data-stops="15"><span class="ig-pill-emoji">🗺️</span><span class="ig-pill-label">Vacances</span><span class="ig-pill-detail">3+ jours · 10+ étapes</span></div>
+            </div>
+        </div>
+        <!-- Step 3: Transport -->
+        <div class="ig-step" id="igStep2">
+            <div class="ig-title">Comment vous déplacez-vous ?</div>
+            <div class="ig-trans-grid">
+                <div class="ig-pill" onclick="window._igSelectPill(this)" data-trans="en voiture"><span class="ig-pill-emoji">🚗</span><span class="ig-pill-label">Voiture</span></div>
+                <div class="ig-pill" onclick="window._igSelectPill(this)" data-trans="à vélo"><span class="ig-pill-emoji">🚲</span><span class="ig-pill-label">Vélo</span></div>
+                <div class="ig-pill" onclick="window._igSelectPill(this)" data-trans="à pied"><span class="ig-pill-emoji">🥾</span><span class="ig-pill-label">À pied</span></div>
+            </div>
+        </div>
+        <!-- Step 4: Preferences -->
+        <div class="ig-step" id="igStep3">
+            <div class="ig-title">Vos envies ? <span style="font-size:0.75rem;color:#bbb;">(optionnel)</span></div>
+            <div class="ig-pref-grid">
+                <span class="ig-chip" onclick="window._igTogglePref(this)" data-pref="aop">AOP / AOC</span>
+                <span class="ig-chip" onclick="window._igTogglePref(this)" data-pref="bio">Bio</span>
+                <span class="ig-chip" onclick="window._igTogglePref(this)" data-pref="chevre">Chèvre</span>
+                <span class="ig-chip" onclick="window._igTogglePref(this)" data-pref="brebis">Brebis</span>
+                <span class="ig-chip" onclick="window._igTogglePref(this)" data-pref="molle">Pâte molle</span>
+                <span class="ig-chip" onclick="window._igTogglePref(this)" data-pref="dure">Pâte pressée</span>
+                <span class="ig-chip" onclick="window._igTogglePref(this)" data-pref="doux">Goût doux</span>
+                <span class="ig-chip" onclick="window._igTogglePref(this)" data-pref="puissant">Goût prononcé</span>
+                <span class="ig-chip" onclick="window._igTogglePref(this)" data-pref="monastique">Monastique</span>
+            </div>
+        </div>
+        <!-- Result -->
+        <div class="ig-result" id="igResult"></div>
+    </div>
+    <div class="ig-footer" id="igFooter">
+        <button class="ig-btn ig-btn-outline" id="igBtnBack" onclick="window._igBack()" style="display:none;">Retour</button>
+        <button class="ig-btn ig-btn-primary" id="igBtnNext" onclick="window._igNext()">Suivant</button>
+    </div>
+</div>
 </div>
 
 <footer class="site-footer">
@@ -281,7 +361,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
-<script src="data.js"></script>
-<script src="app.js"></script>
+<script src="data.js?v=20260323"></script>
+<script src="app.js?v=20260323"></script>
 </body>
 </html>

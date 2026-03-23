@@ -32,6 +32,19 @@
 var ZT=9;
 var PAGE_SIZE=50;
 
+// ── GA4 Custom Event Tracking ──
+function track(ev,params){
+    try{if(typeof gtag==='function')gtag('event',ev,params||{});}catch(e){}
+}
+// Haversine distance (km) for itinerary
+function _haversine(lat1,lon1,lat2,lon2){
+    var R=6371,dLat=(lat2-lat1)*Math.PI/180,dLon=(lon2-lon1)*Math.PI/180;
+    var a=Math.sin(dLat/2)*Math.sin(dLat/2)+
+        Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*
+        Math.sin(dLon/2)*Math.sin(dLon/2);
+    return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
 function N(s){return s?s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''):'';}
 function isMonastic(c){
     if(!c.fm||c.fm==='-'||c.fm==='')return false;
@@ -57,9 +70,22 @@ var S={
     gridPage:0,filtersOpen:true
 };
 
-// ── COMMUNE GEOMETRY LOADER ──
+// ── PERFORMANCE: localStorage cache helpers ──
+var LS_PREFIX='lfb_';
+var LS_TTL=7*24*60*60*1000; // 7 days
+function lsGet(key){
+    try{var raw=localStorage.getItem(LS_PREFIX+key);if(!raw)return null;var o=JSON.parse(raw);if(Date.now()-o.t>LS_TTL){localStorage.removeItem(LS_PREFIX+key);return null;}return o.d;}catch(e){return null;}
+}
+function lsSet(key,data){
+    try{localStorage.setItem(LS_PREFIX+key,JSON.stringify({t:Date.now(),d:data}));}catch(e){/* quota exceeded — silent */}
+}
+
+// ── COMMUNE GEOMETRY LOADER (with localStorage cache) ──
 function fetchCommunes(deptCode,cb){
     if(S.communeCache[deptCode])return cb(S.communeCache[deptCode]);
+    // Try localStorage first
+    var cached=lsGet('c_'+deptCode);
+    if(cached){S.communeCache[deptCode]=cached;return cb(cached);}
     if(S.communeLoading[deptCode]){
         S.communeLoading[deptCode].push(cb);return;
     }
@@ -69,6 +95,7 @@ function fetchCommunes(deptCode,cb){
         var idx={};
         if(geo&&geo.features)geo.features.forEach(function(f){idx[f.properties.code]=f;});
         S.communeCache[deptCode]=idx;
+        lsSet('c_'+deptCode,idx);
         var cbs=S.communeLoading[deptCode]||[];
         delete S.communeLoading[deptCode];
         cbs.forEach(function(fn){fn(idx);});
@@ -244,7 +271,7 @@ function initMap(){
 
     S.map.on('moveend',function(){
         if(S.zoneOn){
-            if(S.map.getZoom()>=ZT){S.zoneL.clearLayers();drawLocal();}
+            if(S.map.getZoom()>=ZT){S.zoneL.clearLayers();drawLocalDebounced();}
             else{S.localL.clearLayers();drawZones();}
         }else{S.localL.clearLayers();S.zoneL.clearLayers();}
     });
@@ -265,6 +292,9 @@ function initMap(){
 }
 
 function fetchDepts(){
+    // Try localStorage cache first
+    var cached=lsGet('depts');
+    if(cached){S.depts=cached;console.log('Depts OK (cache, '+cached.features.length+')');applyF();return;}
     var urls=[
         'https://raw.githubusercontent.com/gregoiredavid/france-geojson/master/departements-version-simplifiee.geojson',
         'https://france-geojson.gregoiredavid.fr/repo/departements/all.geojson',
@@ -273,7 +303,7 @@ function fetchDepts(){
     function go(i){
         if(i>=urls.length){console.warn('Depts: toutes sources échouées.');applyF();return;}
         fetch(urls[i]).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
-        .then(function(d){S.depts=d;console.log('Depts OK ('+d.features.length+')');applyF();})
+        .then(function(d){S.depts=d;lsSet('depts',d);console.log('Depts OK ('+d.features.length+')');applyF();})
         .catch(function(){go(i+1);});
     }
     go(0);
@@ -281,11 +311,14 @@ function fetchDepts(){
 
 function loadData(){
     try{var _b=atob(CHEESE_DATA_B64.trim());var _u8=new Uint8Array(_b.length);for(var _i=0;_i<_b.length;_i++)_u8[_i]=_b.charCodeAt(_i);S.data=JSON.parse(new TextDecoder('utf-8').decode(_u8));}
-    catch(e){console.error('JSON:',e);return;}
+    catch(e){console.error('JSON:',e);track('error_loading',{error:e.message});return;}
+    track('cheese_count_loaded',{count:S.data.cheeses.length});
     popFilters();applyF();
     // Handle hash routing
     handleHash();
     window.addEventListener('hashchange',handleHash);
+    // Auto-open itinerary generator on first visit
+    if(window._maybeAutoOpenItin)window._maybeAutoOpenItin();
 }
 
 function popFilters(){
@@ -295,7 +328,6 @@ function popFilters(){
         if(c.lb)lb.add(c.lb);
         if(c.rg)c.rg.forEach(function(r){rg.add(r);});
         if(c.tp){pa.add(c.tp);S.pateNames[c.tp]=getPateShort(c.tp);}
-        if(c.sa&&c.sa!=='-'&&c.sa!=='Non précisé')sa.add(c.sa);
         if(c.go&&c.go!=='-'&&c.go!=='Non précisé')go.add(c.go);
     });
     function pop(id,set,sh){
@@ -306,7 +338,12 @@ function popFilters(){
     }
     // Desktop filters
     pop('fAnimal',an);pop('fLabel',lb);pop('fRegion',rg);pop('fPate',pa,true);
-    pop('fSaison',sa);pop('fGout',go);
+    // Saison: 4 fixed seasons instead of DB combos
+    ['Printemps','Été','Automne','Hiver'].forEach(function(s){
+        var o=document.createElement('option');o.value=s;o.textContent=s;
+        document.getElementById('fSaison').appendChild(o);
+    });
+    pop('fGout',go);
     // Mobile filters (clone options)
     function cloneOpts(fromId,toId){
         var from=document.getElementById(fromId),to=document.getElementById(toId);
@@ -368,55 +405,77 @@ function applyF(){
     renderMap();renderGrid();
     document.getElementById('pillMonastic').classList.toggle('active',mo);
     document.getElementById('pillEponyme').classList.toggle('active',ep);
+    updateMobFilterReset();
+    // GA4: track filter usage
+    if(an||lb||rg||pa||sa||go||mo||ep||q)track('filter_used',{animal:an,label:lb,region:rg,pate:pa,saison:sa,gout:go,monastic:mo?'oui':'',eponyme:ep?'oui':'',search:q,results:S.filtered.length});
 }
 
 function renderMap(){
     S.cluster.clearLayers();S.markers=[];S._coordCount={};var _frag=[];
     S.filtered.forEach(function(idx){
         var c=S.data.cheeses[idx];
-        var lat=0,lon=0,n=0;
-        if(c.pr)c.pr.forEach(function(p){if(p.la&&p.lo){lat+=p.la;lon+=p.lo;n++;}});
-        if(n>0){lat/=n;lon/=n;}
-        if(n===0&&c.dc&&c.dc.length>0&&S.depts){
+        // Collect valid producer positions
+        var positions=[];
+        if(c.pr)c.pr.forEach(function(p){if(p.la&&p.lo)positions.push({lat:p.la,lon:p.lo});});
+
+        if(positions.length===0&&c.dc&&c.dc.length>0&&S.depts){
             try{
                 var df=S.depts.features.find(function(ft){return ft.properties.code===c.dc[0];});
-                if(df){var db2=L.geoJSON(df).getBounds().getCenter();lat=db2.lat;lon=db2.lng;}
+                if(df){var db2=L.geoJSON(df).getBounds().getCenter();positions.push({lat:db2.lat,lon:db2.lng});}
             }catch(ex){console.warn('Dept fallback error for',c.nm,ex);}
         }
-        if(lat===0&&lon===0)return;
+        if(positions.length===0)return;
 
-        // Micro-offset for colocated markers (same coords → nudge slightly)
-        var coordKey=lat.toFixed(4)+'_'+lon.toFixed(4);
-        if(!S._coordCount)S._coordCount={};
-        if(!S._coordCount[coordKey])S._coordCount[coordKey]=0;
-        var off=S._coordCount[coordKey]++;
-        if(off>0){lat+=(off%3-1)*0.00015;lon+=((off%2===0?1:-1)*Math.ceil(off/2))*0.00015;}
-
-        var icon=L.divIcon({
-            html:'<div class="cheese-mk">'+CHEESE_EMOJI+'</div>',
-            iconSize:[28,28],iconAnchor:[14,14],className:''
-        });
-        var mk=L.marker([lat,lon],{icon:icon});
-        mk.bindTooltip(c.nm,{direction:'auto',offset:[0,-14],className:'cheese-tooltip',permanent:false});
-        mk.cheeseIdx=idx;
-
-
-        mk._chLat=lat;mk._chLon=lon;
-        mk.on('click',function(e){
-            if(e.originalEvent)e.originalEvent._fromMarker=true;
-            // Check if other cheeses share same coords (colocated)
-            var mll=mk.getLatLng();
-            var colocated=S.markers.filter(function(m2){
-                var ll2=m2.getLatLng();
-                return Math.abs(ll2.lat-mll.lat)<0.0005&&Math.abs(ll2.lng-mll.lng)<0.0005&&S.filtered.indexOf(m2.cheeseIdx)>=0;
-            });
-            if(colocated.length>1){
-                window._showCheeseSelector(colocated,e.latlng);
-            }else{
-                window._focus(idx);
+        // If producers are far apart (>5km), place one marker per producer
+        // Otherwise use the average position (single marker)
+        var markerPositions=[];
+        if(positions.length>1){
+            var spread=false;
+            for(var pi=1;pi<positions.length;pi++){
+                if(_haversine(positions[0].lat,positions[0].lon,positions[pi].lat,positions[pi].lon)>5){spread=true;break;}
             }
+            if(spread){markerPositions=positions;}
+            else{
+                var aLat=0,aLon=0;positions.forEach(function(p){aLat+=p.lat;aLon+=p.lon;});
+                markerPositions=[{lat:aLat/positions.length,lon:aLon/positions.length}];
+            }
+        }else{markerPositions=positions;}
+
+        markerPositions.forEach(function(pos){
+            var lat=pos.lat,lon=pos.lon;
+            // Micro-offset for colocated markers
+            var coordKey=lat.toFixed(4)+'_'+lon.toFixed(4);
+            if(!S._coordCount)S._coordCount={};
+            if(!S._coordCount[coordKey])S._coordCount[coordKey]=0;
+            var off=S._coordCount[coordKey]++;
+            if(off>0){lat+=(off%3-1)*0.00015;lon+=((off%2===0?1:-1)*Math.ceil(off/2))*0.00015;}
+
+            var icon=L.divIcon({
+                html:'<div class="cheese-mk">'+CHEESE_EMOJI+'</div>',
+                iconSize:[28,28],iconAnchor:[14,14],className:''
+            });
+            var mk=L.marker([lat,lon],{icon:icon});
+            mk.bindTooltip(c.nm,{direction:'auto',offset:[0,-14],className:'cheese-tooltip',permanent:false});
+            mk.cheeseIdx=idx;
+            mk._chLat=lat;mk._chLon=lon;
+            mk.on('click',function(e){
+                if(e.originalEvent)e.originalEvent._fromMarker=true;
+                var mll=mk.getLatLng();
+                var colocated=S.markers.filter(function(m2){
+                    var ll2=m2.getLatLng();
+                    return Math.abs(ll2.lat-mll.lat)<0.0005&&Math.abs(ll2.lng-mll.lng)<0.0005&&S.filtered.indexOf(m2.cheeseIdx)>=0;
+                });
+                // Deduplicate: same cheeseIdx should only appear once in selector
+                var seen={},unique=[];
+                colocated.forEach(function(m2){if(!seen[m2.cheeseIdx]){seen[m2.cheeseIdx]=true;unique.push(m2);}});
+                if(unique.length>1){
+                    window._showCheeseSelector(unique,e.latlng);
+                }else{
+                    window._focus(idx);
+                }
+            });
+            S.markers.push(mk);_frag.push(mk);
         });
-        S.markers.push(mk);_frag.push(mk);
     });
 
     S.cluster.addLayers(_frag);
@@ -435,9 +494,28 @@ function drawZones(){
     });
 }
 
+// Dept-center lookup for viewport filtering (approx centers)
+var DEPT_CENTERS={};
+function _buildDeptCenters(){
+    if(!S.depts||Object.keys(DEPT_CENTERS).length)return;
+    S.depts.features.forEach(function(f){
+        var c=f.properties.code,b=L.geoJSON(f).getBounds(),ctr=b.getCenter();
+        DEPT_CENTERS[c]={lat:ctr.lat,lng:ctr.lng,bounds:b};
+    });
+}
+
+var _drawLocalTimer=null;
+function drawLocalDebounced(){
+    if(_drawLocalTimer)clearTimeout(_drawLocalTimer);
+    _drawLocalTimer=setTimeout(drawLocal,150);
+}
+
 function drawLocal(){
     S.localL.clearLayers();if(S.map.getZoom()<ZT)return;
+    _buildDeptCenters();
     var bounds=S.map.getBounds();
+    // Expand bounds slightly to preload nearby depts
+    var expandedBounds=bounds.pad(0.3);
     var communeToFromages={};
     var deptsNeeded={};
     S.filtered.forEach(function(i){
@@ -450,39 +528,52 @@ function drawLocal(){
             deptsNeeded[d]=true;
         });
     });
-    Object.keys(deptsNeeded).forEach(function(dc){
-        fetchCommunes(dc,function(idx){
-            if(S.map.getZoom()<ZT)return;
-            Object.keys(idx).forEach(function(code){
-                if(!communeToFromages[code])return;
-                var f=idx[code];
-                if(!f||!f.geometry)return;
-                try{
-                    var b=L.geoJSON(f).getBounds();
-                    if(!bounds.intersects(b))return;
-                }catch(e){return;}
-                var cheeses=communeToFromages[code];
-                var n=cheeses.length;
-                var op=n>3?0.35:n>1?0.25:0.15;
-                var cl='#43A047';
-                var names=cheeses.map(function(i){return S.data.cheeses[i].nm;});
-                var tip=(f.properties.nom||code)+' — '+n+' fromage'+(n>1?'s':'')+' :\n'+names.slice(0,5).join(', ')+(names.length>5?' …':'');
-                L.geoJSON(f,{style:function(){return{color:cl,weight:0.8,opacity:0.5,fillColor:cl,fillOpacity:op};}})
-                .bindTooltip(tip,{sticky:true,className:'zone-tip'})
-                .on('click',function(e){
-                    if(cheeses.length===1){window._focus(cheeses[0]);}
-                    else{
-                        var items=cheeses.map(function(i){var c2=S.data.cheeses[i];return{idx:i,nm:c2.nm,label:c2.lb||''};}).sort(function(a,b){return a.nm.localeCompare(b.nm);});
-                        var html='<div class="cheese-selector"><div class="cheese-selector-title">'+items.length+' fromages dans cette commune</div>';
-                        items.forEach(function(it){html+='<button class="cheese-selector-item" onclick="window._focus('+it.idx+');this.closest(\'.leaflet-popup\').querySelector(\'.leaflet-popup-close-button\').click();">'+it.nm+(it.label?' <span class=\"cs-label\">'+it.label+'</span>':'')+'</button>';});
-                        html+='</div>';
-                        L.popup({maxWidth:280}).setLatLng(e.latlng).setContent(html).openOn(S.map);
-                    }
-                })
-                .addTo(S.localL);
-            });
-        });
+    // Filter depts by viewport — only fetch those visible or nearby
+    var deptKeys=Object.keys(deptsNeeded).filter(function(dc){
+        if(!DEPT_CENTERS[dc])return true; // unknown → fetch anyway
+        return expandedBounds.intersects(DEPT_CENTERS[dc].bounds);
     });
+    // Batch fetch: limit concurrent requests to 4
+    var queue=deptKeys.slice(),active=0,MAX_CONCURRENT=4;
+    function processNext(){
+        while(active<MAX_CONCURRENT&&queue.length>0){
+            var dc=queue.shift();active++;
+            fetchCommunes(dc,function(idx){
+                active--;
+                if(S.map.getZoom()<ZT)return processNext();
+                Object.keys(idx).forEach(function(code){
+                    if(!communeToFromages[code])return;
+                    var f=idx[code];
+                    if(!f||!f.geometry)return;
+                    try{
+                        var b=L.geoJSON(f).getBounds();
+                        if(!bounds.intersects(b))return;
+                    }catch(e){return;}
+                    var cheeses=communeToFromages[code];
+                    var n=cheeses.length;
+                    var op=n>3?0.35:n>1?0.25:0.15;
+                    var cl='#43A047';
+                    var names=cheeses.map(function(i){return S.data.cheeses[i].nm;});
+                    var tip=(f.properties.nom||code)+' — '+n+' fromage'+(n>1?'s':'')+' :\n'+names.slice(0,5).join(', ')+(names.length>5?' …':'');
+                    L.geoJSON(f,{style:function(){return{color:cl,weight:0.8,opacity:0.5,fillColor:cl,fillOpacity:op};}})
+                    .bindTooltip(tip,{sticky:true,className:'zone-tip'})
+                    .on('click',function(e){
+                        if(cheeses.length===1){window._focus(cheeses[0]);}
+                        else{
+                            var items=cheeses.map(function(i){var c2=S.data.cheeses[i];return{idx:i,nm:c2.nm,label:c2.lb||''};}).sort(function(a,b){return a.nm.localeCompare(b.nm);});
+                            var html='<div class="cheese-selector"><div class="cheese-selector-title">'+items.length+' fromages dans cette commune</div>';
+                            items.forEach(function(it){html+='<button class="cheese-selector-item" onclick="window._focus('+it.idx+');this.closest(\'.leaflet-popup\').querySelector(\'.leaflet-popup-close-button\').click();">'+it.nm+(it.label?' <span class=\"cs-label\">'+it.label+'</span>':'')+'</button>';});
+                            html+='</div>';
+                            L.popup({maxWidth:280}).setLatLng(e.latlng).setContent(html).openOn(S.map);
+                        }
+                    })
+                    .addTo(S.localL);
+                });
+                processNext();
+            });
+        }
+    }
+    processNext();
 }
 
 var LABEL_ZOOM=8; // zoom level to show permanent labels
@@ -710,6 +801,7 @@ function handleHash(){
 window._focus=function(idx){
     S.focus=idx;
     var c=S.data.cheeses[idx];
+    track('cheese_view',{cheese_name:c.nm,label:c.lb||'',region:(c.rg&&c.rg[0])||'',animal:c.an||''});
     document.getElementById('dName').textContent=c.nm;
     document.getElementById('dLabel').textContent=c.lb||'';
     var dimg=document.getElementById('dImg');
@@ -883,7 +975,7 @@ window._focus=function(idx){
             // Calculate zoom level that fits bounds in the VISIBLE area (viewport minus panel)
             var totalPad=L.point(panelW+margin*2, margin*2);
             var zoom=S.map.getBoundsZoom(bounds,false,totalPad);
-            zoom=Math.min(zoom,8);
+            zoom=Math.min(zoom, isMobile()?6:8);
             // Calculate offset center: shift right so zone appears left of panel
             var center=bounds.getCenter();
             var pt=S.map.project(center,zoom);
@@ -1088,7 +1180,19 @@ window._reset=function(){
     S.focusL.clearLayers();
     S.map.setView([46.5,2.5],6,{animate:true});
     applyF();
+    updateMobFilterReset();
 };
+
+// Mobile floating reset button — show/hide based on active filters
+window._mobResetFilters=function(){window._reset();};
+function updateMobFilterReset(){
+    var btn=document.getElementById('mobFilterReset');
+    if(!btn)return;
+    var hasFilter=['fAnimal','fLabel','fRegion','fPate','fSaison','fGout'].some(function(id){return document.getElementById(id).value!=='';})
+        || document.getElementById('fMonastic').checked || document.getElementById('fEponyme').checked
+        || document.getElementById('searchInput').value!=='';
+    btn.classList.toggle('visible',hasFilter&&isMobile());
+}
 
 // ── ITINERARY ──
 window._addItin=function(pr,cn){
@@ -1191,7 +1295,7 @@ window._exportItin=function(mode){
         gpx+='</rte>\n</gpx>';
         var blob=new Blob([gpx],{type:'application/gpx+xml'});
         var a=document.createElement('a');a.href=URL.createObjectURL(blob);
-        a.download='itineraire-fromager.gpx';a.click();
+        a.download='itinéraire-fromager.gpx';a.click();
         URL.revokeObjectURL(a.href);
         showToast('GPX téléchargé — importez-le dans Komoot');
     }
@@ -1342,23 +1446,31 @@ function addLegend(){
     S.map.addControl(new C());
 }
 
-// ── GEOLOC PROMPT ──
+// ── WELCOME PROMPT (combined geoloc + itinerary) ──
 function showGeoPrompt(){
+    // Skip if user already visited
+    try{if(localStorage.getItem('lfb_welcome_seen'))return;}catch(e){}
     var overlay=document.createElement('div');overlay.className='geo-overlay';overlay.id='geoOverlay';
     var box=document.createElement('div');box.className='geo-prompt';
-    box.innerHTML='<h3>Bienvenue !</h3><p>Activez la géolocalisation pour découvrir les fromages près de chez vous et planifier votre itinéraire fromager.</p>'+
-    '<div class="geo-prompt-btns">'+
-    '<button class="mbtn" id="geoYes">Activer</button>'+
-    '<button class="mbtn mbtn-outline" id="geoNo">Plus tard</button>'+
+    box.innerHTML='<h3>Bienvenue !</h3>'+
+    '<p>Découvrez plus de 400 fromages français, localisez les producteurs et créez votre itinéraire fromager.</p>'+
+    '<div class="geo-prompt-btns" style="flex-direction:column;gap:0.4rem;">'+
+    '<button class="mbtn" id="geoYes" style="width:100%;">📍 Me localiser et explorer</button>'+
+    '<button class="mbtn mbtn-outline" id="geoItin" style="width:100%;">🗺️ Créer un itinéraire fromager</button>'+
+    '<button class="mbtn mbtn-outline" id="geoNo" style="width:100%;border:none;color:#999;font-size:0.8rem;">Explorer la carte directement</button>'+
     '</div>';
     document.body.appendChild(overlay);document.body.appendChild(box);
     document.getElementById('geoYes').onclick=function(){
         closeGeoPrompt();doGeolocate();renderItin();
     };
+    document.getElementById('geoItin').onclick=function(){
+        closeGeoPrompt();window._openItinGen();
+    };
     document.getElementById('geoNo').onclick=function(){closeGeoPrompt();};
     overlay.onclick=function(){closeGeoPrompt();};
 }
 function closeGeoPrompt(){
+    try{localStorage.setItem('lfb_welcome_seen','1');}catch(e){}
     var o=document.getElementById('geoOverlay');if(o)o.remove();
     var p=document.querySelector('.geo-prompt');if(p)p.remove();
 }
@@ -1518,6 +1630,7 @@ window._openPage=function(page){
         var ids={contact:'pageContact',suggest:'pageSuggest'};
         var el=document.getElementById(ids[page]);
         if(el){el.classList.add('active');document.body.style.overflow='hidden';}
+        track('page_open',{page:page});
     }
 };
 window._closePage=function(){
@@ -1533,6 +1646,7 @@ window._sendSuggestion=function(form){
     var fromage=fd.get('fromage')||'';
     var region=fd.get('region')||'';
     var details=fd.get('details')||'';
+    track('cheese_suggestion',{fromage:fromage,region:region,has_details:details?'yes':'no'});
     var subject='Suggestion de fromage : '+fromage;
     var body='Fromage : '+fromage+'\nRégion : '+region+'\n\nDétails :\n'+details;
     window.location.href='mailto:lesfromagesdubonheur@gmail.com?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
@@ -1586,8 +1700,318 @@ window._updateTabBadge=function(){
     }
 };
 document.addEventListener('keydown',function(e){
-    if(e.key==='Escape'){window._closePage();window._goHome();window._closeMobMenu();}
+    if(e.key==='Escape'){window._closePage();window._goHome();window._closeMobMenu();window._closeItinGen();}
 });
+
+// ── ITINERARY GENERATOR (popup wizard) ──
+var ITIN_CITIES={
+    'paris':{la:48.8566,lo:2.3522},'lyon':{la:45.7640,lo:4.8357},
+    'marseille':{la:43.2965,lo:5.3698},'toulouse':{la:43.6047,lo:1.4442},
+    'nice':{la:43.7102,lo:7.2620},'nantes':{la:47.2184,lo:-1.5536},
+    'strasbourg':{la:48.5734,lo:7.7521},'montpellier':{la:43.6108,lo:3.8767},
+    'bordeaux':{la:44.8378,lo:-0.5792},'lille':{la:50.6292,lo:3.0573},
+    'rennes':{la:48.1173,lo:-1.6778},'reims':{la:49.2583,lo:3.0440},
+    'dijon':{la:47.3220,lo:5.0415},'grenoble':{la:45.1885,lo:5.7245},
+    'clermont-ferrand':{la:45.7772,lo:3.0870},'tours':{la:47.3941,lo:0.6848},
+    'annecy':{la:45.8992,lo:6.1294},'besancon':{la:47.2378,lo:6.0241},
+    'rouen':{la:49.4432,lo:1.0993},'caen':{la:49.1829,lo:-0.3707},
+    'limoges':{la:45.8336,lo:1.2611},'pau':{la:43.2951,lo:-0.3708},
+    'aurillac':{la:44.9308,lo:2.4447},'rodez':{la:44.3497,lo:2.5754},
+    'metz':{la:49.1193,lo:6.1757},'nancy':{la:48.6921,lo:6.1844},
+    'colmar':{la:48.0794,lo:7.3580},'brest':{la:48.3904,lo:-4.4861}
+};
+var igSel={locType:'',lat:0,lon:0,dur:'',radius:150,maxStops:6,trans:'en voiture',prefs:[]};
+var igStep=0;
+// Populate city datalist
+(function(){
+    var dl=document.getElementById('igCityList');
+    if(!dl)return;
+    Object.keys(ITIN_CITIES).sort().forEach(function(c){
+        var o=document.createElement('option');o.value=c.charAt(0).toUpperCase()+c.slice(1);dl.appendChild(o);
+    });
+})();
+
+window._openItinGen=function(){
+    track('itinerary_start');
+    var m=document.getElementById('itinGenModal');if(m)m.style.display='flex';
+    igStep=0;igSel.prefs=[];_igShowStep(0);
+};
+window._closeItinGen=function(){
+    var m=document.getElementById('itinGenModal');if(m)m.style.display='none';
+    try{localStorage.setItem('lfb_itin_seen','1');}catch(e){}
+};
+// Auto-open itinerary: now handled by welcome prompt
+window._maybeAutoOpenItin=function(){
+    // Combined into showGeoPrompt() — no separate popup
+};
+window._igSelectLoc=function(btn,type){
+    document.querySelectorAll('#itinGenModal .ig-loc-btn').forEach(function(b){b.classList.remove('selected');});
+    btn.classList.add('selected');
+    igSel.locType=type;
+    var ci=document.getElementById('igCityInput');
+    if(type==='city'){ci.classList.add('visible');ci.focus();}
+    else{
+        ci.classList.remove('visible');
+        if(S.userLoc){igSel.lat=S.userLoc.lat;igSel.lon=S.userLoc.lon;}
+        else if(navigator.geolocation){
+            navigator.geolocation.getCurrentPosition(function(pos){
+                igSel.lat=pos.coords.latitude;igSel.lon=pos.coords.longitude;
+            },function(){igSel.lat=48.8566;igSel.lon=2.3522;});
+        }else{igSel.lat=48.8566;igSel.lon=2.3522;}
+    }
+};
+window._igSelectPill=function(el){
+    el.parentElement.querySelectorAll('.ig-pill').forEach(function(p){p.classList.remove('selected');});
+    el.classList.add('selected');
+    if(el.dataset.dur){igSel.dur=el.dataset.dur;igSel.radius=parseInt(el.dataset.radius)||80;igSel.maxStops=parseInt(el.dataset.stops)||5;}
+    if(el.dataset.trans){igSel.trans=el.dataset.trans;}
+};
+window._igTogglePref=function(el){
+    el.classList.toggle('selected');
+    var p=el.dataset.pref,idx=igSel.prefs.indexOf(p);
+    if(idx>=0)igSel.prefs.splice(idx,1);else igSel.prefs.push(p);
+};
+
+function _igShowStep(n){
+    document.querySelectorAll('#itinGenModal .ig-step, #itinGenModal .ig-result').forEach(function(s){s.classList.remove('active');});
+    var footer=document.getElementById('igFooter');
+    if(n<4){
+        document.getElementById('igStep'+n).classList.add('active');
+        document.getElementById('igBtnNext').textContent=n===3?'Générer mon itinéraire':'Suivant';
+        document.getElementById('igBtnNext').className=n===3?'ig-btn ig-btn-generate':'ig-btn ig-btn-primary';
+        footer.style.display='flex';
+    }else{
+        _igBuildResult();
+        document.getElementById('igResult').classList.add('active');
+        footer.style.display='none';
+    }
+    document.getElementById('igBtnBack').style.display=n>0?'':'none';
+    igStep=n;
+    // Scroll modal back to top when navigating
+    var modal=document.querySelector('.ig-modal');if(modal)modal.scrollTop=0;
+    for(var i=0;i<4;i++){
+        var d=document.getElementById('igDot'+i);
+        d.classList.remove('active','done');
+        if(i<n)d.classList.add('done');else if(i===n)d.classList.add('active');
+    }
+}
+window._igShowStep=_igShowStep; // expose for onclick in result HTML
+window._igNext=function(){if(igStep<4)_igShowStep(igStep+1);};
+window._igBack=function(){if(igStep>0)_igShowStep(igStep-1);};
+
+function _igMatchesPref(cheese,prefs){
+    if(!prefs||!prefs.length)return true;
+    // Each selected pref is a REQUIRED filter (AND logic)
+    for(var pi=0;pi<prefs.length;pi++){
+        var pf=prefs[pi];
+        if(pf==='aop'&&(!cheese.ao||(!cheese.ao.da&&!cheese.ao.dc_aoc&&!cheese.ao.di)))return false;
+        if(pf==='chevre'&&(!cheese.an||cheese.an.indexOf('Chèvre')<0))return false;
+        if(pf==='brebis'&&(!cheese.an||cheese.an.indexOf('Brebis')<0))return false;
+        if(pf==='molle'&&(!cheese.tp||cheese.tp.toLowerCase().indexOf('molle')<0))return false;
+        if(pf==='dure'&&(!cheese.tp||cheese.tp.toLowerCase().indexOf('press')<0))return false;
+        if(pf==='doux'&&(!cheese.go||cheese.go!=='Doux'))return false;
+        if(pf==='puissant'&&(!cheese.go||cheese.go!=='Puissant'))return false;
+        if(pf==='monastique'&&!isMonastic(cheese))return false;
+        // bio is checked at producer level in _igFindCandidates
+    }
+    return true;
+}
+
+function _igFindCandidates(radius){
+    var candidates=[];
+    var prefs=igSel.prefs;
+    S.data.cheeses.forEach(function(cheese){
+        if(!cheese.pr||!cheese.pr.length)return;
+        if(!_igMatchesPref(cheese,prefs))return;
+        cheese.pr.forEach(function(p){
+            if(!p.la||!p.lo)return;
+            if(prefs.indexOf('bio')>=0&&!p.b)return;
+            var dist=_haversine(igSel.lat,igSel.lon,p.la,p.lo);
+            if(dist<=radius){
+                candidates.push({name:p.n,cheese:cheese.nm,lat:p.la,lon:p.lo,dist:dist,
+                    bio:p.b,aop:!!(cheese.ao&&(cheese.ao.da||cheese.ao.dc_aoc||cheese.ao.di)),
+                    monastique:isMonastic(cheese),label:cheese.lb||'',gout:cheese.go||'',pate:cheese.tp||'',animal:cheese.an||''});
+            }
+        });
+    });
+    return candidates;
+}
+
+function _igBuildResult(){
+    if(!S.data)return;
+    var city='';
+    if(igSel.locType==='city'){
+        city=document.getElementById('igCityInput').value||'Votre ville';
+        var key=city.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+        if(ITIN_CITIES[key]){igSel.lat=ITIN_CITIES[key].la;igSel.lon=ITIN_CITIES[key].lo;}
+        else{igSel.lat=46.6;igSel.lon=2.5;}
+    }else{city='Ma position';}
+
+    // Radius & max expansion: duration × transport lookup table
+    var IG_RADII={
+        'Demi-journée':{'en voiture':[120,200],'à vélo':[40,80],'à pied':[15,20]},
+        'Journée':     {'en voiture':[200,350],'à vélo':[80,150],'à pied':[22,50]},
+        'Week-end':    {'en voiture':[300,900],'à vélo':[150,450],'à pied':[45,135]},
+        'Vacances':    {'en voiture':[500,1500],'à vélo':[250,750],'à pied':[75,225]}
+    };
+    var rEntry=(IG_RADII[igSel.dur]||{})[igSel.trans]||[200,600];
+    var baseR=rEntry[0],maxR=rEntry[1];
+    var minStops=3;
+    var candidates=[];
+    var usedRadius=baseR;
+    // Progressive expansion from baseR to maxR
+    var steps=[baseR, Math.round((baseR+maxR)/2), maxR];
+    for(var mi=0;mi<steps.length;mi++){
+        usedRadius=steps[mi];
+        candidates=_igFindCandidates(usedRadius);
+        var uniq={};candidates.forEach(function(c){uniq[c.cheese]=true;});
+        if(Object.keys(uniq).length>=minStops)break;
+    }
+
+    var panel=document.getElementById('igResult');
+    if(candidates.length===0){
+        panel.innerHTML='<div class="ig-no-result"><div class="ig-no-icon">🧭</div>'+
+            '<h3>Pas encore d\'itinéraire disponible</h3>'+
+            '<p>Même en élargissant la recherche, nous n\'avons pas trouvé assez de producteurs avec ces critères.<br><br>'+
+            'Essayez de modifier vos préférences ou votre point de départ.</p>'+
+            '<button class="ig-back-btn" onclick="window._igShowStep(3)">Modifier mes préférences</button>'+
+            '<button class="ig-back-btn" onclick="window._igShowStep(1)">Changer la durée</button>'+
+            '<button class="ig-back-btn" onclick="window._igShowStep(0)">Changer le point de départ</button></div>';
+        track('itinerary_no_result',{city:city,transport:igSel.trans,duration:igSel.dur,prefs:igSel.prefs.join(',')});
+        return;
+    }
+    var expanded=(usedRadius>baseR);
+
+    candidates.sort(function(a,b){return a.dist-b.dist;});
+    var selected=[],usedCheeses={};
+    candidates.forEach(function(c){
+        if(selected.length>=igSel.maxStops)return;
+        if(usedCheeses[c.cheese])return;
+        usedCheeses[c.cheese]=true;selected.push(c);
+    });
+    // Nearest-neighbor ordering
+    if(selected.length>1){
+        var ordered=[selected[0]],remaining=selected.slice(1);
+        while(remaining.length>0){
+            var last=ordered[ordered.length-1],bestIdx=0,bestDist=Infinity;
+            remaining.forEach(function(r,i){var d=_haversine(last.lat,last.lon,r.lat,r.lon);if(d<bestDist){bestDist=d;bestIdx=i;}});
+            ordered.push(remaining[bestIdx]);remaining.splice(bestIdx,1);
+        }
+        selected=ordered;
+    }
+
+    var html='<div class="ig-result-header"><h3>Votre tournée fromage</h3>'+
+        '<p>'+selected.length+' étapes · '+igSel.dur+' '+igSel.trans+' depuis '+city+'</p>'+
+        (expanded?'<p style="font-size:0.72rem;color:#C67A4A;margin-top:0.3rem;">Itinéraire ambitieux — rayon élargi à ~'+usedRadius+' km pour plus de découvertes</p>':'')+
+        '</div>';
+    var totalDist=0;
+    selected.forEach(function(s,i){
+        var badges='';
+        if(s.aop)badges+=' <span class="ig-badge ig-b-aop">AOP</span>';
+        if(s.bio)badges+=' <span class="ig-badge ig-b-bio">Bio</span>';
+        if(s.monastique)badges+=' <span class="ig-badge" style="background:#EDE7F6;color:#6A1B9A;">Monastique</span>';
+        var detail='<span style="font-size:0.68rem;color:#999;">'+[s.animal,s.pate,s.gout].filter(function(x){return x&&x!=='-'&&x!=='Non précisé';}).join(' · ')+'</span>';
+        var distText;
+        if(i===0){distText='Départ · à '+Math.round(s.dist)+' km';}
+        else{var seg=_haversine(selected[i-1].lat,selected[i-1].lon,s.lat,s.lon);totalDist+=seg;
+            distText=igSel.trans==='à pied'?'↓ '+seg.toFixed(1)+' km':'↓ '+Math.round(seg)+' km';}
+        html+='<div class="ig-stop" style="position:relative;">'+
+            '<div class="ig-stop-num">'+(i+1)+'</div><div class="ig-stop-info">'+
+            '<div class="ig-stop-name">'+s.name+badges+'</div>'+
+            '<div class="ig-stop-cheese">'+s.cheese+'</div>'+
+            '<div>'+detail+'</div>'+
+            '<div class="ig-stop-dist">'+distText+'</div></div>'+
+            '<span style="position:absolute;top:0.4rem;right:0.3rem;cursor:pointer;color:#ccc;font-size:0.75rem;" onclick="window._igRemoveStop('+i+')" title="Retirer cette étape">✕</span>'+
+            '</div>';
+    });
+    totalDist+=selected[0].dist;
+    html+='<div class="ig-total">~'+Math.round(totalDist)+' km au total · '+igSel.dur+' '+igSel.trans+'</div>';
+    html+='<div class="ig-export">';
+    html+='<button class="ig-export-btn" onclick="window._igShowOnMap()" style="background:#8B6F47;color:#fff;border-color:#8B6F47;font-weight:500;width:100%;">🗺️ Voir sur la carte</button>';
+    html+='</div>';
+    html+='<button class="ig-back-btn" onclick="window._igShowStep(0)">Modifier mes choix</button>';
+    panel.innerHTML=html;
+
+    window._igRoute=selected;window._igCity=city;
+    track('itinerary_generated',{city:city,transport:igSel.trans,duration:igSel.dur,stops:selected.length,prefs:igSel.prefs.join(',')});
+}
+
+window._igExportGM=function(){
+    if(!window._igRoute)return;
+    var url='https://www.google.com/maps/dir/'+igSel.lat+','+igSel.lon+'/';
+    window._igRoute.forEach(function(s){url+=encodeURIComponent(s.name)+'@'+s.lat+','+s.lon+'/';});
+    window.open(url,'_blank');
+    track('itinerary_export',{type:'google_maps'});
+};
+window._igExportKomoot=function(){
+    var url='https://www.komoot.com/plan/@'+igSel.lat+','+igSel.lon+',12z';
+    window.open(url,'_blank');
+    track('itinerary_export',{type:'komoot'});
+};
+
+// Show generated itinerary on the map (close modal, draw route)
+window._igShowOnMap=function(){
+    if(!window._igRoute||!window._igRoute.length)return;
+    // Close the modal
+    window._closeItinGen();
+    // Clear existing itinerary and add generated stops
+    S.itin=[];
+    window._igRoute.forEach(function(s){
+        S.itin.push({pr:{n:s.name,la:s.lat,lo:s.lon,b:!!s.bio},cn:s.cheese});
+    });
+    renderItin();drawRoute();updateItinBadge();
+    document.getElementById('itin').classList.add('open');
+    // Fit map to show the route
+    if(S.itin.length>1){
+        var pts=S.itin.map(function(s){return[s.pr.la,s.pr.lo];});
+        S.map.fitBounds(L.polyline(pts).getBounds(),{padding:[50,50]});
+    }
+    // Switch to map view on mobile
+    if(isMobile())window._mobTab('map');
+};
+
+// Remove a stop from generated itinerary and rebuild result
+window._igRemoveStop=function(idx){
+    if(!window._igRoute)return;
+    window._igRoute.splice(idx,1);
+    if(window._igRoute.length===0){
+        _igShowStep(3); // Go back to preferences if all removed
+        return;
+    }
+    // Rebuild the result HTML with updated stops
+    var panel=document.getElementById('igResult');
+    var city=window._igCity||'';
+    var selected=window._igRoute;
+    var html='<div class="ig-result-header"><h3>Votre tournée fromage</h3>'+
+        '<p>'+selected.length+' étapes · '+igSel.dur+' '+igSel.trans+' depuis '+city+'</p></div>';
+    var totalDist=0;
+    selected.forEach(function(s,i){
+        var badges='';
+        if(s.aop)badges+=' <span class="ig-badge ig-b-aop">AOP</span>';
+        if(s.bio)badges+=' <span class="ig-badge ig-b-bio">Bio</span>';
+        if(s.monastique)badges+=' <span class="ig-badge" style="background:#EDE7F6;color:#6A1B9A;">Monastique</span>';
+        var detail='<span style="font-size:0.68rem;color:#999;">'+[s.animal,s.pate,s.gout].filter(function(x){return x&&x!=='-'&&x!=='Non précisé';}).join(' · ')+'</span>';
+        var distText;
+        if(i===0){distText='Départ · à '+Math.round(s.dist)+' km';}
+        else{var seg=_haversine(selected[i-1].lat,selected[i-1].lon,s.lat,s.lon);totalDist+=seg;
+            distText='↓ '+Math.round(seg)+' km';}
+        html+='<div class="ig-stop" style="position:relative;">'+
+            '<div class="ig-stop-num">'+(i+1)+'</div><div class="ig-stop-info">'+
+            '<div class="ig-stop-name">'+s.name+badges+'</div>'+
+            '<div class="ig-stop-cheese">'+s.cheese+'</div>'+
+            '<div>'+detail+'</div>'+
+            '<div class="ig-stop-dist">'+distText+'</div></div>'+
+            '<span style="position:absolute;top:0.4rem;right:0.3rem;cursor:pointer;color:#ccc;font-size:0.75rem;" onclick="window._igRemoveStop('+i+')" title="Retirer cette étape">✕</span>'+
+            '</div>';
+    });
+    totalDist+=selected[0].dist;
+    html+='<div class="ig-total">~'+Math.round(totalDist)+' km au total · '+igSel.dur+' '+igSel.trans+'</div>';
+    html+='<div class="ig-export">';
+    html+='<button class="ig-export-btn" onclick="window._igShowOnMap()" style="background:#8B6F47;color:#fff;border-color:#8B6F47;font-weight:500;width:100%;">🗺️ Voir sur la carte</button>';
+    html+='</div>';
+    html+='<button class="ig-back-btn" onclick="window._igShowStep(0)">Modifier mes choix</button>';
+    panel.innerHTML=html;
+};
 
 })();
 
