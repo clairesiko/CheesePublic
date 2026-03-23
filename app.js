@@ -1419,8 +1419,7 @@ function addZoneCtrl(){
             L.DomEvent.disableClickPropagation(btn);
             L.DomEvent.on(btn,'click',function(){
                 S.zoneOn=!S.zoneOn;btn.classList.toggle('active');
-                S.cluster.addLayers(_frag);
-    if(S.zoneOn){if(S.map.getZoom()<ZT)drawZones();else drawLocal();}
+                if(S.zoneOn){if(S.map.getZoom()<ZT)drawZones();else drawLocal();}
                 else{S.zoneL.clearLayers();S.localL.clearLayers();}
             });
             return btn;
@@ -1464,7 +1463,7 @@ function showGeoPrompt(){
         closeGeoPrompt();doGeolocate();renderItin();
     };
     document.getElementById('geoItin').onclick=function(){
-        closeGeoPrompt();window._openItinGen();
+        closeGeoPrompt();setTimeout(function(){window._openItinGen();},150);
     };
     document.getElementById('geoNo').onclick=function(){closeGeoPrompt();};
     overlay.onclick=function(){closeGeoPrompt();};
@@ -1734,7 +1733,13 @@ var igStep=0;
 window._openItinGen=function(){
     track('itinerary_start');
     var m=document.getElementById('itinGenModal');if(m)m.style.display='flex';
-    igStep=0;igSel.prefs=[];_igShowStep(0);
+    // Full state reset
+    igStep=0;
+    igSel={locType:'',lat:0,lon:0,dur:'',radius:150,maxStops:6,trans:'en voiture',prefs:[]};
+    // Clear all selected states in UI
+    m.querySelectorAll('.selected').forEach(function(el){el.classList.remove('selected');});
+    m.querySelectorAll('.ig-city-input').forEach(function(el){el.value='';el.classList.remove('visible');});
+    _igShowStep(0);
 };
 window._closeItinGen=function(){
     var m=document.getElementById('itinGenModal');if(m)m.style.display='none';
@@ -1807,9 +1812,9 @@ function _igMatchesPref(cheese,prefs){
         if(pf==='aop'&&(!cheese.ao||(!cheese.ao.da&&!cheese.ao.dc_aoc&&!cheese.ao.di)))return false;
         if(pf==='chevre'&&(!cheese.an||cheese.an.indexOf('Chèvre')<0))return false;
         if(pf==='brebis'&&(!cheese.an||cheese.an.indexOf('Brebis')<0))return false;
-        if(pf==='molle'&&(!cheese.tp||cheese.tp.toLowerCase().indexOf('molle')<0))return false;
-        if(pf==='dure'&&(!cheese.tp||cheese.tp.toLowerCase().indexOf('press')<0))return false;
         if(pf==='doux'&&(!cheese.go||cheese.go!=='Doux'))return false;
+        if(pf==='equilibre'&&(!cheese.go||cheese.go!=='Equilibré'))return false;
+        if(pf==='intense'&&(!cheese.go||cheese.go!=='Intense'))return false;
         if(pf==='puissant'&&(!cheese.go||cheese.go!=='Puissant'))return false;
         if(pf==='monastique'&&!isMonastic(cheese))return false;
         // bio is checked at producer level in _igFindCandidates
