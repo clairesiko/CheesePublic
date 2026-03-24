@@ -126,14 +126,17 @@
     </div>
     <div class="dimg" id="dImg"></div>
     <div class="dhead"><h2 id="dName"></h2><div class="dhead-sub" id="dLabel"></div></div>
-    <div class="detail-expand-hint">↑ Glisser pour plus de détails</div>
+    <div class="detail-peek-actions">
+        <button class="detail-expand-btn" onclick="document.getElementById('detail').classList.add('expanded')">↑ Voir les détails</button>
+        <button class="detail-close-btn" onclick="window._closeDetail()">Fermer ↓</button>
+    </div>
     <div class="dbody" id="dBody"></div>
 </div>
 
 <div class="itin" id="itin">
     <div class="itin-head">
         <h3>Mon itinéraire fromager</h3>
-        <button class="itin-close" onclick="window._clearItin()">&times;</button>
+        <button class="itin-close" onclick="window._toggleItin()">&times;</button>
     </div>
     <div class="itin-export" id="itinExport">
         <div class="itin-export-title">Exporter l'itinéraire</div>
@@ -373,7 +376,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
-<script src="data.js?v=20260323"></script>
-<script src="app.js?v=20260323"></script>
+<script src="data.js?v=20260324e"></script>
+<script src="app.js?v=20260324e"></script>
 </body>
 </html>

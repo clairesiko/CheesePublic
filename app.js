@@ -813,8 +813,17 @@ window._focus=function(idx){
 
     var db=document.getElementById('dBody');db.innerHTML='';
 
+    // Label row: badges + share button on same line
+    var labelRow=document.createElement('div');labelRow.className='dlabel-row';
+    // Badges
+    var bx=document.createElement('div');bx.className='dlabel-badges';
+    if(c.ao&&c.ao.da){var b1=document.createElement('span');b1.className='badge b-aop';b1.textContent='AOP';bx.appendChild(b1);}
+    if(c.ao&&c.ao.dc_aoc){var b1c=document.createElement('span');b1c.className='badge b-aoc';b1c.textContent='AOC';bx.appendChild(b1c);}
+    if(c.ao&&c.ao.di){var b1g=document.createElement('span');b1g.className='badge b-igp';b1g.textContent='IGP';bx.appendChild(b1g);}
+    if(isMonastic(c)){var bm=document.createElement('span');bm.className='badge b-mon';bm.textContent='Monastique';bx.appendChild(bm);}
+    if(hasEponyme(c)){var be=document.createElement('span');be.className='badge b-epo';be.textContent='Éponyme';bx.appendChild(be);}
+    labelRow.appendChild(bx);
     // Share button
-    var shareWrap=document.createElement('div');shareWrap.style.cssText='margin-bottom:0.75rem;';
     var shareBtn=document.createElement('button');shareBtn.className='dshare';
     shareBtn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Partager';
     shareBtn.onclick=function(){
@@ -832,9 +841,10 @@ window._focus=function(idx){
             prompt('Copier ce lien :',url);
         }
     };
-    shareWrap.appendChild(shareBtn);
-    db.appendChild(shareWrap);
+    labelRow.appendChild(shareBtn);
+    db.appendChild(labelRow);
 
+    // Characteristics grid — wrapped in toggle on mobile
     var grid=document.createElement('div');grid.className='dgrid';
     function addI(l,v){
         if(!v||v==='-')return;
@@ -845,16 +855,13 @@ window._focus=function(idx){
     }
     addI('Espèce',c.an);addI('Type de lait',c.lc||'Non précisé');addI('Type de pâte',c.tp);
     addI('Affinage',c.af||'Non précisé');addI('Saison optimale',c.sa);addI('Goût',c.go);
-    if(grid.children.length>0)db.appendChild(grid);
-
-    // Badges (labels only, no dates)
-    var bx=document.createElement('div');bx.style.cssText='display:flex;gap:0.3rem;flex-wrap:wrap;margin:0.75rem 0;';
-    if(c.ao&&c.ao.da){var b1=document.createElement('span');b1.className='badge b-aop';b1.textContent='AOP';bx.appendChild(b1);}
-    if(c.ao&&c.ao.dc_aoc){var b1c=document.createElement('span');b1c.className='badge b-aoc';b1c.textContent='AOC';bx.appendChild(b1c);}
-    if(c.ao&&c.ao.di){var b1g=document.createElement('span');b1g.className='badge b-igp';b1g.textContent='IGP';bx.appendChild(b1g);}
-    if(isMonastic(c)){var bm=document.createElement('span');bm.className='badge b-mon';bm.textContent='Monastique';bx.appendChild(bm);}
-    if(hasEponyme(c)){var be=document.createElement('span');be.className='badge b-epo';be.textContent='Éponyme';bx.appendChild(be);}
-    if(bx.children.length>0)db.appendChild(bx);
+    if(grid.children.length>0){
+        if(isMobile()){
+            db.appendChild(mkSec('Caractéristiques', function(inner){inner.appendChild(grid);}, false));
+        }else{
+            db.appendChild(grid);
+        }
+    }
 
     // Helper: section with mobile accordion
     function mkSec(title, contentFn, startOpen){
@@ -958,30 +965,51 @@ window._focus=function(idx){
     // So we manually calculate an offset center and appropriate zoom
     highlightZone(idx, function(){
         setTimeout(function(){
-            var panelW=isMobile()?0:380;
-            var margin=40;
-            // Try zone bounds first
-            var bounds=null;
-            if(S.focusL.getLayers().length>0){
-                try{var b=S.focusL.getBounds();if(b.isValid())bounds=b;}catch(ex){}
+            var mob=isMobile();
+            if(mob){
+                // MOBILE: don't zoom out at all, just pan to the cheese center
+                // Offset upward so cheese appears above the peek panel (90px) + tab bar (56px)
+                var peekH=90+56; // panel + tab bar
+                var center;
+                // Get zone/producer center
+                var bounds=null;
+                if(S.focusL.getLayers().length>0){
+                    try{var b=S.focusL.getBounds();if(b.isValid())bounds=b;}catch(ex){}
+                }
+                if(!bounds){
+                    var lats=[],lons=[];
+                    if(c.pr)c.pr.forEach(function(p){if(p.la&&p.lo){lats.push(p.la);lons.push(p.lo);}});
+                    if(lats.length>0) bounds=L.latLngBounds([Math.min.apply(null,lats),Math.min.apply(null,lons)],[Math.max.apply(null,lats),Math.max.apply(null,lons)]);
+                }
+                center=bounds?bounds.getCenter():S.map.getCenter();
+                var zoom=S.map.getZoom(); // keep current zoom, don't change it
+                var pt=S.map.project(center,zoom);
+                pt.y+=peekH/2; // shift center south so cheese appears above panel
+                var offsetCenter=S.map.unproject(pt,zoom);
+                S.map.panTo(offsetCenter,{animate:true});
+            }else{
+                // DESKTOP: fit bounds left of the 380px panel
+                var panelW=380;
+                var margin=40;
+                var bounds=null;
+                if(S.focusL.getLayers().length>0){
+                    try{var b=S.focusL.getBounds();if(b.isValid())bounds=b;}catch(ex){}
+                }
+                if(!bounds){
+                    var lats=[],lons=[];
+                    if(c.pr)c.pr.forEach(function(p){if(p.la&&p.lo){lats.push(p.la);lons.push(p.lo);}});
+                    if(lats.length>0) bounds=L.latLngBounds([Math.min.apply(null,lats),Math.min.apply(null,lons)],[Math.max.apply(null,lats),Math.max.apply(null,lons)]);
+                }
+                if(!bounds)return;
+                var totalPad=L.point(panelW+margin*2, margin*2);
+                var zoom=S.map.getBoundsZoom(bounds,false,totalPad);
+                zoom=Math.min(zoom,8);
+                var center=bounds.getCenter();
+                var pt=S.map.project(center,zoom);
+                pt.x+=panelW/2;
+                var offsetCenter=S.map.unproject(pt,zoom);
+                S.map.setView(offsetCenter,zoom,{animate:true});
             }
-            // Fallback: bounds from producers
-            if(!bounds){
-                var lats=[],lons=[];
-                if(c.pr)c.pr.forEach(function(p){if(p.la&&p.lo){lats.push(p.la);lons.push(p.lo);}});
-                if(lats.length>0) bounds=L.latLngBounds([Math.min.apply(null,lats),Math.min.apply(null,lons)],[Math.max.apply(null,lats),Math.max.apply(null,lons)]);
-            }
-            if(!bounds)return;
-            // Calculate zoom level that fits bounds in the VISIBLE area (viewport minus panel)
-            var totalPad=L.point(panelW+margin*2, margin*2);
-            var zoom=S.map.getBoundsZoom(bounds,false,totalPad);
-            zoom=Math.min(zoom, isMobile()?6:8);
-            // Calculate offset center: shift right so zone appears left of panel
-            var center=bounds.getCenter();
-            var pt=S.map.project(center,zoom);
-            pt.x+=panelW/2;
-            var offsetCenter=S.map.unproject(pt,zoom);
-            S.map.setView(offsetCenter,zoom,{animate:true});
         },500);
     });
 };
@@ -1037,29 +1065,44 @@ window._zoomProducer=function(p,cheeseName){
 
 // _panelZoom is defined in initMap() for guaranteed S.map access
 
-// ── Mobile bottom sheet: drag to expand/collapse ──
+// ── Mobile bottom sheet: 3-state drag (closed ↔ peek ↔ expanded) ──
 (function(){
     var detail=document.getElementById('detail');
     var startY=0,dragging=false;
     detail.addEventListener('touchstart',function(e){
+        if(!isMobile())return;
         var t=e.touches[0];
         var rect=detail.getBoundingClientRect();
-        if(t.clientY-rect.top>50)return;
+        var isExpanded=detail.classList.contains('expanded');
+        // In peek mode: entire visible panel is draggable (~90px)
+        // In expanded mode: only top 80px (handle + header) is draggable
+        var dragZone=isExpanded?80:100;
+        if(t.clientY-rect.top>dragZone)return;
         startY=t.clientY;
         dragging=true;
     },{passive:true});
     detail.addEventListener('touchmove',function(e){
         if(!dragging)return;
         var dy=startY-e.touches[0].clientY;
-        if(dy>40&&!detail.classList.contains('expanded')){
+        // Swipe threshold: 30px (more sensitive than before)
+        if(dy>30&&!detail.classList.contains('expanded')){
+            // Swipe up: peek → expanded
             detail.classList.add('expanded');
             dragging=false;
-        }else if(dy<-40&&detail.classList.contains('expanded')){
-            detail.classList.remove('expanded');
-            dragging=false;
+        }else if(dy<-30){
+            if(detail.classList.contains('expanded')){
+                // Swipe down from expanded → back to peek
+                detail.classList.remove('expanded');
+                dragging=false;
+            }else{
+                // Swipe down from peek → close
+                window._closeDetail();
+                dragging=false;
+            }
         }
     },{passive:true});
     detail.addEventListener('touchend',function(){dragging=false;},{passive:true});
+    // Tap header/handle area: peek → expanded (or expanded → peek)
     var dnav=detail.querySelector('.dnav');
     if(dnav){
         dnav.addEventListener('click',function(e){
@@ -1068,6 +1111,7 @@ window._zoomProducer=function(p,cheeseName){
             detail.classList.toggle('expanded');
         });
     }
+    // Peek action buttons are handled via inline onclick in HTML
 })();
 
 window._closeDetail=function(){
@@ -1219,7 +1263,7 @@ function renderItin(){
     var exportPanel=document.getElementById('itinExport');
 
     if(S.itin.length===0){
-        body.innerHTML='<p style="color:#bbb;font-size:0.82rem;">Ajoutez des producteurs depuis les fiches fromage.</p>';
+        body.innerHTML='<p style="color:#999;font-size:0.82rem;line-height:1.5;"><a href="#" onclick="event.preventDefault();window._toggleItin();" style="color:#8B6F47;text-decoration:underline;">Ajoutez des producteurs</a> ou <a href="#" onclick="event.preventDefault();window._toggleItin();setTimeout(function(){window._openItinGen();},200);" style="color:#8B6F47;text-decoration:underline;">créer ton itinéraire</a></p>';
         exportPanel.classList.remove('has-items');
         return;
     }
@@ -1757,12 +1801,13 @@ window._igSelectLoc=function(btn,type){
     if(type==='city'){ci.classList.add('visible');ci.focus();}
     else{
         ci.classList.remove('visible');
-        if(S.userLoc){igSel.lat=S.userLoc.lat;igSel.lon=S.userLoc.lon;}
+        if(S.userLoc){igSel.lat=S.userLoc.lat;igSel.lon=S.userLoc.lon;setTimeout(function(){_igShowStep(1);},350);}
         else if(navigator.geolocation){
             navigator.geolocation.getCurrentPosition(function(pos){
                 igSel.lat=pos.coords.latitude;igSel.lon=pos.coords.longitude;
-            },function(){igSel.lat=48.8566;igSel.lon=2.3522;});
-        }else{igSel.lat=48.8566;igSel.lon=2.3522;}
+                setTimeout(function(){_igShowStep(1);},200);
+            },function(){igSel.lat=48.8566;igSel.lon=2.3522;setTimeout(function(){_igShowStep(1);},200);});
+        }else{igSel.lat=48.8566;igSel.lon=2.3522;setTimeout(function(){_igShowStep(1);},350);}
     }
 };
 window._igSelectPill=function(el){
@@ -1770,7 +1815,20 @@ window._igSelectPill=function(el){
     el.classList.add('selected');
     if(el.dataset.dur){igSel.dur=el.dataset.dur;igSel.radius=parseInt(el.dataset.radius)||80;igSel.maxStops=parseInt(el.dataset.stops)||5;}
     if(el.dataset.trans){igSel.trans=el.dataset.trans;}
+    // Auto-advance after brief visual feedback (steps 1=duration, 2=transport)
+    if(igStep<3){setTimeout(function(){_igShowStep(igStep+1);},350);}
 };
+// Auto-advance from city input: on Enter or datalist selection
+(function(){
+    var ci=document.getElementById('igCityInput');
+    if(!ci)return;
+    ci.addEventListener('keydown',function(e){
+        if(e.key==='Enter'){e.preventDefault();if(ci.value.trim())setTimeout(function(){_igShowStep(1);},200);}
+    });
+    ci.addEventListener('change',function(){
+        if(ci.value.trim())setTimeout(function(){_igShowStep(1);},300);
+    });
+})();
 window._igTogglePref=function(el){
     el.classList.toggle('selected');
     var p=el.dataset.pref,idx=igSel.prefs.indexOf(p);
@@ -1780,17 +1838,28 @@ window._igTogglePref=function(el){
 function _igShowStep(n){
     document.querySelectorAll('#itinGenModal .ig-step, #itinGenModal .ig-result').forEach(function(s){s.classList.remove('active');});
     var footer=document.getElementById('igFooter');
+    var btnNext=document.getElementById('igBtnNext');
+    var btnBack=document.getElementById('igBtnBack');
     if(n<4){
         document.getElementById('igStep'+n).classList.add('active');
-        document.getElementById('igBtnNext').textContent=n===3?'Générer mon itinéraire':'Suivant';
-        document.getElementById('igBtnNext').className=n===3?'ig-btn ig-btn-generate':'ig-btn ig-btn-primary';
-        footer.style.display='flex';
+        // Steps 0-2: auto-advance, hide Next. Step 3: show Generate.
+        if(n===3){
+            btnNext.textContent='Générer mon itinéraire';
+            btnNext.className='ig-btn ig-btn-generate';
+            btnNext.style.display='';
+        }else{
+            btnNext.style.display='none';
+        }
+        // Show footer only if there's a visible button (back or generate)
+        footer.style.display=(n>0||n===3)?'flex':'none';
     }else{
         _igBuildResult();
         document.getElementById('igResult').classList.add('active');
         footer.style.display='none';
     }
-    document.getElementById('igBtnBack').style.display=n>0?'':'none';
+    btnBack.style.display=n>0?'':'none';
+    // Show footer if back button is visible
+    if(n>0&&n<4)footer.style.display='flex';
     igStep=n;
     // Scroll modal back to top when navigating
     var modal=document.querySelector('.ig-modal');if(modal)modal.scrollTop=0;
@@ -1806,17 +1875,37 @@ window._igBack=function(){if(igStep>0)_igShowStep(igStep-1);};
 
 function _igMatchesPref(cheese,prefs){
     if(!prefs||!prefs.length)return true;
-    // Each selected pref is a REQUIRED filter (AND logic)
+    // Group prefs by category: animal and goût use OR logic within group, others use AND
+    var animalPrefs=[],goutPrefs=[],otherPrefs=[];
     for(var pi=0;pi<prefs.length;pi++){
         var pf=prefs[pi];
-        if(pf==='aop'&&(!cheese.ao||(!cheese.ao.da&&!cheese.ao.dc_aoc&&!cheese.ao.di)))return false;
-        if(pf==='chevre'&&(!cheese.an||cheese.an.indexOf('Chèvre')<0))return false;
-        if(pf==='brebis'&&(!cheese.an||cheese.an.indexOf('Brebis')<0))return false;
-        if(pf==='doux'&&(!cheese.go||cheese.go!=='Doux'))return false;
-        if(pf==='equilibre'&&(!cheese.go||cheese.go!=='Equilibré'))return false;
-        if(pf==='intense'&&(!cheese.go||cheese.go!=='Intense'))return false;
-        if(pf==='puissant'&&(!cheese.go||cheese.go!=='Puissant'))return false;
-        if(pf==='monastique'&&!isMonastic(cheese))return false;
+        if(pf==='chevre'||pf==='brebis')animalPrefs.push(pf);
+        else if(pf==='doux'||pf==='equilibre'||pf==='intense'||pf==='puissant')goutPrefs.push(pf);
+        else otherPrefs.push(pf);
+    }
+    // Animal: OR logic — cheese must match at least one selected animal
+    if(animalPrefs.length>0){
+        var animalOk=false;
+        for(var ai=0;ai<animalPrefs.length;ai++){
+            if(animalPrefs[ai]==='chevre'&&cheese.an&&cheese.an.indexOf('Chèvre')>=0){animalOk=true;break;}
+            if(animalPrefs[ai]==='brebis'&&cheese.an&&cheese.an.indexOf('Brebis')>=0){animalOk=true;break;}
+        }
+        if(!animalOk)return false;
+    }
+    // Goût: OR logic — cheese must match at least one selected goût
+    if(goutPrefs.length>0){
+        var goutOk=false;
+        var goutMap={doux:'Doux',equilibre:'Equilibré',intense:'Intense',puissant:'Puissant'};
+        for(var gi=0;gi<goutPrefs.length;gi++){
+            if(cheese.go&&cheese.go===goutMap[goutPrefs[gi]]){goutOk=true;break;}
+        }
+        if(!goutOk)return false;
+    }
+    // Others (aop, monastique): AND logic
+    for(var oi=0;oi<otherPrefs.length;oi++){
+        var op=otherPrefs[oi];
+        if(op==='aop'&&(!cheese.ao||(!cheese.ao.da&&!cheese.ao.dc_aoc&&!cheese.ao.di)))return false;
+        if(op==='monastique'&&!isMonastic(cheese))return false;
         // bio is checked at producer level in _igFindCandidates
     }
     return true;
