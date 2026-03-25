@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tous les fromages de France de A à Z — Les Fromages du Bonheur</title>
+<meta name="description" content="Liste complète des fromages de France classés par ordre alphabétique : AOP, AOC, IGP, fermiers, artisanaux. Trouvez votre fromage et découvrez sa fiche détaillée.">
+<meta name="robots" content="index, follow">
+<meta name="robots" content="noai, noimageai">
+<link rel="canonical" href="https://www.lesfromagesdubonheur.com/fromages.html">
+<meta property="og:title" content="Tous les fromages de France de A à Z — Les Fromages du Bonheur">
+<meta property="og:description" content="Liste complète des fromages de France classés de A à Z. AOP, AOC, IGP, fermiers, artisanaux.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.lesfromagesdubonheur.com/fromages.html">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="Les Fromages du Bonheur">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧀</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;color:#3a3226;background:#faf8f5;min-height:100vh;}
+.page-nav{background:rgba(250,248,245,0.97);border-bottom:1px solid rgba(139,111,71,0.1);padding:0.8rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;}
+.page-nav .logo{font-family:'Playfair Display',serif;font-size:1.3rem;color:#5a4230;text-decoration:none;font-weight:700;}
+.page-nav .nav-links{display:flex;gap:1rem;align-items:center;}
+.page-nav .nav-links a{color:#5a4230;text-decoration:none;font-size:0.88rem;font-weight:500;padding:0.3rem 0;}
+.page-nav .nav-links a:hover{text-decoration:underline;}
+.page-nav .nav-links a.active{text-decoration:underline;font-weight:600;}
+.container{max-width:900px;margin:0 auto;padding:2rem 1.5rem 3rem;}
+h1{font-family:'Playfair Display',serif;font-size:1.8rem;color:#5a4230;margin-bottom:0.5rem;text-align:center;}
+.subtitle{text-align:center;color:#8a7a66;font-size:0.9rem;margin-bottom:1.5rem;}
+.search-box{display:block;width:100%;max-width:400px;margin:0 auto 1.5rem;padding:0.6rem 1rem;border:1px solid #d4cec5;border-radius:8px;font-size:0.9rem;font-family:'Inter',sans-serif;background:#fff;}
+.search-box:focus{outline:none;border-color:#5a4230;}
+.letter-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:0.3rem;margin-bottom:2rem;}
+.letter-nav a{display:inline-block;width:2rem;height:2rem;line-height:2rem;text-align:center;border-radius:6px;background:#efe9df;color:#6b5636;font-weight:600;font-size:0.85rem;text-decoration:none;}
+.letter-nav a:hover,.letter-nav a.active{background:#8B6F47;color:#fff;}
+.letter-nav a.empty{opacity:0.35;pointer-events:none;}
+.letter-group{margin-bottom:1.5rem;}
+.letter-group h2{font-family:'Playfair Display',serif;font-size:1.3rem;color:#5a4230;padding-bottom:0.4rem;border-bottom:2px solid #efe9df;margin-bottom:0.6rem;scroll-margin-top:80px;}
+.cheese-list{display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;}
+.cheese-item{display:flex;align-items:baseline;gap:0.4rem;padding:0.4rem 0.6rem;border-radius:6px;transition:background 0.15s;}
+.cheese-item:hover{background:#efe9df;}
+.cheese-item a{color:#3a3226;text-decoration:none;font-size:0.88rem;font-weight:500;}
+.cheese-item a:hover{color:#5a4230;}
+.cheese-item .badges{display:flex;gap:0.25rem;flex-shrink:0;}
+.cheese-item .badge{font-size:0.65rem;padding:0.1rem 0.35rem;border-radius:4px;font-weight:600;white-space:nowrap;}
+.badge-aop{background:#fef3e0;color:#b8860b;}
+.badge-igp{background:#e8f5e9;color:#2e7d32;}
+.badge-fermier{background:#fff3e0;color:#5a4230;}
+.count{text-align:center;color:#8a7a66;font-size:0.82rem;margin-top:1rem;}
+footer{text-align:center;padding:2rem 1rem;font-size:0.78rem;color:#b5a48a;border-top:1px solid #f0ede8;}
+footer a{color:#5a4230;text-decoration:none;}
+@media(max-width:600px){
+    .container{padding:1.2rem 0.8rem 2rem;}
+    h1{font-size:1.4rem;}
+    .cheese-list{grid-template-columns:1fr;}
+    .page-nav{padding:0.6rem 1rem;}
+    .page-nav .nav-links{gap:0.6rem;}
+}
+</style>
+</head>
+<body>
+<nav class="page-nav">
+    <a href="/" class="logo">Les Fromages du Bonheur</a>
+    <div class="nav-links">
+        <a href="/">Carte</a>
+        <a href="/fromages.html" class="active">Fromages A-Z</a>
+        <a href="/definition.html">Lexique</a>
+        <a href="/about.html">À propos</a>
+        <a href="/contact.html">Contact</a>
+        <a href="https://www.instagram.com/lesfromagesdubonheur/" target="_blank" rel="noopener" title="Instagram" style="display:inline-flex;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg></a>
+    </div>
+</nav>
+
+<div class="container">
+    <h1>Les fromages de France de A à Z</h1>
+    <p class="subtitle" id="countText">Chargement...</p>
+
+    <input type="text" class="search-box" id="searchBox" placeholder="Rechercher un fromage..." autocomplete="off">
+
+    <div class="letter-nav" id="letterNav"></div>
+    <div id="cheeseList"></div>
+</div>
+
+<footer>
+    &copy; 2025–2026 <a href="mailto:lesfromagesdubonheur@gmail.com">Les Fromages du Bonheur</a> · <a href="/">Carte interactive des fromages de France</a> · <a href="https://www.instagram.com/lesfromagesdubonheur/" target="_blank" rel="noopener">Instagram</a>
+</footer>
+
+<script src="data.js"></script>
+<script>
+(function(){
+    var raw=JSON.parse(atob(CHEESE_DATA_B64));
+    var cheeses=raw.cheeses||raw;
+    cheeses.sort(function(a,b){return (a.nm||'').localeCompare(b.nm||'','fr');});
+
+    var byLetter={};
+    cheeses.forEach(function(c){
+        var first=(c.nm||'?')[0].toUpperCase();
+        if(first<'A'||first>'Z')first='#';
+        if(!byLetter[first])byLetter[first]=[];
+        byLetter[first].push(c);
+    });
+
+    document.getElementById('countText').textContent=cheeses.length+' fromages répertoriés';
+
+    // Letter nav
+    var navHtml='';
+    var letters='ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    letters.forEach(function(l){
+        if(byLetter[l]){
+            navHtml+='<a href="#letter-'+l+'">'+l+'</a>';
+        }else{
+            navHtml+='<a class="empty">'+l+'</a>';
+        }
+    });
+    document.getElementById('letterNav').innerHTML=navHtml;
+
+    function getBadges(c){
+        var html='';
+        if(c.ao&&(c.ao.da||c.ao.dc_aoc||c.ao.di)){
+            if(c.ao.da)html+='<span class="badge badge-aop">AOP</span>';
+            else if(c.ao.di)html+='<span class="badge badge-igp">IGP</span>';
+            else if(c.ao.dc_aoc)html+='<span class="badge badge-aop">AOC</span>';
+        }
+        if(c.lb&&c.lb.indexOf('Fermier')>=0)html+='<span class="badge badge-fermier">Fermier</span>';
+        return html;
+    }
+
+    function renderList(filtered){
+        var grouped={};
+        filtered.forEach(function(c){
+            var first=(c.nm||'?')[0].toUpperCase();
+            if(first<'A'||first>'Z')first='#';
+            if(!grouped[first])grouped[first]=[];
+            grouped[first].push(c);
+        });
+
+        var html='';
+        letters.forEach(function(l){
+            if(!grouped[l])return;
+            html+='<div class="letter-group"><h2 id="letter-'+l+'">'+l+'</h2><div class="cheese-list">';
+            grouped[l].forEach(function(c){
+                var badges=getBadges(c);
+                html+='<div class="cheese-item"><a href="/#fromage='+encodeURIComponent(c.nm)+'">'+c.nm+'</a>';
+                if(badges)html+='<span class="badges">'+badges+'</span>';
+                html+='</div>';
+            });
+            html+='</div></div>';
+        });
+        document.getElementById('cheeseList').innerHTML=html;
+        document.getElementById('countText').textContent=filtered.length+' fromage'+(filtered.length>1?'s':'')+' répertorié'+(filtered.length>1?'s':'');
+    }
+
+    renderList(cheeses);
+
+    document.getElementById('searchBox').addEventListener('input',function(){
+        var q=this.value.trim().toLowerCase();
+        if(!q){renderList(cheeses);return;}
+        var filtered=cheeses.filter(function(c){return (c.nm||'').toLowerCase().indexOf(q)>=0;});
+        renderList(filtered);
+    });
+})();
+</script>
+</body>
+</html>

@@ -4,11 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Carte interactive des fromages de France — Les Fromages du Bonheur</title>
-<meta name="description" content="La carte interactive la plus exhaustive des fromages de France : plus de 402 fromages fermiers et artisanaux, producteurs, fromageries, itinéraires fromagers. Explorez les AOP, AOC, IGP et créez votre tournée des fromages.">
+<meta name="description" content="La carte interactive la plus exhaustive des fromages de France : fromages fermiers et artisanaux, producteurs, fromageries, itinéraires fromagers. Explorez les AOP, AOC, IGP et créez votre tournée des fromages.">
 <meta name="keywords" content="carte fromage France, carte interactive fromage, itinéraire fromager, fromage fermier, fromage artisanal, fromagerie France, producteur fromage, AOP fromage, AOC fromage, IGP fromage, tournée fromage, guide fromage France, fromage français carte, terroir France, fromage exhaustif, route des fromages, fromage de France liste">
 <meta name="author" content="Les Fromages du Bonheur">
 <meta name="robots" content="index, follow">
 <meta name="robots" content="noai, noimageai">
+<meta name="msvalidate.01" content="244EFD9C87BFC51592B8D1F227DD6A39" />
 <!-- Block known AI crawlers and scrapers -->
 <meta name="GPTBot" content="noindex, nofollow">
 <meta name="CCBot" content="noindex, nofollow">
@@ -17,7 +18,7 @@
 <link rel="canonical" href="https://www.lesfromagesdubonheur.com/">
 
 <!-- Open Graph (Facebook, LinkedIn, WhatsApp) -->
-<meta property="og:title" content="Carte interactive des fromages de France — 402+ fromages, producteurs et itinéraires">
+<meta property="og:title" content="Carte interactive des fromages de France — Les Fromages du Bonheur">
 <meta property="og:description" content="La carte la plus exhaustive des fromages français : fermiers, artisanaux, AOP, AOC, IGP. Trouvez les producteurs, créez votre itinéraire fromager et explorez le terroir.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.lesfromagesdubonheur.com/">
@@ -26,12 +27,12 @@
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Carte interactive des fromages de France — 402+ fromages et producteurs">
+<meta name="twitter:title" content="Carte interactive des fromages de France — Les Fromages du Bonheur">
 <meta name="twitter:description" content="La carte la plus exhaustive des fromages français : fermiers, artisanaux, AOP. Trouvez les producteurs et créez votre itinéraire fromager.">
 
 <!-- Structured Data (Google Rich Results) -->
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebSite","name":"Les Fromages du Bonheur","alternateName":"Carte interactive des fromages de France","url":"https://www.lesfromagesdubonheur.com/","description":"La carte interactive la plus exhaustive des fromages de France : plus de 402 fromages fermiers et artisanaux, producteurs, fromageries et itinéraires fromagers.","inLanguage":"fr","potentialAction":{"@type":"SearchAction","target":"https://www.lesfromagesdubonheur.com/#fromage={search_term_string}","query-input":"required name=search_term_string"},"about":{"@type":"Thing","name":"Fromages de France","description":"Guide exhaustif des fromages français avec carte interactive, producteurs fermiers, AOP, AOC, IGP et itinéraires fromagers"}}
+{"@context":"https://schema.org","@type":"WebSite","name":"Les Fromages du Bonheur","alternateName":"Carte interactive des fromages de France","url":"https://www.lesfromagesdubonheur.com/","description":"La carte interactive la plus exhaustive des fromages de France : fromages fermiers et artisanaux, producteurs, fromageries et itinéraires fromagers.","inLanguage":"fr","potentialAction":{"@type":"SearchAction","target":"https://www.lesfromagesdubonheur.com/#fromage={search_term_string}","query-input":"required name=search_term_string"},"about":{"@type":"Thing","name":"Fromages de France","description":"Guide exhaustif des fromages français avec carte interactive, producteurs fermiers, AOP, AOC, IGP et itinéraires fromagers"}}
 </script>
 
 <!-- Copyright & Legal -->
@@ -62,13 +63,13 @@
 
 <div class="seo-text">
 <h1>Carte interactive des fromages de France</h1>
-<p>Les Fromages du Bonheur : la carte interactive la plus exhaustive des fromages français. Découvrez plus de 402 fromages fermiers et artisanaux, localisez les producteurs et fromageries sur la carte, créez votre itinéraire fromager personnalisé. Explorez les fromages AOP, AOC et IGP de toutes les régions de France. Guide complet du terroir fromager français avec fiches détaillées, photos et informations sur chaque fromage. Planifiez votre route des fromages en voiture, à vélo ou à pied.</p>
+<p>Les Fromages du Bonheur : la carte interactive la plus exhaustive des fromages français. Découvrez les fromages fermiers et artisanaux, localisez les producteurs et fromageries sur la carte, créez votre itinéraire fromager personnalisé. Explorez les fromages AOP, AOC et IGP de toutes les régions de France. Guide complet du terroir fromager français avec fiches détaillées, photos et informations sur chaque fromage. Planifiez votre route des fromages en voiture, à vélo ou à pied.</p>
 </div>
 
 <div class="top-bar" id="topBar">
     <header>
         <button class="home-btn" id="homeBtn" onclick="window._goHome()">← Page principale</button>
-        <div class="logo">Les Fromages du Bonheur</div>
+        <a href="/" class="logo" onclick="event.preventDefault();window._goHome();" style="text-decoration:none;color:inherit;cursor:pointer;">Les Fromages du Bonheur</a>
         <div class="search-wrap">
             <input type="text" id="searchInput" placeholder="Chercher un fromage..." autocomplete="off" aria-label="Rechercher un fromage">
             <div class="search-suggest" id="searchSuggest"></div>
@@ -79,6 +80,7 @@
         <div class="nav-links">
             <button class="nav-link" onclick="window._openPage('about')">À propos</button>
             <button class="nav-link" onclick="window._openPage('contact')">Contact</button>
+            <a class="nav-link insta-link" href="https://www.instagram.com/lesfromagesdubonheur/" target="_blank" rel="noopener" title="Suivez-nous sur Instagram"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg> Instagram</a>
             <button class="nav-link itin-nav-btn" id="itinNavBtn" onclick="window._toggleItin()"> Mon itinéraire <span class="itin-badge" id="itinBadge"></span><span class="itin-tip show" id="itinTip">Cliquez sur un producteur pour l'ajouter à votre tournée</span></button>
         </div>
         <button class="itin-gen-btn" onclick="window._openItinGen()" title="Créer un itinéraire fromager">Créer un itinéraire</button>
@@ -284,6 +286,10 @@
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
         <span>Plus</span>
     </button>
+    <a class="mob-tab mob-tab-insta" href="https://www.instagram.com/lesfromagesdubonheur/" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+        <span>Insta</span>
+    </a>
 </nav>
 
 <!-- Mobile "Plus" menu overlay -->
@@ -371,12 +377,12 @@
 </div>
 
 <footer class="site-footer">
-    &copy; 2025–2026 <a href="mailto:lesfromagesdubonheur@gmail.com">Les Fromages du Bonheur</a> · Carte interactive des fromages de France · Données compilées à la main avec amour
+    &copy; 2025–2026 <a href="mailto:lesfromagesdubonheur@gmail.com">Les Fromages du Bonheur</a> · Carte interactive des fromages de France · Données compilées à la main avec amour · <a href="https://www.instagram.com/lesfromagesdubonheur/" target="_blank" rel="noopener" style="color:#8B6F47;">Instagram</a>
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
-<script src="data.js?v=20260324e"></script>
-<script src="app.js?v=20260324e"></script>
+<script src="data.js?v=20260325d"></script>
+<script src="app.js?v=20260325d"></script>
 </body>
 </html>

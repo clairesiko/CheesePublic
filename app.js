@@ -46,6 +46,13 @@ function _haversine(lat1,lon1,lat2,lon2){
 }
 
 function N(s){return s?s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''):'';}
+function cheeseSlug(name){
+    return name?name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+        .replace(/['']/g,'-').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,''):'';
+}
+// Cache of verified image URLs (true=exists, false=not found)
+var _imgCache={};
+function cheeseImgUrl(name){return 'img/'+cheeseSlug(name)+'.jpg';}
 function isMonastic(c){
     if(!c.fm||c.fm==='-'||c.fm==='')return false;
     var t=c.fm.toLowerCase();
@@ -78,6 +85,25 @@ function lsGet(key){
 }
 function lsSet(key,data){
     try{localStorage.setItem(LS_PREFIX+key,JSON.stringify({t:Date.now(),d:data}));}catch(e){/* quota exceeded — silent */}
+}
+
+// ── ITINERARY PERSISTENCE ──
+function _saveItin(){
+    try{
+        var serialized=S.itin.map(function(s){
+            return {cn:s.cn,pr:{n:s.pr.n,la:s.pr.la,lo:s.pr.lo,b:s.pr.b||false},isGeo:!!s.isGeo};
+        });
+        localStorage.setItem(LS_PREFIX+'itin',JSON.stringify(serialized));
+    }catch(e){/* silent */}
+}
+function _loadItin(){
+    try{
+        var raw=localStorage.getItem(LS_PREFIX+'itin');
+        if(!raw)return;
+        var arr=JSON.parse(raw);
+        if(!Array.isArray(arr)||arr.length===0)return;
+        S.itin=arr;
+    }catch(e){/* silent */}
 }
 
 // ── COMMUNE GEOMETRY LOADER (with localStorage cache) ──
@@ -763,7 +789,9 @@ function renderGrid(){
         card.onclick=(function(i){return function(){window._focus(i);};})(idx);
         var top=document.createElement('div');top.className='ccard-top';top.textContent=c.nm;
         card.appendChild(top);
-        if(c.img){var cimg=document.createElement('div');cimg.className='ccard-img';cimg.dataset.bg=c.img;card.appendChild(cimg);}
+        var _cardImgSrc=c.img||null;
+        if(!_cardImgSrc){var _sp=cheeseImgUrl(c.nm);if(_imgCache[_sp]===true)_cardImgSrc=_sp;}
+        if(_cardImgSrc){var cimg=document.createElement('div');cimg.className='ccard-img';cimg.dataset.bg=_cardImgSrc;card.appendChild(cimg);}
         var body=document.createElement('div');body.className='ccard-body';
         var lb=document.createElement('div');lb.className='ccard-label';lb.textContent=c.lb||'';
         var an=document.createElement('div');an.className='ccard-an';an.textContent=c.an||'-';
@@ -806,7 +834,22 @@ window._focus=function(idx){
     document.getElementById('dLabel').textContent=c.lb||'';
     var dimg=document.getElementById('dImg');
     if(c.img){dimg.style.backgroundImage='url('+c.img+')';dimg.classList.add('has-img');}
-    else{dimg.style.backgroundImage='';dimg.classList.remove('has-img');}
+    else{
+        // Try auto-detect from img/ folder
+        var _imgPath=cheeseImgUrl(c.nm);
+        if(_imgCache[_imgPath]===true){
+            dimg.style.backgroundImage='url('+_imgPath+')';dimg.classList.add('has-img');
+        }else if(_imgCache[_imgPath]===false){
+            dimg.style.backgroundImage='';dimg.classList.remove('has-img');
+        }else{
+            dimg.style.backgroundImage='';dimg.classList.remove('has-img');
+            var _t=new Image();_t.onload=function(){
+                _imgCache[_imgPath]=true;
+                dimg.style.backgroundImage='url('+_imgPath+')';dimg.classList.add('has-img');
+            };_t.onerror=function(){_imgCache[_imgPath]=false;};
+            _t.src=_imgPath;
+        }
+    }
 
     // Update hash without scrolling
     history.replaceState(null,null,'#fromage='+encodeURIComponent(c.nm));
@@ -1244,6 +1287,7 @@ window._addItin=function(pr,cn){
         showToast('Déjà dans l\'itinéraire');return;
     }
     S.itin.push({pr:pr,cn:cn});
+    _saveItin();
     renderItin();
     document.getElementById('itin').classList.add('open');
     updateItinBadge();
@@ -1278,7 +1322,7 @@ function renderItin(){
         gb.textContent='📍 Ma position comme départ';
         gb.onclick=function(){
             S.itin.unshift({pr:{n:'Ma position',la:S.userLoc.lat,lo:S.userLoc.lon},cn:'Point de départ',isGeo:true});
-            renderItin();drawRoute();
+            _saveItin();renderItin();drawRoute();
         };
         body.appendChild(gb);
     }
@@ -1288,7 +1332,7 @@ function renderItin(){
         var icon=stop.isGeo?'📍 ':'';
         d.innerHTML='<strong>'+icon+(i+1)+'. '+stop.pr.n+'</strong><br><span style="color:#999;font-size:0.78rem;">'+stop.cn+'</span>';
         var del=document.createElement('span');del.className='istop-del';del.textContent='✕';
-        del.onclick=function(){S.itin.splice(i,1);renderItin();drawRoute();updateItinBadge();if(S.itin.length===0)document.getElementById('itin').classList.remove('open');};
+        del.onclick=function(){S.itin.splice(i,1);_saveItin();renderItin();drawRoute();updateItinBadge();if(S.itin.length===0)document.getElementById('itin').classList.remove('open');};
         d.appendChild(del);body.appendChild(d);
 
         if(i<S.itin.length-1){
@@ -1314,7 +1358,7 @@ function renderItin(){
 
     var cb=document.createElement('button');cb.className='mbtn mbtn-outline';cb.style.marginTop='0.3rem';
     cb.textContent='Vider l\'itinéraire';
-    cb.onclick=function(){S.itin=[];renderItin();drawRoute();updateItinBadge();document.getElementById('itin').classList.remove('open');};
+    cb.onclick=function(){S.itin=[];_saveItin();renderItin();drawRoute();updateItinBadge();document.getElementById('itin').classList.remove('open');};
     body.appendChild(cb);
 
     drawRoute();
@@ -1403,7 +1447,7 @@ function hav(a,b){
     return Math.round(R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x)));
 }
 
-window._clearItin=function(){S.itin=[];S.routeL.clearLayers();document.getElementById('itin').classList.remove('open');updateItinBadge();};
+window._clearItin=function(){S.itin=[];_saveItin();S.routeL.clearLayers();document.getElementById('itin').classList.remove('open');updateItinBadge();};
 window._toggleItin=function(){
     var el=document.getElementById('itin');
     if(el.classList.contains('open')){el.classList.remove('open');}
@@ -1653,6 +1697,11 @@ document.addEventListener('keydown',function(e){
 try{
     initFilterToggle();
     initMap();setTimeout(loadData,0);
+    // Restore saved itinerary from localStorage
+    _loadItin();
+    if(S.itin.length>0){
+        setTimeout(function(){drawRoute();updateItinBadge();},1200);
+    }
     // Ensure map tiles + padding after layout settles
     setTimeout(function(){setTopPadding();S.map.invalidateSize();},100);
     setTimeout(function(){setTopPadding();S.map.invalidateSize();},500);
@@ -1788,6 +1837,14 @@ window._openItinGen=function(){
 window._closeItinGen=function(){
     var m=document.getElementById('itinGenModal');if(m)m.style.display='none';
     try{localStorage.setItem('lfb_itin_seen','1');}catch(e){}
+    // Auto-save generated itinerary if exists and not yet applied
+    if(window._igRoute&&window._igRoute.length>0&&S.itin.length===0){
+        S.itin=[];
+        window._igRoute.forEach(function(s){
+            S.itin.push({pr:{n:s.name,la:s.lat,lo:s.lon,b:!!s.bio},cn:s.cheese});
+        });
+        _saveItin();renderItin();drawRoute();updateItinBadge();
+    }
 };
 // Auto-open itinerary: now handled by welcome prompt
 window._maybeAutoOpenItin=function(){
@@ -2053,7 +2110,7 @@ window._igShowOnMap=function(){
     window._igRoute.forEach(function(s){
         S.itin.push({pr:{n:s.name,la:s.lat,lo:s.lon,b:!!s.bio},cn:s.cheese});
     });
-    renderItin();drawRoute();updateItinBadge();
+    _saveItin();renderItin();drawRoute();updateItinBadge();
     document.getElementById('itin').classList.add('open');
     // Fit map to show the route
     if(S.itin.length>1){
