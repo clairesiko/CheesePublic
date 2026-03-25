@@ -789,9 +789,8 @@ function renderGrid(){
         card.onclick=(function(i){return function(){window._focus(i);};})(idx);
         var top=document.createElement('div');top.className='ccard-top';top.textContent=c.nm;
         card.appendChild(top);
-        var _cardImgSrc=c.img||null;
-        if(!_cardImgSrc){var _sp=cheeseImgUrl(c.nm);if(_imgCache[_sp]===true)_cardImgSrc=_sp;}
-        if(_cardImgSrc){var cimg=document.createElement('div');cimg.className='ccard-img';cimg.dataset.bg=_cardImgSrc;card.appendChild(cimg);}
+        var _sp=cheeseImgUrl(c.nm);
+        if(_imgCache[_sp]===true){var cimg=document.createElement('div');cimg.className='ccard-img';cimg.dataset.bg=_sp;card.appendChild(cimg);}
         var body=document.createElement('div');body.className='ccard-body';
         var lb=document.createElement('div');lb.className='ccard-label';lb.textContent=c.lb||'';
         var an=document.createElement('div');an.className='ccard-an';an.textContent=c.an||'-';
@@ -833,22 +832,19 @@ window._focus=function(idx){
     document.getElementById('dName').textContent=c.nm;
     document.getElementById('dLabel').textContent=c.lb||'';
     var dimg=document.getElementById('dImg');
-    if(c.img){dimg.style.backgroundImage='url('+c.img+')';dimg.classList.add('has-img');}
-    else{
-        // Try auto-detect from img/ folder
-        var _imgPath=cheeseImgUrl(c.nm);
-        if(_imgCache[_imgPath]===true){
+    // Photos from img/ folder only (slug-based auto-detect)
+    var _imgPath=cheeseImgUrl(c.nm);
+    if(_imgCache[_imgPath]===true){
+        dimg.style.backgroundImage='url('+_imgPath+')';dimg.classList.add('has-img');
+    }else if(_imgCache[_imgPath]===false){
+        dimg.style.backgroundImage='';dimg.classList.remove('has-img');
+    }else{
+        dimg.style.backgroundImage='';dimg.classList.remove('has-img');
+        var _t=new Image();_t.onload=function(){
+            _imgCache[_imgPath]=true;
             dimg.style.backgroundImage='url('+_imgPath+')';dimg.classList.add('has-img');
-        }else if(_imgCache[_imgPath]===false){
-            dimg.style.backgroundImage='';dimg.classList.remove('has-img');
-        }else{
-            dimg.style.backgroundImage='';dimg.classList.remove('has-img');
-            var _t=new Image();_t.onload=function(){
-                _imgCache[_imgPath]=true;
-                dimg.style.backgroundImage='url('+_imgPath+')';dimg.classList.add('has-img');
-            };_t.onerror=function(){_imgCache[_imgPath]=false;};
-            _t.src=_imgPath;
-        }
+        };_t.onerror=function(){_imgCache[_imgPath]=false;};
+        _t.src=_imgPath;
     }
 
     // Update hash without scrolling
