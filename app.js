@@ -7,7 +7,7 @@
     var _origStringify=JSON.stringify;
     JSON.stringify=function(v){
         if(v&&v.cheeses&&v.cheeses.length>50){
-            console.warn('⚠️ Les données de ce site sont protégées par le droit d\'auteur.');
+            console.warn('⚠️ Les données d ce site sont protégées par le droit d\'auteur.');
             return '{"error":"protected"}';
         }
         return _origStringify.apply(JSON,arguments);
@@ -52,7 +52,7 @@ function cheeseSlug(name){
 }
 // Cache of verified image URLs (true=exists, false=not found)
 var _imgCache={};
-function cheeseImgUrl(name){return 'img/'+cheeseSlug(name)+'.jpg';}
+function cheeseImgUrl(name){return 'site/img/'+cheeseSlug(name)+'.jpg';}
 function isMonastic(c){
     if(!c.fm||c.fm==='-'||c.fm==='')return false;
     var t=c.fm.toLowerCase();
