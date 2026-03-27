@@ -50,11 +50,29 @@ function cheeseSlug(name){
     return name?name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
         .replace(/['']/g,'-').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,''):'';
 }
-// Cache of verified image URLs (true=exists, false=not found)
+// Cache of verified image URLs (true=url, false=not found)
 var _imgCache={};
 var _isLocal=(location.protocol==='file:'||location.hostname==='localhost'||location.hostname==='127.0.0.1');
 var _imgBase=_isLocal?'https://lesfromagesdubonheur.com/site/img/':'site/img/';
 function cheeseImgUrl(name){return _imgBase+cheeseSlug(name)+'.jpg';}
+function cheeseImgUrlAlt(name){return _imgBase+cheeseSlug(name)+'.jpeg';}
+// Try .jpg first, then .jpeg fallback; calls cb(url) on success or cb(null) on failure
+function loadCheeseImg(name,cb){
+    var slug=cheeseSlug(name);if(!slug){cb(null);return;}
+    var jpg=_imgBase+slug+'.jpg';
+    var jpeg=_imgBase+slug+'.jpeg';
+    if(_imgCache[slug]){cb(_imgCache[slug]);return;}
+    if(_imgCache[slug]===false){cb(null);return;}
+    var i1=new Image();
+    i1.onload=function(){_imgCache[slug]=jpg;cb(jpg);};
+    i1.onerror=function(){
+        var i2=new Image();
+        i2.onload=function(){_imgCache[slug]=jpeg;cb(jpeg);};
+        i2.onerror=function(){_imgCache[slug]=false;cb(null);};
+        i2.src=jpeg;
+    };
+    i1.src=jpg;
+}
 function isMonastic(c){
     if(!c.fm||c.fm==='-'||c.fm==='')return false;
     var t=c.fm.toLowerCase();
@@ -742,7 +760,7 @@ function updateLabels(){
 var _lazyObs=null;
 function initLazyLoad(){
     if(_lazyObs)_lazyObs.disconnect();
-    var targets=document.querySelectorAll('.ccard-img[data-src]');
+    var targets=document.querySelectorAll('.ccard-img[data-name]');
     if(!('IntersectionObserver' in window)){
         targets.forEach(function(el){_loadCardImg(el);});
         return;
@@ -755,13 +773,15 @@ function initLazyLoad(){
     targets.forEach(function(el){_lazyObs.observe(el);});
 }
 function _loadCardImg(el){
-    var src=el.dataset.src;if(!src)return;
-    if(_imgCache[src]===true){el.style.backgroundImage='url('+src+')';el.classList.add('ccard-img-loaded');el.removeAttribute('data-src');return;}
-    if(_imgCache[src]===false){el.classList.add('ccard-img-none');el.removeAttribute('data-src');return;}
-    var img=new Image();
-    img.onload=function(){_imgCache[src]=true;el.style.backgroundImage='url('+src+')';el.classList.add('ccard-img-loaded');};
-    img.onerror=function(){_imgCache[src]=false;el.classList.add('ccard-img-none');};
-    img.src=src;el.removeAttribute('data-src');
+    var name=el.dataset.name;if(!name)return;
+    var slug=cheeseSlug(name);
+    if(_imgCache[slug]){el.style.backgroundImage='url('+_imgCache[slug]+')';el.classList.add('ccard-img-loaded');el.removeAttribute('data-name');return;}
+    if(_imgCache[slug]===false){el.classList.add('ccard-img-none');el.removeAttribute('data-name');return;}
+    loadCheeseImg(name,function(url){
+        if(url){el.style.backgroundImage='url('+url+')';el.classList.add('ccard-img-loaded');}
+        else{el.classList.add('ccard-img-none');}
+    });
+    el.removeAttribute('data-name');
 }
 
 function renderGrid(){
@@ -864,10 +884,10 @@ function renderGrid(){
         top.appendChild(heartSpan);
         card.appendChild(top);
         // Always create image placeholder — lazy-loaded
-        var _sp=cheeseImgUrl(c.nm);
-        var cimg=document.createElement('div');cimg.className='ccard-img';cimg.dataset.src=_sp;
-        if(_imgCache[_sp]===true){cimg.style.backgroundImage='url('+_sp+')';cimg.classList.add('ccard-img-loaded');}
-        else if(_imgCache[_sp]===false){cimg.classList.add('ccard-img-none');}
+        var _slug=cheeseSlug(c.nm);
+        var cimg=document.createElement('div');cimg.className='ccard-img';cimg.dataset.name=c.nm;
+        if(_imgCache[_slug]){cimg.style.backgroundImage='url('+_imgCache[_slug]+')';cimg.classList.add('ccard-img-loaded');}
+        else if(_imgCache[_slug]===false){cimg.classList.add('ccard-img-none');}
         card.appendChild(cimg);
         var body=document.createElement('div');body.className='ccard-body';
         var lb=document.createElement('div');lb.className='ccard-label';lb.textContent=c.lb||'';
@@ -925,19 +945,17 @@ window._focus=function(idx){
     var oldHeadFav=document.querySelector('.dhead-fav');
     if(oldHeadFav)oldHeadFav.remove();
     var dimg=document.getElementById('dImg');
-    // Photos from img/ folder only (slug-based auto-detect)
-    var _imgPath=cheeseImgUrl(c.nm);
-    if(_imgCache[_imgPath]===true){
-        dimg.style.backgroundImage='url('+_imgPath+')';dimg.classList.add('has-img');
-    }else if(_imgCache[_imgPath]===false){
+    // Photos from img/ folder only (slug-based auto-detect, .jpg/.jpeg)
+    var _slug=cheeseSlug(c.nm);
+    if(_imgCache[_slug]){
+        dimg.style.backgroundImage='url('+_imgCache[_slug]+')';dimg.classList.add('has-img');
+    }else if(_imgCache[_slug]===false){
         dimg.style.backgroundImage='';dimg.classList.remove('has-img');
     }else{
         dimg.style.backgroundImage='';dimg.classList.remove('has-img');
-        var _t=new Image();_t.onload=function(){
-            _imgCache[_imgPath]=true;
-            dimg.style.backgroundImage='url('+_imgPath+')';dimg.classList.add('has-img');
-        };_t.onerror=function(){_imgCache[_imgPath]=false;};
-        _t.src=_imgPath;
+        loadCheeseImg(c.nm,function(url){
+            if(url){dimg.style.backgroundImage='url('+url+')';dimg.classList.add('has-img');}
+        });
     }
 
     // Update hash without scrolling
