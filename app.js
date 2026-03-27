@@ -7,7 +7,7 @@
     var _origStringify=JSON.stringify;
     JSON.stringify=function(v){
         if(v&&v.cheeses&&v.cheeses.length>50){
-            console.warn('⚠️ Les données d ce site sont protégées par le droit d\'auteur.');
+            console.warn('⚠️ Les données de ce site sont protégées par le droit d\'auteur.');
             return '{"error":"protected"}';
         }
         return _origStringify.apply(JSON,arguments);
@@ -52,7 +52,9 @@ function cheeseSlug(name){
 }
 // Cache of verified image URLs (true=exists, false=not found)
 var _imgCache={};
-function cheeseImgUrl(name){return 'site/img/'+cheeseSlug(name)+'.jpg';}
+var _isLocal=(location.protocol==='file:'||location.hostname==='localhost'||location.hostname==='127.0.0.1');
+var _imgBase=_isLocal?'https://lesfromagesdubonheur.com/site/img/':'site/img/';
+function cheeseImgUrl(name){return _imgBase+cheeseSlug(name)+'.jpg';}
 function isMonastic(c){
     if(!c.fm||c.fm==='-'||c.fm==='')return false;
     var t=c.fm.toLowerCase();
@@ -62,6 +64,25 @@ function isMonastic(c){
 }
 function hasEponyme(c){return c.ep&&Array.isArray(c.ep)&&c.ep.length>0&&c.ep.some(function(e){return e&&e!=='Eponyme';});}
 function isMobile(){return window.innerWidth<=768;}
+
+// ── FAVORITES (localStorage) ──
+var FAV_KEY='lfdb_favs';
+function getFavs(){try{return JSON.parse(localStorage.getItem(FAV_KEY))||[];}catch(e){return [];}}
+function saveFavs(arr){try{localStorage.setItem(FAV_KEY,JSON.stringify(arr));}catch(e){}}
+function isFav(name){return getFavs().indexOf(name)>=0;}
+function toggleFav(name){
+    var f=getFavs();var idx=f.indexOf(name);
+    if(idx>=0){f.splice(idx,1);}else{f.push(name);}
+    saveFavs(f);
+    updateFavBadge();
+    return idx<0; // returns true if added
+}
+function updateFavBadge(){
+    var count=getFavs().length;
+    var badge=document.getElementById('tabFavBadge');
+    if(badge){badge.textContent=count;badge.classList.toggle('has-items',count>0);}
+    var nc=document.getElementById('navFavCount');if(nc)nc.textContent=count;
+}
 
 // Cheese emoji icon
 var CHEESE_EMOJI='&#x1F9C0;';
@@ -74,7 +95,7 @@ var S={
     zoneL:null,localL:null,focusL:null,routeL:null,
     zoneOn:false,pateNames:{},userLoc:null,geoMarker:null,
     communeCache:{},communeLoading:{},
-    gridPage:0,filtersOpen:true
+    gridPage:0,filtersOpen:true,showFavs:false
 };
 
 // ── PERFORMANCE: localStorage cache helpers ──
@@ -340,6 +361,8 @@ function loadData(){
     catch(e){console.error('JSON:',e);track('error_loading',{error:e.message});return;}
     track('cheese_count_loaded',{count:S.data.cheeses.length});
     popFilters();applyF();
+    // Update favorites badge
+    updateFavBadge();
     // Handle hash routing
     handleHash();
     window.addEventListener('hashchange',handleHash);
@@ -432,6 +455,18 @@ function applyF(){
     document.getElementById('pillMonastic').classList.toggle('active',mo);
     document.getElementById('pillEponyme').classList.toggle('active',ep);
     updateMobFilterReset();
+    // Encode active filters in URL hash (for sharing)
+    var fp=[];
+    if(an)fp.push('espece='+encodeURIComponent(an));
+    if(lb)fp.push('label='+encodeURIComponent(lb));
+    if(rg)fp.push('region='+encodeURIComponent(rg));
+    if(pa)fp.push('pate='+encodeURIComponent(pa));
+    if(sa)fp.push('saison='+encodeURIComponent(sa));
+    if(go)fp.push('gout='+encodeURIComponent(go));
+    if(mo)fp.push('monastique=1');
+    if(ep)fp.push('eponyme=1');
+    if(fp.length>0)history.replaceState(null,null,'#'+fp.join('&'));
+    else if(!window.location.hash.match(/fromage=/))history.replaceState(null,null,window.location.pathname);
     // GA4: track filter usage
     if(an||lb||rg||pa||sa||go||mo||ep||q)track('filter_used',{animal:an,label:lb,region:rg,pate:pa,saison:sa,gout:go,monastic:mo?'oui':'',eponyme:ep?'oui':'',search:q,results:S.filtered.length});
 }
@@ -707,31 +742,44 @@ function updateLabels(){
 var _lazyObs=null;
 function initLazyLoad(){
     if(_lazyObs)_lazyObs.disconnect();
+    var targets=document.querySelectorAll('.ccard-img[data-src]');
     if(!('IntersectionObserver' in window)){
-        document.querySelectorAll('.ccard-img[data-bg]').forEach(function(el){
-            el.style.backgroundImage='url('+el.dataset.bg+')';
-        });
+        targets.forEach(function(el){_loadCardImg(el);});
         return;
     }
     _lazyObs=new IntersectionObserver(function(entries){
         entries.forEach(function(entry){
-            if(entry.isIntersecting){
-                var el=entry.target;
-                if(el.dataset.bg){
-                    el.style.backgroundImage='url('+el.dataset.bg+')';
-                    el.removeAttribute('data-bg');
-                }
-                _lazyObs.unobserve(el);
-            }
+            if(entry.isIntersecting){_loadCardImg(entry.target);_lazyObs.unobserve(entry.target);}
         });
     },{rootMargin:'200px'});
-    document.querySelectorAll('.ccard-img[data-bg]').forEach(function(el){
-        _lazyObs.observe(el);
-    });
+    targets.forEach(function(el){_lazyObs.observe(el);});
+}
+function _loadCardImg(el){
+    var src=el.dataset.src;if(!src)return;
+    if(_imgCache[src]===true){el.style.backgroundImage='url('+src+')';el.classList.add('ccard-img-loaded');el.removeAttribute('data-src');return;}
+    if(_imgCache[src]===false){el.classList.add('ccard-img-none');el.removeAttribute('data-src');return;}
+    var img=new Image();
+    img.onload=function(){_imgCache[src]=true;el.style.backgroundImage='url('+src+')';el.classList.add('ccard-img-loaded');};
+    img.onerror=function(){_imgCache[src]=false;el.classList.add('ccard-img-none');};
+    img.src=src;el.removeAttribute('data-src');
 }
 
 function renderGrid(){
     var gv=document.getElementById('gridView');gv.innerHTML='';
+
+    // Favorites filtering handled by nav buttons (desktop header + mobile tab)
+
+    // If showing favorites only, filter
+    if(S.showFavs){
+        var favs=getFavs();
+        if(favs.length===0){
+            var emptyFav=document.createElement('div');emptyFav.className='empty-state';
+            emptyFav.innerHTML='<div style="font-size:2rem;">♡</div><h3>Pas encore de favoris</h3><p>Cliquez sur le cœur d\'un fromage pour l\'ajouter à vos favoris.</p><button onclick="S.showFavs=false;var btn=document.getElementById(\'navFavBtn\');if(btn)btn.classList.remove(\'active\');window._view(\'grid\');" style="margin-top:1rem;padding:0.5rem 1rem;border:1px solid #e8e4de;border-radius:20px;background:#fff;cursor:pointer;font-size:0.85rem;color:#8B6F47;font-family:Inter,sans-serif;">Voir tous les fromages</button>';
+            gv.appendChild(emptyFav);
+            return;
+        }
+        S.filtered=S.filtered.filter(function(idx){return favs.indexOf(S.data.cheeses[idx].nm)>=0;});
+    }
 
     // Sort filtered indices alphabetically
     S.filtered.sort(function(a,b){
@@ -752,16 +800,33 @@ function renderGrid(){
     var letters={};
     for(var k=0;k<S.filtered.length;k++){
         var firstChar=S.data.cheeses[S.filtered[k]].nm.charAt(0).toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-        if(!firstChar.match(/[A-Z]/))firstChar='#';
+        if(!firstChar.match(/[A-Z]/))continue;
         letters[firstChar]=true;
     }
     var alphaBar=document.createElement('div');alphaBar.className='alpha-index';
+    // Desktop: individual letters
     'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(function(l){
-        var btn=document.createElement('button');btn.className='alpha-btn';btn.textContent=l;
+        var btn=document.createElement('button');btn.className='alpha-btn alpha-single';btn.textContent=l;
         if(!letters[l]){btn.classList.add('disabled');}
         else{btn.onclick=function(){
             var target=document.getElementById('letter-'+l);
             if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
+        };}
+        alphaBar.appendChild(btn);
+    });
+    // Mobile: grouped letters
+    var groups=['ABC','DEF','GHI','JKL','MNO','PQR','STU','VWX','YZ'];
+    groups.forEach(function(g){
+        var btn=document.createElement('button');btn.className='alpha-btn alpha-group';
+        btn.textContent=g.charAt(0)+'-'+g.charAt(g.length-1);
+        var hasAny=false;
+        for(var i=0;i<g.length;i++){if(letters[g.charAt(i)])hasAny=true;}
+        if(!hasAny){btn.classList.add('disabled');}
+        else{btn.onclick=function(){
+            for(var i=0;i<g.length;i++){
+                var target=document.getElementById('letter-'+g.charAt(i));
+                if(target){target.scrollIntoView({behavior:'smooth',block:'start'});break;}
+            }
         };}
         alphaBar.appendChild(btn);
     });
@@ -779,18 +844,31 @@ function renderGrid(){
         var c=S.data.cheeses[idx];
         // Letter separator
         var fl=c.nm.charAt(0).toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-        if(!fl.match(/[A-Z]/))fl='#';
-        if(fl!==currentLetter){
+        if(fl.match(/[A-Z]/)&&fl!==currentLetter){
             currentLetter=fl;
             var sep=document.createElement('div');sep.className='alpha-sep';sep.id='letter-'+fl;sep.textContent=fl;
             gi.appendChild(sep);
         }
         var card=document.createElement('div');card.className='ccard';
         card.onclick=(function(i){return function(){window._focus(i);};})(idx);
-        var top=document.createElement('div');top.className='ccard-top';top.textContent=c.nm;
+        var top=document.createElement('div');top.className='ccard-top';
+        var topName=document.createElement('span');topName.textContent=c.nm;top.appendChild(topName);
+        var heartSpan=document.createElement('span');heartSpan.className='ccard-fav'+(isFav(c.nm)?' ccard-fav-active':'');
+        heartSpan.dataset.name=c.nm;heartSpan.textContent=isFav(c.nm)?'♥':'♡';
+        heartSpan.onclick=(function(name,hs){return function(e){
+            e.stopPropagation();
+            var added=toggleFav(name);
+            hs.textContent=added?'♥':'♡';
+            hs.classList.toggle('ccard-fav-active',added);
+        };})(c.nm,heartSpan);
+        top.appendChild(heartSpan);
         card.appendChild(top);
+        // Always create image placeholder — lazy-loaded
         var _sp=cheeseImgUrl(c.nm);
-        if(_imgCache[_sp]===true){var cimg=document.createElement('div');cimg.className='ccard-img';cimg.dataset.bg=_sp;card.appendChild(cimg);}
+        var cimg=document.createElement('div');cimg.className='ccard-img';cimg.dataset.src=_sp;
+        if(_imgCache[_sp]===true){cimg.style.backgroundImage='url('+_sp+')';cimg.classList.add('ccard-img-loaded');}
+        else if(_imgCache[_sp]===false){cimg.classList.add('ccard-img-none');}
+        card.appendChild(cimg);
         var body=document.createElement('div');body.className='ccard-body';
         var lb=document.createElement('div');lb.className='ccard-label';lb.textContent=c.lb||'';
         var an=document.createElement('div');an.className='ccard-an';an.textContent=c.an||'-';
@@ -821,6 +899,18 @@ function handleHash(){
             var idx=S.data.cheeses.findIndex(function(c){return N(c.nm)===N(name);});
             if(idx>=0)setTimeout(function(){window._focus(idx);},300);
         }
+    }else if(hash&&hash.length>1&&hash.indexOf('fromage=')===-1){
+        // Restore filters from hash (e.g. #espece=Chèvre&region=Occitanie)
+        var params={};hash.substring(1).split('&').forEach(function(p){var kv=p.split('=');if(kv.length===2)params[kv[0]]=decodeURIComponent(kv[1]);});
+        if(params.espece)document.getElementById('fAnimal').value=params.espece;
+        if(params.label)document.getElementById('fLabel').value=params.label;
+        if(params.region)document.getElementById('fRegion').value=params.region;
+        if(params.pate)document.getElementById('fPate').value=params.pate;
+        if(params.saison)document.getElementById('fSaison').value=params.saison;
+        if(params.gout)document.getElementById('fGout').value=params.gout;
+        if(params.monastique)document.getElementById('fMonastic').checked=true;
+        if(params.eponyme)document.getElementById('fEponyme').checked=true;
+        if(Object.keys(params).length>0)setTimeout(function(){applyF();},300);
     }
 }
 
@@ -831,6 +921,9 @@ window._focus=function(idx){
     track('cheese_view',{cheese_name:c.nm,label:c.lb||'',region:(c.rg&&c.rg[0])||'',animal:c.an||''});
     document.getElementById('dName').textContent=c.nm;
     document.getElementById('dLabel').textContent=c.lb||'';
+    // Clean up previous heart icon in header
+    var oldHeadFav=document.querySelector('.dhead-fav');
+    if(oldHeadFav)oldHeadFav.remove();
     var dimg=document.getElementById('dImg');
     // Photos from img/ folder only (slug-based auto-detect)
     var _imgPath=cheeseImgUrl(c.nm);
@@ -880,8 +973,47 @@ window._focus=function(idx){
             prompt('Copier ce lien :',url);
         }
     };
-    labelRow.appendChild(shareBtn);
+    if(isMobile()){
+        // Mobile: share button in header next to cheese name
+        var headShare=document.getElementById('dHeadShare');
+        headShare.innerHTML='';headShare.appendChild(shareBtn);
+    }else{
+        labelRow.appendChild(shareBtn);
+    }
     db.appendChild(labelRow);
+
+    // Favorite button
+    var favBtn=document.createElement('button');favBtn.className='dfav';
+    var _isFav=isFav(c.nm);
+    favBtn.innerHTML=(_isFav?'♥':'♡')+' '+(_isFav?'Favori':'Ajouter aux favoris');
+    if(_isFav)favBtn.classList.add('dfav-active');
+    favBtn.onclick=function(){
+        var added=toggleFav(c.nm);
+        favBtn.innerHTML=(added?'♥ Favori':'♡ Ajouter aux favoris');
+        favBtn.classList.toggle('dfav-active',added);
+        // Update card heart if visible
+        document.querySelectorAll('.ccard-fav[data-name="'+CSS.escape(c.nm)+'"]').forEach(function(h){
+            h.textContent=added?'♥':'♡';h.classList.toggle('ccard-fav-active',added);
+        });
+    };
+    if(isMobile()){
+        // Mobile: small heart in header next to share button
+        var headFav=document.createElement('span');headFav.className='dhead-fav'+(_isFav?' dhead-fav-active':'');
+        headFav.textContent=_isFav?'♥':'♡';
+        headFav.onclick=function(){
+            var added=toggleFav(c.nm);
+            headFav.textContent=added?'♥':'♡';
+            headFav.classList.toggle('dhead-fav-active',added);
+            document.querySelectorAll('.ccard-fav[data-name="'+CSS.escape(c.nm)+'"]').forEach(function(h){
+                h.textContent=added?'♥':'♡';h.classList.toggle('ccard-fav-active',added);
+            });
+        };
+        var headShare=document.getElementById('dHeadShare');
+        headShare.parentNode.insertBefore(headFav, headShare);
+    }else{
+        // Desktop: compact fav button in label row
+        labelRow.appendChild(favBtn);
+    }
 
     // Characteristics grid — wrapped in toggle on mobile
     var grid=document.createElement('div');grid.className='dgrid';
@@ -927,7 +1059,7 @@ window._focus=function(idx){
         db.appendChild(mkSec('Fun Fact', function(inner){
             var t1=document.createElement('div');t1.className='dtext';t1.textContent=c.ff;
             inner.appendChild(t1);
-        }, true));
+        }, false));
     }
     // Monastique — collapsed on mobile
     if(isMonastic(c)){
@@ -943,12 +1075,19 @@ window._focus=function(idx){
             if(c.ao.da){var d1=document.createElement('div');d1.className='ditem';d1.innerHTML='<div class="ditem-l">Date AOP</div><div class="ditem-v">'+c.ao.da.replace(/\.0$/,'')+'</div>';aoGrid.appendChild(d1);}
             if(c.ao.dc_aoc){var d2=document.createElement('div');d2.className='ditem';d2.innerHTML='<div class="ditem-l">Date AOC</div><div class="ditem-v">'+c.ao.dc_aoc.replace(/\.0$/,'')+'</div>';aoGrid.appendChild(d2);}
             if(c.ao.di){var d3=document.createElement('div');d3.className='ditem';d3.innerHTML='<div class="ditem-l">Date IGP</div><div class="ditem-v">'+c.ao.di.replace(/\.0$/,'')+'</div>';aoGrid.appendChild(d3);}
-            if(c.ao.sp&&c.ao.sp!=='-'){var d6=document.createElement('div');d6.className='ditem';d6.innerHTML='<div class="ditem-l">Saisonnalité production</div><div class="ditem-v">'+c.ao.sp+'</div>';aoGrid.appendChild(d6);}
             if(c.ao.og&&c.ao.og!=='-'){var d4=document.createElement('div');d4.className='ditem';d4.innerHTML='<div class="ditem-l">OGM (cahier des charges)</div><div class="ditem-v">'+c.ao.og+'</div>';aoGrid.appendChild(d4);}
             if(c.ao.pf){var pf=parseFloat(c.ao.pf);if(!isNaN(pf)){var d5=document.createElement('div');d5.className='ditem';d5.innerHTML='<div class="ditem-l">Production fermière</div><div class="ditem-v">'+(pf*100).toFixed(1)+'%</div>';aoGrid.appendChild(d5);}}
             inner.appendChild(aoGrid);
+            if(c.ao.sp&&c.ao.sp!=='-'){
+                var spDiv=document.createElement('div');spDiv.className='dtext';spDiv.style.marginTop='0.6rem';
+                var spLbl=document.createElement('div');spLbl.className='dtext-l';spLbl.textContent='Saisonnalité de production';
+                spDiv.appendChild(spLbl);spDiv.appendChild(document.createTextNode(c.ao.sp));
+                inner.appendChild(spDiv);
+            }
             if(c.ao.cm&&c.ao.cm!=='-'){
-                var rec=document.createElement('div');rec.className='dtext';rec.style.marginTop='0.6rem';rec.textContent=c.ao.cm;
+                var rec=document.createElement('div');rec.className='dtext';rec.style.marginTop='0.6rem';
+                var cmLbl=document.createElement('div');cmLbl.className='dtext-l';cmLbl.textContent='Commentaire';
+                rec.appendChild(cmLbl);rec.appendChild(document.createTextNode(c.ao.cm));
                 inner.appendChild(rec);
             }
         }, false));
@@ -1146,7 +1285,7 @@ window._zoomProducer=function(p,cheeseName){
     if(dnav){
         dnav.addEventListener('click',function(e){
             if(!isMobile())return;
-            if(e.target.closest('.dclose'))return;
+            if(e.target.closest('.dclose,.dreduce'))return;
             detail.classList.toggle('expanded');
         });
     }
@@ -1444,6 +1583,12 @@ function hav(a,b){
 }
 
 window._clearItin=function(){S.itin=[];_saveItin();S.routeL.clearLayers();document.getElementById('itin').classList.remove('open');updateItinBadge();};
+window._toggleDesktopFavs=function(){
+    S.showFavs=!S.showFavs;
+    var btn=document.getElementById('navFavBtn');
+    if(btn)btn.classList.toggle('active',S.showFavs);
+    window._view('grid');
+};
 window._toggleItin=function(){
     var el=document.getElementById('itin');
     if(el.classList.contains('open')){el.classList.remove('open');}
@@ -1709,16 +1854,16 @@ try{
 }
 // ── PAGE NAVIGATION ──
 window._openPage=function(page){
+    track('page_open',{page:page});
     if(page==='about'){
-        // Full page navigation
-        document.getElementById('pageAbout').classList.add('active');
-        document.getElementById('homeBtn').classList.add('visible');
-    }else{
-        // Overlay for contact/suggest
-        var ids={contact:'pageContact',suggest:'pageSuggest'};
-        var el=document.getElementById(ids[page]);
+        window.location.href='about.html';
+    }else if(page==='contact'){
+        window.location.href='contact.html';
+    }else if(page==='definitions'){
+        window.location.href='definition.html';
+    }else if(page==='suggest'){
+        var el=document.getElementById('pageSuggest');
         if(el){el.classList.add('active');document.body.style.overflow='hidden';}
-        track('page_open',{page:page});
     }
 };
 window._closePage=function(){
@@ -1763,6 +1908,11 @@ window._mobTab=function(tab){
         window._view('map');
         window._toggleItin();
         window._closeMobPlus();
+    }else if(tab==='fav'){
+        document.getElementById('tabFav').classList.add('active');
+        S.showFavs=true;
+        window._view('grid');
+        window._closeMobPlus();
     }else if(tab==='plus'){
         document.getElementById('tabPlus').classList.add('active');
         document.getElementById('mobPlusMenu').classList.add('open');
@@ -1775,7 +1925,7 @@ window._closeMobPlus=function(){
     // Restore active tab based on current view
     var tabs=document.querySelectorAll('.mob-tab');
     tabs.forEach(function(t){t.classList.remove('active');});
-    if(S.currentView==='grid') document.getElementById('tabFromages').classList.add('active');
+    if(S.currentView==='grid'){if(S.showFavs) document.getElementById('tabFav').classList.add('active');else document.getElementById('tabFromages').classList.add('active');}
     else document.getElementById('tabCarte').classList.add('active');
 };
 // Update itinerary badge on tab bar
@@ -1787,8 +1937,23 @@ window._updateTabBadge=function(){
         badge.classList.toggle('has-items',cnt>0);
     }
 };
+// ── Desktop dropdown menus ──
+(function(){
+    document.querySelectorAll('.nav-dropdown').forEach(function(dd){
+        var btn=dd.querySelector('.nav-drop-btn');
+        btn.addEventListener('click',function(e){
+            e.stopPropagation();
+            var wasOpen=dd.classList.contains('open');
+            document.querySelectorAll('.nav-dropdown.open').forEach(function(d){d.classList.remove('open');});
+            if(!wasOpen)dd.classList.add('open');
+        });
+    });
+    document.addEventListener('click',function(){
+        document.querySelectorAll('.nav-dropdown.open').forEach(function(d){d.classList.remove('open');});
+    });
+})();
 document.addEventListener('keydown',function(e){
-    if(e.key==='Escape'){window._closePage();window._goHome();window._closeMobMenu();window._closeItinGen();}
+    if(e.key==='Escape'){window._closePage();window._goHome();window._closeMobMenu();window._closeItinGen();document.querySelectorAll('.nav-dropdown.open').forEach(function(d){d.classList.remove('open');});}
 });
 
 // ── ITINERARY GENERATOR (popup wizard) ──

@@ -49,7 +49,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css"/>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=20260327b">
 </head>
 <body>
 
@@ -78,13 +78,27 @@
             Filtres <span class="arrow" id="filterArrow">▼</span>
         </button>
         <div class="nav-links">
-            <button class="nav-link" onclick="window._openPage('about')">À propos</button>
-            <button class="nav-link" onclick="window._openPage('contact')">Contact</button>
-            <a class="nav-link insta-link" href="https://www.instagram.com/lesfromagesdubonheur/" target="_blank" rel="noopener" title="Suivez-nous sur Instagram"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg> Instagram</a>
-            <button class="nav-link itin-nav-btn" id="itinNavBtn" onclick="window._toggleItin()"> Mon itinéraire <span class="itin-badge" id="itinBadge"></span><span class="itin-tip show" id="itinTip">Cliquez sur un producteur pour l'ajouter à votre tournée</span></button>
+            <!-- Itinéraire dropdown -->
+            <div class="nav-dropdown" id="navItin">
+                <button class="nav-drop-btn" id="itinNavBtn">Itinéraire <span class="itin-badge" id="itinBadge"></span> <span class="nav-drop-arrow">▾</span></button>
+                <div class="nav-drop-menu">
+                    <button onclick="window._toggleItin();this.closest('.nav-dropdown').classList.remove('open');">Mon itinéraire <span class="itin-badge-sm" id="itinBadgeSm"></span></button>
+                    <button onclick="window._openItinGen();this.closest('.nav-dropdown').classList.remove('open');">Créer un itinéraire</button>
+                </div>
+            </div>
+            <!-- En savoir plus dropdown -->
+            <div class="nav-dropdown" id="navInfo">
+                <button class="nav-drop-btn">En savoir plus <span class="nav-drop-arrow">▾</span></button>
+                <div class="nav-drop-menu">
+                    <button onclick="window._openPage('about');this.closest('.nav-dropdown').classList.remove('open');">À propos</button>
+                    <button onclick="window._openPage('contact');this.closest('.nav-dropdown').classList.remove('open');">Contact</button>
+                    <button onclick="window._openPage('definitions');this.closest('.nav-dropdown').classList.remove('open');">Définitions</button>
+                    <a href="https://www.instagram.com/lesfromagesdubonheur/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/></svg>Instagram</a>
+                </div>
+            </div>
+            <button class="nav-fav-btn" id="navFavBtn" onclick="window._toggleDesktopFavs()">♥ <span id="navFavCount">0</span></button>
+            <button class="suggest-btn" onclick="window._openPage('suggest')" title="Suggérer un fromage">+ Suggérer un fromage</button>
         </div>
-        <button class="itin-gen-btn" onclick="window._openItinGen()" title="Créer un itinéraire fromager">Créer un itinéraire</button>
-        <button class="suggest-btn" onclick="window._openPage('suggest')" title="Suggérer un fromage">+ Suggérer un fromage</button>
         <button class="mob-menu-btn" id="mobMenuBtn" onclick="window._openMobMenu()"><span></span></button>
     </header>
     <div class="filter-bar" id="filterBar">
@@ -124,10 +138,11 @@
 
 <div class="detail" id="detail">
     <div class="dnav">
-        <button class="dclose" onclick="window._closeDetail()" aria-label="Fermer le détail">&times;</button>
+        <button class="dclose dclose-desktop" onclick="window._closeDetail()" aria-label="Fermer le détail">&times;</button>
+        <button class="dreduce dreduce-mobile" onclick="var d=document.getElementById('detail');if(d.classList.contains('expanded')){d.scrollTop=0;d.classList.remove('expanded');}else{window._closeDetail();}">Réduire</button>
     </div>
     <div class="dimg" id="dImg"></div>
-    <div class="dhead"><h2 id="dName"></h2><div class="dhead-sub" id="dLabel"></div></div>
+    <div class="dhead"><div class="dhead-left"><h2 id="dName"></h2><div class="dhead-sub" id="dLabel"></div></div><div id="dHeadShare"></div></div>
     <div class="detail-peek-actions">
         <button class="detail-expand-btn" onclick="document.getElementById('detail').classList.add('expanded')">↑ Voir les détails</button>
         <button class="detail-close-btn" onclick="window._closeDetail()">Fermer ↓</button>
@@ -255,6 +270,18 @@
     </div>
 </div>
 
+<div class="page-overlay" id="pageDefinitions" onclick="if(event.target===this)window._closePage()">
+    <div class="page-box">
+        <div class="page-header">
+            <h2>Définitions</h2>
+            <button class="page-close" onclick="window._closePage()">&times;</button>
+        </div>
+        <div class="page-content">
+            <p>Cette page est en cours de construction. Revenez bientôt !</p>
+        </div>
+    </div>
+</div>
+
 <!-- Mobile menu drawer -->
 <div class="mob-overlay" id="mobOverlay" onclick="window._closeMobMenu()"></div>
 <div class="mob-menu" id="mobMenu">
@@ -282,23 +309,24 @@
         <span>Itinéraire</span>
         <span class="tab-badge" id="tabItinBadge">0</span>
     </button>
+    <button class="mob-tab" id="tabFav" onclick="window._mobTab('fav')">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <span>Favoris</span>
+        <span class="tab-badge" id="tabFavBadge">0</span>
+    </button>
     <button class="mob-tab" id="tabPlus" onclick="window._mobTab('plus')">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
         <span>Plus</span>
     </button>
-    <a class="mob-tab mob-tab-insta" href="https://www.instagram.com/lesfromagesdubonheur/" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
-        <span>Insta</span>
-    </a>
 </nav>
 
 <!-- Mobile "Plus" menu overlay -->
 <div class="mob-plus-overlay" id="mobPlusOverlay" onclick="window._closeMobPlus()"></div>
 <div class="mob-plus-menu" id="mobPlusMenu">
-    <button onclick="window._openItinGen();window._closeMobPlus();">Créer un itinéraire</button>
-    <button onclick="window._openPage('suggest');window._closeMobPlus();">Suggérer un fromage</button>
     <button onclick="window._openPage('about');window._closeMobPlus();">À propos</button>
     <button onclick="window._openPage('contact');window._closeMobPlus();">Contact</button>
+    <button onclick="window._openPage('definitions');window._closeMobPlus();">Définitions</button>
+    <a href="https://www.instagram.com/lesfromagesdubonheur/" target="_blank" rel="noopener" onclick="window._closeMobPlus();" class="mob-plus-link"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:0.4rem;"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>Instagram</a>
 </div>
 
 <!-- ── ITINERARY GENERATOR MODAL ── -->
@@ -382,7 +410,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
-<script src="data.js?v=20260325g"></script>
-<script src="app.js?v=20260325g"></script>
+<script src="data.js?v=20260327b"></script>
+<script src="app.js?v=20260327b"></script>
 </body>
 </html>
