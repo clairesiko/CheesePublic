@@ -62,7 +62,7 @@ function isMonastic(c){
            t.indexOf('soeur')>-1||t.indexOf('trapp')>-1||t.indexOf('religieu')>-1||
            t.indexOf('père')>-1||t.indexOf('cistercien')>-1;
 }
-function hasEponyme(c){return c.ep&&Array.isArray(c.ep)&&c.ep.length>0&&c.ep.some(function(e){return e&&e!=='Eponyme';});}
+function hasEponyme(c){return c.ep&&Array.isArray(c.ep)&&c.ep.length>0;}
 function isMobile(){return window.innerWidth<=768;}
 
 // ── FAVORITES (localStorage) ──
