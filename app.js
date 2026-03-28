@@ -824,14 +824,18 @@ function renderGrid(){
         letters[firstChar]=true;
     }
     var alphaBar=document.createElement('div');alphaBar.className='alpha-index';
+    // Scroll helper: scroll inside gridView only, offset for sticky alpha bar
+    function scrollToLetter(letterId){
+        var target=document.getElementById(letterId);
+        if(!target)return;
+        var alphaH=alphaBar.offsetHeight||40;
+        gv.scrollTo({top:target.offsetTop-alphaH,behavior:'smooth'});
+    }
     // Desktop: individual letters
     'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(function(l){
         var btn=document.createElement('button');btn.className='alpha-btn alpha-single';btn.textContent=l;
         if(!letters[l]){btn.classList.add('disabled');}
-        else{btn.onclick=function(){
-            var target=document.getElementById('letter-'+l);
-            if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
-        };}
+        else{btn.onclick=function(){scrollToLetter('letter-'+l);};}
         alphaBar.appendChild(btn);
     });
     // Mobile: grouped letters
@@ -844,8 +848,8 @@ function renderGrid(){
         if(!hasAny){btn.classList.add('disabled');}
         else{btn.onclick=function(){
             for(var i=0;i<g.length;i++){
-                var target=document.getElementById('letter-'+g.charAt(i));
-                if(target){target.scrollIntoView({behavior:'smooth',block:'start'});break;}
+                var t=document.getElementById('letter-'+g.charAt(i));
+                if(t){scrollToLetter('letter-'+g.charAt(i));break;}
             }
         };}
         alphaBar.appendChild(btn);
