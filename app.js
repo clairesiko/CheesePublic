@@ -55,23 +55,28 @@ var _imgCache={};
 var _isLocal=(location.protocol==='file:'||location.hostname==='localhost'||location.hostname==='127.0.0.1');
 var _imgBase=_isLocal?'https://lesfromagesdubonheur.com/site/img/':'site/img/';
 function cheeseImgUrl(name){return _imgBase+cheeseSlug(name)+'.jpg';}
-function cheeseImgUrlAlt(name){return _imgBase+cheeseSlug(name)+'.jpeg';}
-// Try .jpg first, then .jpeg fallback; calls cb(url) on success or cb(null) on failure
+// Build capitalized slug: first letter uppercase of each segment (e.g. "comte" -> "Comte", "bleu-de-gex" -> "Bleu-de-gex")
+function _capSlug(name){
+    var s=cheeseSlug(name);
+    return s?s.charAt(0).toUpperCase()+s.slice(1):'';
+}
+// Try multiple image URL variants (case + extension); calls cb(url) on success or cb(null) on failure
 function loadCheeseImg(name,cb){
     var slug=cheeseSlug(name);if(!slug){cb(null);return;}
-    var jpg=_imgBase+slug+'.jpg';
-    var jpeg=_imgBase+slug+'.jpeg';
     if(_imgCache[slug]){cb(_imgCache[slug]);return;}
     if(_imgCache[slug]===false){cb(null);return;}
-    var i1=new Image();
-    i1.onload=function(){_imgCache[slug]=jpg;cb(jpg);};
-    i1.onerror=function(){
-        var i2=new Image();
-        i2.onload=function(){_imgCache[slug]=jpeg;cb(jpeg);};
-        i2.onerror=function(){_imgCache[slug]=false;cb(null);};
-        i2.src=jpeg;
-    };
-    i1.src=jpg;
+    var cap=_capSlug(name);
+    var candidates=[_imgBase+slug+'.jpg',_imgBase+cap+'.jpg',_imgBase+slug+'.jpeg',_imgBase+cap+'.jpeg'];
+    var idx=0;
+    function tryNext(){
+        if(idx>=candidates.length){_imgCache[slug]=false;cb(null);return;}
+        var url=candidates[idx++];
+        var img=new Image();
+        img.onload=function(){_imgCache[slug]=url;cb(url);};
+        img.onerror=tryNext;
+        img.src=url;
+    }
+    tryNext();
 }
 function isMonastic(c){
     if(!c.fm||c.fm==='-'||c.fm==='')return false;
