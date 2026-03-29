@@ -1551,12 +1551,19 @@ function renderItin(){
 
 window._exportItin=function(mode){
     if(S.itin.length<2){showToast('Ajoutez au moins 2 étapes');return;}
-    var pts=S.itin.map(function(s){return encodeURIComponent(s.pr.n)+'@'+s.pr.la+','+s.pr.lo;});
+    // Filter stops with valid coordinates
+    var valid=S.itin.filter(function(s){return s.pr.la&&s.pr.lo;});
+    if(valid.length<2){showToast('Coordonnées GPS manquantes');return;}
 
     if(mode==='driving'||mode==='walking'){
-        // Google Maps
-        var url='https://www.google.com/maps/dir/?api=1&origin='+pts[0]+'&destination='+pts[pts.length-1];
-        if(pts.length>2)url+='&waypoints='+pts.slice(1,-1).join('|');
+        // Google Maps Directions API — use lat,lon for origin/destination
+        var origin=valid[0].pr.la+','+valid[0].pr.lo;
+        var dest=valid[valid.length-1].pr.la+','+valid[valid.length-1].pr.lo;
+        var url='https://www.google.com/maps/dir/?api=1&origin='+encodeURIComponent(origin)+'&destination='+encodeURIComponent(dest);
+        if(valid.length>2){
+            var wps=valid.slice(1,-1).map(function(s){return s.pr.la+','+s.pr.lo;});
+            url+='&waypoints='+encodeURIComponent(wps.join('|'));
+        }
         url+='&travelmode='+mode;
         window.open(url,'_blank');
     }else if(mode==='komoot'){
@@ -2300,9 +2307,9 @@ function _igBuildResult(){
 }
 
 window._igExportGM=function(){
-    if(!window._igRoute)return;
+    if(!window._igRoute||!window._igRoute.length)return;
     var url='https://www.google.com/maps/dir/'+igSel.lat+','+igSel.lon+'/';
-    window._igRoute.forEach(function(s){url+=encodeURIComponent(s.name)+'@'+s.lat+','+s.lon+'/';});
+    window._igRoute.forEach(function(s){if(s.lat&&s.lon)url+=s.lat+','+s.lon+'/';});
     window.open(url,'_blank');
     track('itinerary_export',{type:'google_maps'});
 };
