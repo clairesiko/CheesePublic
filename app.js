@@ -85,6 +85,7 @@ function isMonastic(c){
            t.indexOf('soeur')>-1||t.indexOf('trapp')>-1||t.indexOf('religieu')>-1||
            t.indexOf('père')>-1||t.indexOf('cistercien')>-1;
 }
+function hasBio(c){return c.pr&&c.pr.some(function(p){return p.b;});}
 function hasEponyme(c){return c.ep&&Array.isArray(c.ep)&&c.ep.length>0;}
 function isMobile(){return window.innerWidth<=768;}
 
@@ -208,6 +209,8 @@ function openFilterSheet(){
     document.getElementById('fPateM').value=document.getElementById('fPate').value;
     document.getElementById('fSaisonM').value=document.getElementById('fSaison').value;
     document.getElementById('fGoutM').value=document.getElementById('fGout').value;
+    document.getElementById('fBioM').checked=document.getElementById('fBio').checked;
+    document.getElementById('pillBioM').classList.toggle('active',document.getElementById('fBio').checked);
     document.getElementById('fMonasticM').checked=document.getElementById('fMonastic').checked;
     document.getElementById('fEponymeM').checked=document.getElementById('fEponyme').checked;
     document.getElementById('pillMonasticM').classList.toggle('active',document.getElementById('fMonastic').checked);
@@ -226,18 +229,21 @@ window._closeFilterSheet=function(){
     overlay.classList.remove('active');
     setTimeout(function(){sheet.style.display='none';},300);
 };
-window._applyMobileFilters=function(){
-    // Sync mobile→desktop
+function syncMobileToDesktop(){
     document.getElementById('fAnimal').value=document.getElementById('fAnimalM').value;
     document.getElementById('fLabel').value=document.getElementById('fLabelM').value;
     document.getElementById('fRegion').value=document.getElementById('fRegionM').value;
     document.getElementById('fPate').value=document.getElementById('fPateM').value;
     document.getElementById('fSaison').value=document.getElementById('fSaisonM').value;
     document.getElementById('fGout').value=document.getElementById('fGoutM').value;
+    document.getElementById('fBio').checked=document.getElementById('fBioM').checked;
     document.getElementById('fMonastic').checked=document.getElementById('fMonasticM').checked;
     document.getElementById('fEponyme').checked=document.getElementById('fEponymeM').checked;
-    window._closeFilterSheet();
     applyF();
+}
+window._applyMobileFilters=function(){
+    syncMobileToDesktop();
+    window._closeFilterSheet();
 };
 window._resetFilters=function(){
     document.getElementById('fAnimalM').value='';
@@ -246,17 +252,28 @@ window._resetFilters=function(){
     document.getElementById('fPateM').value='';
     document.getElementById('fSaisonM').value='';
     document.getElementById('fGoutM').value='';
+    document.getElementById('fBioM').checked=false;
     document.getElementById('fMonasticM').checked=false;
     document.getElementById('fEponymeM').checked=false;
+    document.getElementById('pillBioM').classList.remove('active');
     document.getElementById('pillMonasticM').classList.remove('active');
     document.getElementById('pillEponymeM').classList.remove('active');
 };
 document.getElementById('fsOverlay').addEventListener('click',function(){window._closeFilterSheet();});
+document.getElementById('fBioM').addEventListener('change',function(){
+    document.getElementById('pillBioM').classList.toggle('active',this.checked);
+    syncMobileToDesktop();
+});
 document.getElementById('fMonasticM').addEventListener('change',function(){
     document.getElementById('pillMonasticM').classList.toggle('active',this.checked);
+    syncMobileToDesktop();
 });
 document.getElementById('fEponymeM').addEventListener('change',function(){
     document.getElementById('pillEponymeM').classList.toggle('active',this.checked);
+    syncMobileToDesktop();
+});
+['fAnimalM','fLabelM','fRegionM','fPateM','fSaisonM','fGoutM'].forEach(function(id){
+    document.getElementById(id).addEventListener('change',function(){syncMobileToDesktop();});
 });
 
 function initMap(){
@@ -449,6 +466,7 @@ function applyF(){
     var pa=document.getElementById('fPate').value;
     var sa=document.getElementById('fSaison').value;
     var go=document.getElementById('fGout').value;
+    var bi=document.getElementById('fBio').checked;
     var mo=document.getElementById('fMonastic').checked;
     var ep=document.getElementById('fEponyme').checked;
     var q=N(document.getElementById('searchInput').value);
@@ -462,6 +480,7 @@ function applyF(){
         if(pa&&N(c.tp)!==N(pa))ok=false;
         if(sa&&N(c.sa||'').indexOf(N(sa))===-1)ok=false;
         if(go&&N(c.go||'').indexOf(N(go))===-1)ok=false;
+        if(bi&&!hasBio(c))ok=false;
         if(mo&&!isMonastic(c))ok=false;
         if(ep&&!hasEponyme(c))ok=false;
         if(q){
@@ -475,6 +494,7 @@ function applyF(){
     });
     S.gridPage=0;
     renderMap();renderGrid();
+    document.getElementById('pillBio').classList.toggle('active',bi);
     document.getElementById('pillMonastic').classList.toggle('active',mo);
     document.getElementById('pillEponyme').classList.toggle('active',ep);
     updateMobFilterReset();
@@ -486,12 +506,13 @@ function applyF(){
     if(pa)fp.push('pate='+encodeURIComponent(pa));
     if(sa)fp.push('saison='+encodeURIComponent(sa));
     if(go)fp.push('gout='+encodeURIComponent(go));
+    if(bi)fp.push('bio=1');
     if(mo)fp.push('monastique=1');
     if(ep)fp.push('eponyme=1');
     if(fp.length>0)history.replaceState(null,null,'#'+fp.join('&'));
     else if(!window.location.hash.match(/fromage=/))history.replaceState(null,null,window.location.pathname);
     // GA4: track filter usage
-    if(an||lb||rg||pa||sa||go||mo||ep||q)track('filter_used',{animal:an,label:lb,region:rg,pate:pa,saison:sa,gout:go,monastic:mo?'oui':'',eponyme:ep?'oui':'',search:q,results:S.filtered.length});
+    if(an||lb||rg||pa||sa||go||bi||mo||ep||q)track('filter_used',{animal:an,label:lb,region:rg,pate:pa,saison:sa,gout:go,bio:bi?'oui':'',monastic:mo?'oui':'',eponyme:ep?'oui':'',search:q,results:S.filtered.length});
 }
 
 function renderMap(){
@@ -937,6 +958,7 @@ function handleHash(){
         if(params.pate)document.getElementById('fPate').value=params.pate;
         if(params.saison)document.getElementById('fSaison').value=params.saison;
         if(params.gout)document.getElementById('fGout').value=params.gout;
+        if(params.bio)document.getElementById('fBio').checked=true;
         if(params.monastique)document.getElementById('fMonastic').checked=true;
         if(params.eponyme)document.getElementById('fEponyme').checked=true;
         if(Object.keys(params).length>0)setTimeout(function(){applyF();},300);
@@ -1423,6 +1445,7 @@ window._view=function(v){
 
 window._reset=function(){
     ['fAnimal','fLabel','fRegion','fPate','fSaison','fGout'].forEach(function(id){document.getElementById(id).value='';});
+    document.getElementById('fBio').checked=false;
     document.getElementById('fMonastic').checked=false;
     document.getElementById('fEponyme').checked=false;
     document.getElementById('searchInput').value='';
@@ -1438,7 +1461,7 @@ function updateMobFilterReset(){
     var btn=document.getElementById('mobFilterReset');
     if(!btn)return;
     var hasFilter=['fAnimal','fLabel','fRegion','fPate','fSaison','fGout'].some(function(id){return document.getElementById(id).value!=='';})
-        || document.getElementById('fMonastic').checked || document.getElementById('fEponyme').checked
+        || document.getElementById('fBio').checked || document.getElementById('fMonastic').checked || document.getElementById('fEponyme').checked
         || document.getElementById('searchInput').value!=='';
     btn.classList.toggle('visible',hasFilter&&isMobile());
 }
@@ -1732,6 +1755,7 @@ function closeGeoPrompt(){
 
 // ── EVENTS ──
 ['fAnimal','fLabel','fRegion','fPate','fSaison','fGout'].forEach(function(id){document.getElementById(id).addEventListener('change',applyF);});
+document.getElementById('fBio').addEventListener('change',applyF);
 document.getElementById('fMonastic').addEventListener('change',applyF);
 document.getElementById('fEponyme').addEventListener('change',applyF);
 

@@ -69,6 +69,7 @@ select:focus{outline:none;border-color:#8B6F47;}
 }
 .pill input{display:none;}
 .pill.active,.pill:has(input:checked){background:#8B6F47;color:#fff;border-color:#8B6F47;}
+#pillBio.active,#pillBio:has(input:checked),#pillBioM.active,#pillBioM:has(input:checked){background:#43A047;border-color:#43A047;color:#fff;}
 .filter-reset{cursor:pointer;color:#C67A4A;font-size:0.75rem;opacity:0.7;transition:opacity 0.2s;font-weight:700;}
 .filter-reset:hover{opacity:1;}
 .sep{width:1px;height:20px;background:#e0dcd6;}
