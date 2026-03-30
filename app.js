@@ -1556,13 +1556,12 @@ window._exportItin=function(mode){
     if(valid.length<2){showToast('Coordonnées GPS manquantes');return;}
 
     if(mode==='driving'||mode==='walking'){
-        // Google Maps path format — Name/@lat,lon shows name + correct GPS
+        // Google Maps path format — raw Name/@lat,lon (no encodeURIComponent, no ?travelmode)
         var url='https://www.google.com/maps/dir/';
         valid.forEach(function(s){
-            var name=s.pr.n.replace(/\s+/g,'+');
-            url+=encodeURIComponent(name)+'/@'+s.pr.la+','+s.pr.lo+',17z/';
+            var name=s.pr.n.replace(/[?&#=]/g,'').replace(/\s+/g,'+');
+            url+=name+'/@'+s.pr.la+','+s.pr.lo+',15z/';
         });
-        url+='?travelmode='+mode;
         window.open(url,'_blank');
     }else if(mode==='komoot'){
         // Generate GPX file for Komoot import
@@ -2318,12 +2317,12 @@ function _igBuildResult(){
 
 window._igExportGM=function(){
     if(!window._igRoute||!window._igRoute.length)return;
-    var cityName=(window._igCity||'Départ').replace(/\s+/g,'+');
-    var url='https://www.google.com/maps/dir/'+encodeURIComponent(cityName)+'/@'+igSel.lat+','+igSel.lon+',12z/';
+    var cityName=(window._igCity||'Départ').replace(/[?&#=]/g,'').replace(/\s+/g,'+');
+    var url='https://www.google.com/maps/dir/'+cityName+'/@'+igSel.lat+','+igSel.lon+',12z/';
     window._igRoute.forEach(function(s){
         if(s.lat&&s.lon){
-            var name=s.name.replace(/\s+/g,'+');
-            url+=encodeURIComponent(name)+'/@'+s.lat+','+s.lon+',17z/';
+            var name=s.name.replace(/[?&#=]/g,'').replace(/\s+/g,'+');
+            url+=name+'/@'+s.lat+','+s.lon+',15z/';
         }
     });
     window.open(url,'_blank');
