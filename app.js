@@ -1564,17 +1564,13 @@ window._exportItin=function(mode){
         });
         window.open(url,'_blank');
     }else if(mode==='komoot'){
-        // Generate GPX file for Komoot import
-        var gpx='<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="Les Fromages du Bonheur">\n<metadata><name>Itinéraire Fromager</name></metadata>\n<rte><name>Tournée des fromages</name>\n';
-        S.itin.forEach(function(s,i){
-            gpx+='<rtept lat="'+s.pr.la+'" lon="'+s.pr.lo+'"><name>'+(i+1)+'. '+s.pr.n.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</name><desc>'+s.cn.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</desc></rtept>\n';
+        // Open Komoot plan page with waypoints
+        var kUrl='https://www.komoot.com/plan/@'+valid[0].pr.la+','+valid[0].pr.lo+',12z?sport=touringbicycle';
+        valid.forEach(function(s,i){
+            var prefix=i===0?'&start=':'&wp=';
+            kUrl+=prefix+s.pr.la+'%2C'+s.pr.lo;
         });
-        gpx+='</rte>\n</gpx>';
-        var blob=new Blob([gpx],{type:'application/gpx+xml'});
-        var a=document.createElement('a');a.href=URL.createObjectURL(blob);
-        a.download='itinéraire-fromager.gpx';a.click();
-        URL.revokeObjectURL(a.href);
-        showToast('GPX téléchargé — importez-le dans Komoot');
+        window.open(kUrl,'_blank');
     }
 };
 
@@ -2217,12 +2213,12 @@ function _igBuildResult(){
         else{igSel.lat=46.6;igSel.lon=2.5;}
     }else{city='Ma position';}
 
-    // Radius & max expansion: duration × transport lookup table
+    // Radius & max expansion: distance from start (one-way), kept realistic for round trip
     var IG_RADII={
-        'Demi-journée':{'en voiture':[120,200],'à vélo':[40,80],'à pied':[15,20]},
-        'Journée':     {'en voiture':[200,350],'à vélo':[80,150],'à pied':[22,50]},
-        'Week-end':    {'en voiture':[300,900],'à vélo':[150,450],'à pied':[45,135]},
-        'Vacances':    {'en voiture':[500,1500],'à vélo':[250,750],'à pied':[75,225]}
+        'Demi-journée':{'en voiture':[40,80],'à vélo':[15,30],'à pied':[5,10]},
+        'Journée':     {'en voiture':[60,120],'à vélo':[25,50],'à pied':[8,18]},
+        'Week-end':    {'en voiture':[100,200],'à vélo':[40,100],'à pied':[15,40]},
+        'Vacances':    {'en voiture':[150,400],'à vélo':[80,200],'à pied':[25,75]}
     };
     var rEntry=(IG_RADII[igSel.dur]||{})[igSel.trans]||[200,600];
     var baseR=rEntry[0],maxR=rEntry[1];
@@ -2304,7 +2300,11 @@ function _igBuildResult(){
             '</div>';
     });
     totalDist+=selected[0].dist;
-    html+='<div class="ig-total">~'+Math.round(totalDist)+' km au total · '+igSel.dur+' '+igSel.trans+'</div>';
+    // Add return distance (last stop back to start)
+    var lastStop=selected[selected.length-1];
+    var returnDist=_haversine(lastStop.lat,lastStop.lon,igSel.lat,igSel.lon);
+    totalDist+=returnDist;
+    html+='<div class="ig-total">~'+Math.round(totalDist)+' km aller-retour · '+igSel.dur+' '+igSel.trans+'</div>';
     html+='<div class="ig-export">';
     html+='<button class="ig-export-btn" onclick="window._igShowOnMap()" style="background:#8B6F47;color:#fff;border-color:#8B6F47;font-weight:500;width:100%;">🗺️ Voir sur la carte</button>';
     html+='</div>';
@@ -2329,7 +2329,12 @@ window._igExportGM=function(){
     track('itinerary_export',{type:'google_maps'});
 };
 window._igExportKomoot=function(){
-    var url='https://www.komoot.com/plan/@'+igSel.lat+','+igSel.lon+',12z';
+    if(!window._igRoute||!window._igRoute.length)return;
+    var url='https://www.komoot.com/plan/@'+igSel.lat+','+igSel.lon+',12z?sport=touringbicycle';
+    url+='&start='+igSel.lat+'%2C'+igSel.lon;
+    window._igRoute.forEach(function(s){
+        if(s.lat&&s.lon)url+='&wp='+s.lat+'%2C'+s.lon;
+    });
     window.open(url,'_blank');
     track('itinerary_export',{type:'komoot'});
 };
@@ -2390,7 +2395,10 @@ window._igRemoveStop=function(idx){
             '</div>';
     });
     totalDist+=selected[0].dist;
-    html+='<div class="ig-total">~'+Math.round(totalDist)+' km au total · '+igSel.dur+' '+igSel.trans+'</div>';
+    var lastS=selected[selected.length-1];
+    var retD=_haversine(lastS.lat,lastS.lon,igSel.lat,igSel.lon);
+    totalDist+=retD;
+    html+='<div class="ig-total">~'+Math.round(totalDist)+' km aller-retour · '+igSel.dur+' '+igSel.trans+'</div>';
     html+='<div class="ig-export">';
     html+='<button class="ig-export-btn" onclick="window._igShowOnMap()" style="background:#8B6F47;color:#fff;border-color:#8B6F47;font-weight:500;width:100%;">🗺️ Voir sur la carte</button>';
     html+='</div>';
