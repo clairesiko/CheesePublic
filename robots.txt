@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 Disallow:
 
-Sitemap: https://www.lesfromagesdubonheur.com/sitemap.xml
+Sitemap: https://lesfromagesdubonheur.com/sitemap.xml
 
 # Block AI crawlers
 User-agent: GPTBot
