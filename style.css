@@ -961,6 +961,8 @@ select:focus{outline:none;border-color:#8B6F47;}
     color:#666;font-size:0.8rem;cursor:pointer;font-family:'Inter',sans-serif;
 }
 .ig-back-btn:hover{border-color:#8B6F47;color:#8B6F47;}
+.ig-spinner{width:32px;height:32px;border:3px solid #f0ece6;border-top:3px solid #8B6F47;border-radius:50%;margin:0 auto;animation:igSpin 0.7s linear infinite;}
+@keyframes igSpin{to{transform:rotate(360deg);}}
 .ig-no-result{text-align:center;padding:1.5rem 0.5rem;}
 .ig-no-icon{font-size:2.5rem;margin-bottom:0.8rem;}
 .ig-no-result h3{font-family:'Playfair Display',serif;font-size:1.1rem;color:#8B6F47;margin-bottom:0.5rem;}
@@ -969,9 +971,20 @@ select:focus{outline:none;border-color:#8B6F47;}
 @media(max-width:768px){
     .itin-gen-btn{display:none;}
     .ig-modal{width:100%;max-width:none;border-radius:16px 16px 0 0;
-        position:fixed;bottom:0;left:0;right:0;max-height:90vh;overflow-y:auto;}
-    .ig-header{padding:1.2rem;}
+        position:fixed;bottom:0;left:0;right:0;max-height:90vh;overflow-y:auto;
+        padding-left:0.8rem;padding-right:0.8rem;}
+    .ig-header{padding:1.2rem 0.5rem;}
     .ig-header h2{font-size:1.2rem;}
+    .ig-stop{padding:0.5rem 0.4rem;gap:0.5rem;}
+    .ig-stop-name{font-size:0.8rem;line-height:1.3;}
+    .ig-stop-cheese{font-size:0.72rem;}
+    .ig-stop-dist{font-size:0.65rem;}
+    .ig-stop-num{width:22px;height:22px;font-size:0.65rem;}
+    .ig-result-header h3{font-size:1rem;}
+    .ig-result-header p{font-size:0.72rem;}
+    .ig-total{padding:0.5rem 0.6rem;font-size:0.75rem;}
+    .ig-export{margin-top:0.6rem;}
+    .ig-export-btn{font-size:0.72rem;padding:0.5rem 0.6rem;}
 }
 
 /* ── ANTI-SCRAPING ── */

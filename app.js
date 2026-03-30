@@ -1556,15 +1556,13 @@ window._exportItin=function(mode){
     if(valid.length<2){showToast('Coordonnées GPS manquantes');return;}
 
     if(mode==='driving'||mode==='walking'){
-        // Google Maps Directions API — use lat,lon for origin/destination
-        var origin=valid[0].pr.la+','+valid[0].pr.lo;
-        var dest=valid[valid.length-1].pr.la+','+valid[valid.length-1].pr.lo;
-        var url='https://www.google.com/maps/dir/?api=1&origin='+encodeURIComponent(origin)+'&destination='+encodeURIComponent(dest);
-        if(valid.length>2){
-            var wps=valid.slice(1,-1).map(function(s){return s.pr.la+','+s.pr.lo;});
-            url+='&waypoints='+encodeURIComponent(wps.join('|'));
-        }
-        url+='&travelmode='+mode;
+        // Google Maps path format — Name/@lat,lon shows name + correct GPS
+        var url='https://www.google.com/maps/dir/';
+        valid.forEach(function(s){
+            var name=s.pr.n.replace(/\s+/g,'+');
+            url+=encodeURIComponent(name)+'/@'+s.pr.la+','+s.pr.lo+',17z/';
+        });
+        url+='?travelmode='+mode;
         window.open(url,'_blank');
     }else if(mode==='komoot'){
         // Generate GPX file for Komoot import
@@ -2129,9 +2127,12 @@ function _igShowStep(n){
         // Show footer only if there's a visible button (back or generate)
         footer.style.display=(n>0||n===3)?'flex':'none';
     }else{
-        _igBuildResult();
-        document.getElementById('igResult').classList.add('active');
+        // Show loading spinner, then build result
+        var igPanel=document.getElementById('igResult');
+        igPanel.innerHTML='<div style="text-align:center;padding:2rem 0;"><div class="ig-spinner"></div><p style="color:#999;font-size:0.82rem;margin-top:0.8rem;">Création de votre itinéraire…</p></div>';
+        igPanel.classList.add('active');
         footer.style.display='none';
+        setTimeout(function(){_igBuildResult();},80);
     }
     btnBack.style.display=n>0?'':'none';
     // Show footer if back button is visible
@@ -2253,11 +2254,20 @@ function _igBuildResult(){
     var expanded=(usedRadius>baseR);
 
     candidates.sort(function(a,b){return a.dist-b.dist;});
-    var selected=[],usedCheeses={};
+    // Deduplicate by producer: group cheeses per producer, one stop per producer
+    var selected=[],usedProducers={},usedCheeses={};
     candidates.forEach(function(c){
-        if(selected.length>=igSel.maxStops)return;
+        if(selected.length>=igSel.maxStops&&!usedProducers[c.name])return;
         if(usedCheeses[c.cheese])return;
-        usedCheeses[c.cheese]=true;selected.push(c);
+        usedCheeses[c.cheese]=true;
+        if(usedProducers[c.name]){
+            // Same producer already selected — append cheese to existing stop
+            var existing=usedProducers[c.name];
+            existing.cheese+=', '+c.cheese;
+        }else if(selected.length<igSel.maxStops){
+            usedProducers[c.name]=c;
+            selected.push(c);
+        }
     });
     // Nearest-neighbor ordering
     if(selected.length>1){
@@ -2308,8 +2318,14 @@ function _igBuildResult(){
 
 window._igExportGM=function(){
     if(!window._igRoute||!window._igRoute.length)return;
-    var url='https://www.google.com/maps/dir/'+igSel.lat+','+igSel.lon+'/';
-    window._igRoute.forEach(function(s){if(s.lat&&s.lon)url+=s.lat+','+s.lon+'/';});
+    var cityName=(window._igCity||'Départ').replace(/\s+/g,'+');
+    var url='https://www.google.com/maps/dir/'+encodeURIComponent(cityName)+'/@'+igSel.lat+','+igSel.lon+',12z/';
+    window._igRoute.forEach(function(s){
+        if(s.lat&&s.lon){
+            var name=s.name.replace(/\s+/g,'+');
+            url+=encodeURIComponent(name)+'/@'+s.lat+','+s.lon+',17z/';
+        }
+    });
     window.open(url,'_blank');
     track('itinerary_export',{type:'google_maps'});
 };
