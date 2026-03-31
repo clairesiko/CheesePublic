@@ -613,17 +613,30 @@ select:focus{outline:none;border-color:#8B6F47;}
     .detail-close-btn:hover{background:#eee;color:#666;}
 
     /* ── MOBILE ITINERARY ── */
-    .itin{width:100%!important;left:0!important;right:0!important;bottom:56px!important;
-        max-height:55vh;border-radius:16px 16px 0 0;
+    .itin{width:100%!important;left:0!important;right:0!important;
+        bottom:calc(56px + env(safe-area-inset-bottom, 0px))!important;
+        max-height:42vh;border-radius:16px 16px 0 0;
         box-shadow:0 -4px 24px rgba(0,0,0,0.12);
         overflow-x:hidden;
+        transition:max-height 0.3s ease;
     }
-    .itin-head{padding:0.7rem 1rem;}
-    .itin-export{padding:0.5rem 1rem;}
-    .itin-body{padding:0.75rem 1rem;}
-    .itin-export-title{font-size:0.7rem;}
+    .itin.collapsed{max-height:48px!important;overflow:hidden!important;}
+    .itin-head{padding:0.5rem 1rem;}
+    .itin-head h3{font-size:0.85rem;}
+    .itin-export{padding:0.4rem 1rem;overflow-x:hidden;}
+    .itin-body{padding:0.5rem 1rem;}
+    .itin-export-title{font-size:0.68rem;}
     .itin-export-grid{flex-direction:row;}
-    .itin-export-btn{flex:1;justify-content:center;font-size:0.78rem;padding:0.4rem 0.3rem;}
+    .itin-export-btn{flex:1;justify-content:center;font-size:0.75rem;padding:0.35rem 0.2rem;}
+    .istop{padding:0.4rem 0.5rem;font-size:0.78rem;}
+    .idist{font-size:0.68rem;padding:0.15rem 0;}
+    .itotal{font-size:0.78rem;margin:0.3rem 0;}
+    .itin-toggle{
+        display:inline-flex;align-items:center;gap:0.2rem;
+        background:none;border:none;cursor:pointer;color:#bbb;font-size:0.75rem;
+        padding:0.2rem;transition:transform 0.3s;
+    }
+    .itin.collapsed .itin-toggle{transform:rotate(180deg);}
 
     /* ── MOBILE GRID ── */
     .grid-view{padding:0 0.75rem 60px;}
@@ -976,12 +989,14 @@ select:focus{outline:none;border-color:#8B6F47;}
 @media(max-width:768px){
     .itin-gen-btn{display:none;}
     .ig-modal{width:100%;max-width:none;border-radius:16px 16px 0 0;
-        position:fixed;bottom:0;left:0;right:0;max-height:90vh;overflow-y:auto;
-        padding-left:0.8rem;padding-right:0.8rem;}
-    .ig-header{padding:1.2rem 0.5rem;}
-    .ig-header h2{font-size:1.2rem;}
-    .ig-stop{padding:0.5rem 0.4rem;gap:0.5rem;}
-    .ig-stop-name{font-size:0.8rem;line-height:1.3;}
+        position:fixed;bottom:0;left:0;right:0;max-height:85vh;overflow-y:auto;
+        padding-left:0;padding-right:0;}
+    .ig-body{padding:1rem;}
+    .ig-header{padding:1rem 0.8rem;}
+    .ig-header h2{font-size:1.1rem;}
+    .ig-header p{font-size:0.78rem;}
+    .ig-stop{padding:0.5rem 0.4rem;gap:0.5rem;position:relative;}
+    .ig-stop-name{font-size:0.8rem;line-height:1.3;padding-right:1.2rem;}
     .ig-stop-cheese{font-size:0.72rem;}
     .ig-stop-dist{font-size:0.65rem;}
     .ig-stop-num{width:22px;height:22px;font-size:0.65rem;}

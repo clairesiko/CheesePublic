@@ -49,7 +49,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css"/>
-    <link rel="stylesheet" href="style.css?v=20260330b">
+    <link rel="stylesheet" href="style.css?v=20260330c">
 </head>
 <body>
 
@@ -154,7 +154,10 @@
 <div class="itin" id="itin">
     <div class="itin-head">
         <h3>Mon itinéraire fromager</h3>
-        <button class="itin-close" onclick="window._toggleItin()">&times;</button>
+        <span style="display:flex;align-items:center;gap:0.3rem;">
+            <button class="itin-toggle" onclick="document.getElementById('itin').classList.toggle('collapsed')" title="Réduire / Agrandir">▼</button>
+            <button class="itin-close" onclick="window._toggleItin()">&times;</button>
+        </span>
     </div>
     <div class="itin-export" id="itinExport">
         <div class="itin-export-title">Exporter l'itinéraire</div>
