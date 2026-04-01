@@ -2279,6 +2279,12 @@ function _igBuildResult(){
         '<p>'+selected.length+' étapes · '+igSel.dur+' '+igSel.trans+' depuis '+city+'</p>'+
         (expanded?'<p style="font-size:0.72rem;color:#C67A4A;margin-top:0.3rem;">Itinéraire ambitieux — rayon élargi à ~'+usedRadius+' km pour plus de découvertes</p>':'')+
         '</div>';
+    // Show starting point as first visual step
+    html+='<div class="ig-stop" style="opacity:0.7;">'+
+        '<div class="ig-stop-num" style="background:#C67A4A;">📍</div><div class="ig-stop-info">'+
+        '<div class="ig-stop-name">'+city+'</div>'+
+        '<div class="ig-stop-cheese" style="color:#999;">Point de départ</div>'+
+        '</div></div>';
     var totalDist=0;
     selected.forEach(function(s,i){
         var badges='';
@@ -2287,7 +2293,7 @@ function _igBuildResult(){
         if(s.monastique)badges+=' <span class="ig-badge" style="background:#EDE7F6;color:#6A1B9A;">Monastique</span>';
         var detail='<span style="font-size:0.68rem;color:#999;">'+[s.animal,s.pate,s.gout].filter(function(x){return x&&x!=='-'&&x!=='Non précisé';}).join(' · ')+'</span>';
         var distText;
-        if(i===0){distText='Départ · à '+Math.round(s.dist)+' km';}
+        if(i===0){distText='↓ '+Math.round(s.dist)+' km';}
         else{var seg=_haversine(selected[i-1].lat,selected[i-1].lon,s.lat,s.lon);totalDist+=seg;
             distText=igSel.trans==='à pied'?'↓ '+seg.toFixed(1)+' km':'↓ '+Math.round(seg)+' km';}
         html+='<div class="ig-stop" style="position:relative;">'+
@@ -2344,8 +2350,12 @@ window._igShowOnMap=function(){
     if(!window._igRoute||!window._igRoute.length)return;
     // Close the modal
     window._closeItinGen();
-    // Clear existing itinerary and add generated stops
+    // Clear existing itinerary, add start point + generated stops
     S.itin=[];
+    // Add starting city/position as first stop
+    if(igSel.lat&&igSel.lon){
+        S.itin.push({pr:{n:window._igCity||'Départ',la:igSel.lat,lo:igSel.lon},cn:'Point de départ',isGeo:true});
+    }
     window._igRoute.forEach(function(s){
         S.itin.push({pr:{n:s.name,la:s.lat,lo:s.lon,b:!!s.bio},cn:s.cheese});
     });
