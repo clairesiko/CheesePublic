@@ -1556,11 +1556,16 @@ window._exportItin=function(mode){
     if(valid.length<2){showToast('Coordonnées GPS manquantes');return;}
 
     if(mode==='driving'||mode==='walking'){
-        // Google Maps direction format — use raw coordinates for reliable waypoints
-        var url='https://www.google.com/maps/dir/';
-        valid.forEach(function(s){
-            url+=s.pr.la+','+s.pr.lo+'/';
-        });
+        // Google Maps Directions API URL format — works on desktop + mobile app
+        var origin=valid[0].pr.la+','+valid[0].pr.lo;
+        var dest=valid[valid.length-1].pr.la+','+valid[valid.length-1].pr.lo;
+        var tm=mode==='driving'?'driving':'walking';
+        var url='https://www.google.com/maps/dir/?api=1&travelmode='+tm+'&origin='+origin+'&destination='+dest;
+        if(valid.length>2){
+            var wps=[];
+            for(var i=1;i<valid.length-1;i++){wps.push(valid[i].pr.la+','+valid[i].pr.lo);}
+            url+='&waypoints='+wps.join('|');
+        }
         window.open(url,'_blank');
     }else if(mode==='komoot'){
         // Open Komoot plan page with waypoints
@@ -2322,12 +2327,17 @@ function _igBuildResult(){
 
 window._igExportGM=function(){
     if(!window._igRoute||!window._igRoute.length)return;
-    var url='https://www.google.com/maps/dir/'+igSel.lat+','+igSel.lon+'/';
-    window._igRoute.forEach(function(s){
-        if(s.lat&&s.lon){
-            url+=s.lat+','+s.lon+'/';
-        }
-    });
+    var stops=window._igRoute.filter(function(s){return s.lat&&s.lon;});
+    if(!stops.length)return;
+    var origin=igSel.lat+','+igSel.lon;
+    var last=stops[stops.length-1];
+    var dest=last.lat+','+last.lon;
+    var url='https://www.google.com/maps/dir/?api=1&travelmode=driving&origin='+origin+'&destination='+dest;
+    if(stops.length>1){
+        var wps=[];
+        for(var i=0;i<stops.length-1;i++){wps.push(stops[i].lat+','+stops[i].lon);}
+        url+='&waypoints='+wps.join('|');
+    }
     window.open(url,'_blank');
     track('itinerary_export',{type:'google_maps'});
 };
