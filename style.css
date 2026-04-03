@@ -1,5 +1,5 @@
 *{margin:0;padding:0;box-sizing:border-box;}
-html,body{height:100%;width:100%;overflow:hidden;overflow-x:hidden;}
+html,body{height:100%;width:100%;overflow:hidden;overflow-x:hidden;overscroll-behavior:none;}
 body{font-family:'Inter',sans-serif;color:#3a3226;background:#F8F9FA;-webkit-text-size-adjust:100%;}
 a{color:#8B6F47;text-decoration:none;}
 
@@ -200,13 +200,15 @@ select:focus{outline:none;border-color:#8B6F47;}
     position:fixed;right:0;top:0;width:380px;height:100%;
     background:#fff;
     border-left:1px solid #e8e4de;
-    z-index:510;overflow-y:auto;
+    z-index:510;overflow-y:auto;overflow-x:hidden;
     transform:translateX(100%);transition:transform 0.35s cubic-bezier(.25,.1,.25,1);
     box-shadow:-4px 0 20px rgba(0,0,0,0.06);
     pointer-events:none;
     -webkit-overflow-scrolling:touch;
+    visibility:hidden;
 }
-.detail.open{transform:translateX(0);pointer-events:auto;}
+.detail.open{visibility:visible;}
+.detail.open{transform:translateX(0);pointer-events:auto;visibility:visible;}
 .dnav{
     position:sticky;top:0;z-index:10;
     display:flex;justify-content:space-between;align-items:center;
@@ -659,8 +661,8 @@ select:focus{outline:none;border-color:#8B6F47;}
 
     /* Touch */
     .detail,.itin,.filter-sheet,.grid-view{-webkit-overflow-scrolling:touch;touch-action:pan-y;}
-    body{touch-action:manipulation;overflow-x:hidden!important;overscroll-behavior-x:none;}
-    html{overflow-x:hidden!important;overscroll-behavior-x:none;}
+    body{touch-action:manipulation;overflow-x:hidden!important;overscroll-behavior:none;}
+    html{overflow-x:hidden!important;overscroll-behavior:none;position:fixed;top:0;left:0;right:0;bottom:0;}
 }
 
 /* ── MOBILE TAB BAR ── */
