@@ -1557,13 +1557,22 @@ window._exportItin=function(mode){
 
     if(mode==='driving'||mode==='walking'){
         // Google Maps Directions API URL format — works on desktop + mobile app
-        var origin=valid[0].pr.la+','+valid[0].pr.lo;
-        var dest=valid[valid.length-1].pr.la+','+valid[valid.length-1].pr.lo;
+        // Use named waypoints so mobile app shows producer/cheese names instead of "Dropped pin"
+        function gmLabel(s){
+            var name=s.cn||'';
+            var prod=s.pr.n||'';
+            // Use producer name if available, otherwise cheese name, with coords as fallback
+            var label=prod||name;
+            if(label&&label!=='Point de départ') return encodeURIComponent(label)+',France';
+            return s.pr.la+','+s.pr.lo;
+        }
+        var origin=gmLabel(valid[0]);
+        var dest=gmLabel(valid[valid.length-1]);
         var tm=mode==='driving'?'driving':'walking';
         var url='https://www.google.com/maps/dir/?api=1&travelmode='+tm+'&origin='+origin+'&destination='+dest;
         if(valid.length>2){
             var wps=[];
-            for(var i=1;i<valid.length-1;i++){wps.push(valid[i].pr.la+','+valid[i].pr.lo);}
+            for(var i=1;i<valid.length-1;i++){wps.push(gmLabel(valid[i]));}
             url+='&waypoints='+wps.join('|');
         }
         window.open(url,'_blank');
@@ -1735,7 +1744,7 @@ function showGeoPrompt(){
     var overlay=document.createElement('div');overlay.className='geo-overlay';overlay.id='geoOverlay';
     var box=document.createElement('div');box.className='geo-prompt';
     box.innerHTML='<h3>Bienvenue !</h3>'+
-    '<p>Découvrez plus de 400 fromages français, localisez les producteurs et créez votre itinéraire fromager.</p>'+
+    '<p>Découvrez les fromages français, localisez les producteurs et créez votre itinéraire fromager.</p>'+
     '<div class="geo-prompt-btns" style="flex-direction:column;gap:0.4rem;">'+
     '<button class="mbtn" id="geoYes" style="width:100%;">📍 Me localiser et explorer</button>'+
     '<button class="mbtn mbtn-outline" id="geoItin" style="width:100%;">🗺️ Créer un itinéraire fromager</button>'+
