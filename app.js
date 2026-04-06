@@ -310,7 +310,7 @@ function initMap(){
         iconCreateFunction:function(cl){
             var n=cl.getChildCount(),sz=n>50?46:n>20?40:34;
             return L.divIcon({
-                html:'<div style="display:flex;flex-direction:column;align-items:center;"><div class="cluster-icon" style="width:'+sz+'px;height:'+sz+'px;font-size:'+(sz>40?13:11)+'px;">'+n+'</div><span style="color:#8B6F47;font-size:9px;font-weight:600;font-family:Inter,sans-serif;margin-top:2px;text-shadow:0 0 3px #fff,0 0 3px #fff;">fromages</span></div>',
+                html:'<div style="display:flex;flex-direction:column;align-items:center;"><div class="cluster-icon" style="width:'+sz+'px;height:'+sz+'px;font-size:'+(sz>40?13:11)+'px;">'+n+'</div><span style="color:#8B6F47;font-size:9px;font-weight:600;font-family:Inter,sans-serif;margin-top:2px;text-shadow:0 0 3px #fff,0 0 3px #fff;">'+T('cheeses')+'</span></div>',
                 iconSize:[sz,sz+16],iconAnchor:[sz/2,(sz+16)/2],className:''
             });
         }
@@ -422,14 +422,15 @@ function popFilters(){
     function pop(id,set,sh){
         var sel=document.getElementById(id);
         Array.from(set).sort().forEach(function(v){
-            var o=document.createElement('option');o.value=v;o.textContent=sh?S.pateNames[v]:v;sel.appendChild(o);
+            var display=sh?S.pateNames[v]:v;
+            var o=document.createElement('option');o.value=v;o.textContent=typeof TF==='function'?TF(display):display;sel.appendChild(o);
         });
     }
     // Desktop filters
     pop('fAnimal',an);pop('fLabel',lb);pop('fRegion',rg);pop('fPate',pa,true);
     // Saison: 4 fixed seasons instead of DB combos
     ['Printemps','Été','Automne','Hiver'].forEach(function(s){
-        var o=document.createElement('option');o.value=s;o.textContent=s;
+        var o=document.createElement('option');o.value=s;o.textContent=typeof TF==='function'?TF(s):s;
         document.getElementById('fSaison').appendChild(o);
     });
     pop('fGout',go);
@@ -666,7 +667,7 @@ function drawLocal(){
                         if(cheeses.length===1){window._focus(cheeses[0]);}
                         else{
                             var items=cheeses.map(function(i){var c2=S.data.cheeses[i];return{idx:i,nm:c2.nm,label:c2.lb||''};}).sort(function(a,b){return a.nm.localeCompare(b.nm);});
-                            var html='<div class="cheese-selector"><div class="cheese-selector-title">'+items.length+' fromages dans cette commune</div>';
+                            var html='<div class="cheese-selector"><div class="cheese-selector-title">'+items.length+' '+T('cheeses_in_commune')+'</div>';
                             items.forEach(function(it){html+='<button class="cheese-selector-item" onclick="window._focus('+it.idx+');this.closest(\'.leaflet-popup\').querySelector(\'.leaflet-popup-close-button\').click();">'+it.nm+(it.label?' <span class=\"cs-label\">'+it.label+'</span>':'')+'</button>';});
                             html+='</div>';
                             L.popup({maxWidth:280}).setLatLng(e.latlng).setContent(html).openOn(S.map);
@@ -751,7 +752,7 @@ function updateLabels(){
             var listHtml=names.map(function(n){return '<div style="padding:1px 0;">'+n+'</div>';}).join('');
             var label=L.marker(ll,{
                 icon:L.divIcon({
-                    html:'<div class="group-label"><div class="gl-num">'+g.length+'</div><span class="gl-txt">fromages</span></div>',
+                    html:'<div class="group-label"><div class="gl-num">'+g.length+'</div><span class="gl-txt">'+T('cheeses')+'</span></div>',
                     className:'',iconSize:[0,0],iconAnchor:[0,12]
                 }),
                 interactive:true,zIndexOffset:1000
@@ -820,7 +821,7 @@ function renderGrid(){
         var favs=getFavs();
         if(favs.length===0){
             var emptyFav=document.createElement('div');emptyFav.className='empty-state';
-            emptyFav.innerHTML='<div style="font-size:2rem;">♡</div><h3>Pas encore de favoris</h3><p>Cliquez sur le cœur d\'un fromage pour l\'ajouter à vos favoris.</p><button onclick="S.showFavs=false;var btn=document.getElementById(\'navFavBtn\');if(btn)btn.classList.remove(\'active\');window._view(\'grid\');" style="margin-top:1rem;padding:0.5rem 1rem;border:1px solid #e8e4de;border-radius:20px;background:#fff;cursor:pointer;font-size:0.85rem;color:#8B6F47;font-family:Inter,sans-serif;">Voir tous les fromages</button>';
+            emptyFav.innerHTML='<div style="font-size:2rem;">♡</div><h3>'+T('no_favorites_yet')+'</h3><p>'+T('favorites_hint')+'</p><button onclick="S.showFavs=false;var btn=document.getElementById(\'navFavBtn\');if(btn)btn.classList.remove(\'active\');window._view(\'grid\');" style="margin-top:1rem;padding:0.5rem 1rem;border:1px solid #e8e4de;border-radius:20px;background:#fff;cursor:pointer;font-size:0.85rem;color:#8B6F47;font-family:Inter,sans-serif;">'+T('view_all_cheeses')+'</button>';
             gv.appendChild(emptyFav);
             return;
         }
@@ -837,7 +838,7 @@ function renderGrid(){
     // Empty state
     if(S.filtered.length===0){
         var empty=document.createElement('div');empty.className='empty-state';
-        empty.innerHTML='<div class="emoji" style="font-size:2rem;">—</div><h3>Aucun fromage trouvé</h3><p>Essayez de modifier vos filtres ou votre recherche pour découvrir d\'autres fromages.</p>';
+        empty.innerHTML='<div class="emoji" style="font-size:2rem;">—</div><h3>'+T('no_cheese_found')+'</h3><p>'+T('try_modify_filters')+'</p>';
         gv.appendChild(empty);
         return;
     }
@@ -1006,7 +1007,8 @@ window._focus=function(idx){
     labelRow.appendChild(bx);
     // Share button
     var shareBtn=document.createElement('button');shareBtn.className='dshare';
-    shareBtn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Partager';
+    var _shareSvg='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> ';
+    shareBtn.innerHTML=_shareSvg+T('share');
     shareBtn.onclick=function(){
         var url=window.location.origin+window.location.pathname+'#fromage='+encodeURIComponent(c.nm);
         if(navigator.clipboard&&navigator.clipboard.writeText){
@@ -1015,7 +1017,7 @@ window._focus=function(idx){
                 shareBtn.innerHTML=T('link_copied');
                 setTimeout(function(){
                     shareBtn.classList.remove('dshare-ok');
-                    shareBtn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Partager';
+                    shareBtn.innerHTML=_shareSvg+T('share');
                 },2000);
             });
         }else{
@@ -1038,7 +1040,7 @@ window._focus=function(idx){
     if(_isFav)favBtn.classList.add('dfav-active');
     favBtn.onclick=function(){
         var added=toggleFav(c.nm);
-        favBtn.innerHTML=(added?'♥ Favori':'♡ Ajouter aux favoris');
+        favBtn.innerHTML=(added?'♥ '+T('favorite'):'♡ '+T('add_to_favorites'));
         favBtn.classList.toggle('dfav-active',added);
         // Update card heart if visible
         document.querySelectorAll('.ccard-fav[data-name="'+CSS.escape(c.nm)+'"]').forEach(function(h){
@@ -1125,7 +1127,7 @@ window._focus=function(idx){
             if(c.ao.dc_aoc){var d2=document.createElement('div');d2.className='ditem';d2.innerHTML='<div class="ditem-l">Date AOC</div><div class="ditem-v">'+c.ao.dc_aoc.replace(/\.0$/,'')+'</div>';aoGrid.appendChild(d2);}
             if(c.ao.di){var d3=document.createElement('div');d3.className='ditem';d3.innerHTML='<div class="ditem-l">Date IGP</div><div class="ditem-v">'+c.ao.di.replace(/\.0$/,'')+'</div>';aoGrid.appendChild(d3);}
             if(c.ao.og&&c.ao.og!=='-'){var d4=document.createElement('div');d4.className='ditem';d4.innerHTML='<div class="ditem-l">OGM (cahier des charges)</div><div class="ditem-v">'+c.ao.og+'</div>';aoGrid.appendChild(d4);}
-            if(c.ao.pf){var pf=parseFloat(c.ao.pf);if(!isNaN(pf)){var d5=document.createElement('div');d5.className='ditem';d5.innerHTML='<div class="ditem-l">Production fermière</div><div class="ditem-v">'+(pf*100).toFixed(1)+'%</div>';aoGrid.appendChild(d5);}}
+            if(c.ao.pf){var pf=parseFloat(c.ao.pf);if(!isNaN(pf)){var d5=document.createElement('div');d5.className='ditem';d5.innerHTML='<div class="ditem-l">'+T('farmstead_production')+'</div><div class="ditem-v">'+(pf*100).toFixed(1)+'%</div>';aoGrid.appendChild(d5);}}
             inner.appendChild(aoGrid);
             if(c.ao.sp&&c.ao.sp!=='-'){
                 var spDiv=document.createElement('div');spDiv.className='dtext';spDiv.style.marginTop='0.6rem';
@@ -1177,11 +1179,11 @@ window._focus=function(idx){
 
     // Inline legend
     var leg=document.createElement('div');leg.className='dlegend';
-    leg.innerHTML='<div class="dleg-title">Légende carte</div>'+
-        '<div class="dleg-row"><span class="dleg-dot" style="background:#8B6F47;font-size:6px;">'+CHEESE_EMOJI+'</span> Fromage</div>'+
-        '<div class="dleg-row"><span class="dleg-dot" style="background:#E8836B;">'+HOUSE_SVG.replace(/width="\d+"/g,'width="6"').replace(/height="\d+"/g,'height="6"')+'</span> Producteur</div>'+
-        '<div class="dleg-row"><span class="dleg-dot" style="background:#5D4037;">'+FLAG_SVG.replace(/width="\d+"/g,'width="6"').replace(/height="\d+"/g,'height="6"')+'</span> Commune éponyme</div>'+
-        '<div class="dleg-row"><span class="dleg-dot" style="background:#66BB6A;"></span> Zone de production</div>';
+    leg.innerHTML='<div class="dleg-title">'+T('map_legend')+'</div>'+
+        '<div class="dleg-row"><span class="dleg-dot" style="background:#8B6F47;font-size:6px;">'+CHEESE_EMOJI+'</span> '+T('cheese')+'</div>'+
+        '<div class="dleg-row"><span class="dleg-dot" style="background:#E8836B;">'+HOUSE_SVG.replace(/width="\d+"/g,'width="6"').replace(/height="\d+"/g,'height="6"')+'</span> '+T('producer')+'</div>'+
+        '<div class="dleg-row"><span class="dleg-dot" style="background:#5D4037;">'+FLAG_SVG.replace(/width="\d+"/g,'width="6"').replace(/height="\d+"/g,'height="6"')+'</span> '+T('eponymous_commune')+'</div>'+
+        '<div class="dleg-row"><span class="dleg-dot" style="background:#66BB6A;"></span> '+T('production_zone')+'</div>';
     db.appendChild(leg);
 
     document.getElementById('detail').classList.add('open');
@@ -1250,7 +1252,7 @@ window._showCheeseSelector=function(markers,latlng){
     }).sort(function(a,b){return a.nm.localeCompare(b.nm);});
 
     var html='<div class="cheese-selector">';
-    html+='<div class="cheese-selector-title">'+items.length+' fromages à cet endroit</div>';
+    html+='<div class="cheese-selector-title">'+items.length+' '+T('cheeses_at_location')+'</div>';
     items.forEach(function(it){
         html+='<button class="cheese-selector-item" onclick="window._focus('+it.idx+');this.closest(\'.leaflet-popup\').querySelector(\'.leaflet-popup-close-button\').click();">'+it.nm;
         if(it.label) html+=' <span class="cs-label">'+it.label+'</span>';
@@ -1399,8 +1401,8 @@ function highlightZone(idx, doneCb){
             });
             var mk=L.marker([p.la,p.lo],{icon:ic}).addTo(S.focusL);
             var bt=p.b?' <span style="background:#43A047;color:#fff;padding:1px 4px;border-radius:3px;font-size:9px;">Bio</span>':'';
-            mk.bindPopup('<strong>'+p.n+'</strong>'+bt+'<br><span style="color:#999;font-size:0.8rem;">'+c.nm+'</span><br><a href="#" onclick="window._addItin({n:\''+p.n.replace(/'/g,"\\'")+'\',la:'+p.la+',lo:'+p.lo+',b:'+(p.b?'true':'false')+'},\''+c.nm.replace(/'/g,"\\'")+'\');return false;" style="color:#8B6F47;font-size:0.82rem;">+ Ajouter à l\'itinéraire</a>');
-            mk.bindTooltip('Cliquez pour ajouter à l\'itinéraire',{direction:'top',offset:[0,-14],className:'cheese-tooltip',permanent:false});
+            mk.bindPopup('<strong>'+p.n+'</strong>'+bt+'<br><span style="color:#999;font-size:0.8rem;">'+c.nm+'</span><br><a href="#" onclick="window._addItin({n:\''+p.n.replace(/'/g,"\\'")+'\',la:'+p.la+',lo:'+p.lo+',b:'+(p.b?'true':'false')+'},\''+c.nm.replace(/'/g,"\\'")+'\');return false;" style="color:#8B6F47;font-size:0.82rem;">'+T('add_to_itinerary_long')+'</a>');
+            mk.bindTooltip(T('click_add_itinerary'),{direction:'top',offset:[0,-14],className:'cheese-tooltip',permanent:false});
             mk.on('click',function(){
                 window._addItin({n:p.n,la:p.la,lo:p.lo,b:!!p.b},c.nm);
             });
@@ -1492,7 +1494,7 @@ function renderItin(){
     var exportPanel=document.getElementById('itinExport');
 
     if(S.itin.length===0){
-        body.innerHTML='<p style="color:#999;font-size:0.82rem;line-height:1.5;"><a href="#" onclick="event.preventDefault();window._toggleItin();" style="color:#8B6F47;text-decoration:underline;">Ajoutez des producteurs</a> ou <a href="#" onclick="event.preventDefault();window._toggleItin();setTimeout(function(){window._openItinGen();},200);" style="color:#8B6F47;text-decoration:underline;">créer ton itinéraire</a></p>';
+        body.innerHTML='<p style="color:#999;font-size:0.82rem;line-height:1.5;"><a href="#" onclick="event.preventDefault();window._toggleItin();" style="color:#8B6F47;text-decoration:underline;">'+T('itin_add_producers')+'</a> <a href="#" onclick="event.preventDefault();window._toggleItin();setTimeout(function(){window._openItinGen();},200);" style="color:#8B6F47;text-decoration:underline;">'+T('itin_or_create')+'</a></p>';
         exportPanel.classList.remove('has-items');
         return;
     }
@@ -1542,7 +1544,7 @@ function renderItin(){
     body.appendChild(rb);
 
     var cb=document.createElement('button');cb.className='mbtn mbtn-outline';cb.style.marginTop='0.3rem';
-    cb.textContent='Vider l\'itinéraire';
+    cb.textContent=T('clear_itinerary');
     cb.onclick=function(){S.itin=[];_saveItin();renderItin();drawRoute();updateItinBadge();document.getElementById('itin').classList.remove('open');};
     body.appendChild(cb);
 
@@ -1725,11 +1727,11 @@ function addLegend(){
         options:{position:'bottomright'},
         onAdd:function(){
             var d=L.DomUtil.create('div');d.className='mleg';
-            d.innerHTML='<div class="mleg-t">Légende</div>'+
-            '<div class="mleg-i"><span class="mleg-d" style="background:#8B6F47;font-size:9px;line-height:1;">'+CHEESE_EMOJI+'</span> Fromage</div>'+
-            '<div class="mleg-i"><span class="mleg-d" style="background:#E8836B;">'+HOUSE_SVG.replace('width="13" height="13"','width="8" height="8"')+'</span> Producteur</div>'+
-            '<div class="mleg-i"><span class="mleg-d" style="background:#5D4037;">'+FLAG_SVG.replace('width="12" height="12"','width="8" height="8"')+'</span> Commune éponyme</div>'+
-            '<div class="mleg-i"><span class="mleg-d" style="background:#66BB6A;"></span> Zone de production</div>';
+            d.innerHTML='<div class="mleg-t">'+T('legend')+'</div>'+
+            '<div class="mleg-i"><span class="mleg-d" style="background:#8B6F47;font-size:9px;line-height:1;">'+CHEESE_EMOJI+'</span> '+T('cheese')+'</div>'+
+            '<div class="mleg-i"><span class="mleg-d" style="background:#E8836B;">'+HOUSE_SVG.replace('width="13" height="13"','width="8" height="8"')+'</span> '+T('producer')+'</div>'+
+            '<div class="mleg-i"><span class="mleg-d" style="background:#5D4037;">'+FLAG_SVG.replace('width="12" height="12"','width="8" height="8"')+'</span> '+T('eponymous_commune')+'</div>'+
+            '<div class="mleg-i"><span class="mleg-d" style="background:#66BB6A;"></span> '+T('production_zone')+'</div>';
             L.DomEvent.disableClickPropagation(d);
             return d;
         }
@@ -2137,7 +2139,7 @@ function _igShowStep(n){
     }else{
         // Show loading spinner, then build result
         var igPanel=document.getElementById('igResult');
-        igPanel.innerHTML='<div style="text-align:center;padding:2rem 0;"><div class="ig-spinner"></div><p style="color:#999;font-size:0.82rem;margin-top:0.8rem;">Création de votre itinéraire…</p></div>';
+        igPanel.innerHTML='<div style="text-align:center;padding:2rem 0;"><div class="ig-spinner"></div><p style="color:#999;font-size:0.82rem;margin-top:0.8rem;">'+T('creating_itinerary')+'</p></div>';
         igPanel.classList.add('active');
         footer.style.display='none';
         setTimeout(function(){_igBuildResult();},80);
@@ -2220,7 +2222,7 @@ function _igBuildResult(){
     if(!S.data)return;
     var city='';
     if(igSel.locType==='city'){
-        city=document.getElementById('igCityInput').value||'Votre ville';
+        city=document.getElementById('igCityInput').value||T('your_city');
         var key=city.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
         if(ITIN_CITIES[key]){igSel.lat=ITIN_CITIES[key].la;igSel.lon=ITIN_CITIES[key].lo;}
         else{igSel.lat=46.6;igSel.lon=2.5;}
@@ -2250,12 +2252,12 @@ function _igBuildResult(){
     var panel=document.getElementById('igResult');
     if(candidates.length===0){
         panel.innerHTML='<div class="ig-no-result"><div class="ig-no-icon">🧭</div>'+
-            '<h3>Pas encore d\'itinéraire disponible</h3>'+
-            '<p>Même en élargissant la recherche, nous n\'avons pas trouvé assez de producteurs avec ces critères.<br><br>'+
-            'Essayez de modifier vos préférences ou votre point de départ.</p>'+
-            '<button class="ig-back-btn" onclick="window._igShowStep(3)">Modifier mes préférences</button>'+
-            '<button class="ig-back-btn" onclick="window._igShowStep(1)">Changer la durée</button>'+
-            '<button class="ig-back-btn" onclick="window._igShowStep(0)">Changer le point de départ</button></div>';
+            '<h3>'+T('no_itinerary_yet')+'</h3>'+
+            '<p>'+T('no_producers_found')+'<br><br>'+
+            T('try_modify')+'</p>'+
+            '<button class="ig-back-btn" onclick="window._igShowStep(3)">'+T('modify_preferences')+'</button>'+
+            '<button class="ig-back-btn" onclick="window._igShowStep(1)">'+T('change_duration')+'</button>'+
+            '<button class="ig-back-btn" onclick="window._igShowStep(0)">'+T('change_starting_point')+'</button></div>';
         track('itinerary_no_result',{city:city,transport:igSel.trans,duration:igSel.dur,prefs:igSel.prefs.join(',')});
         return;
     }
@@ -2288,9 +2290,9 @@ function _igBuildResult(){
         selected=ordered;
     }
 
-    var html='<div class="ig-result-header"><h3>Votre tournée fromage</h3>'+
-        '<p>'+selected.length+' étapes · '+igSel.dur+' '+igSel.trans+' depuis '+city+'</p>'+
-        (expanded?'<p style="font-size:0.72rem;color:#C67A4A;margin-top:0.3rem;">Itinéraire ambitieux — rayon élargi à ~'+usedRadius+' km pour plus de découvertes</p>':'')+
+    var html='<div class="ig-result-header"><h3>'+T('your_cheese_tour')+'</h3>'+
+        '<p>'+selected.length+' '+T('stops')+' · '+igSel.dur+' '+igSel.trans+' '+T('from_city')+' '+city+'</p>'+
+        (expanded?'<p style="font-size:0.72rem;color:#C67A4A;margin-top:0.3rem;">'+T('ambitious_radius',{radius:usedRadius})+'</p>':'')+
         '</div>';
     // Show starting point as first visual step
     html+='<div class="ig-stop" style="opacity:0.7;">'+
@@ -2323,11 +2325,11 @@ function _igBuildResult(){
     var lastStop=selected[selected.length-1];
     var returnDist=_haversine(lastStop.lat,lastStop.lon,igSel.lat,igSel.lon);
     totalDist+=returnDist;
-    html+='<div class="ig-total">~'+Math.round(totalDist)+' km aller-retour · '+igSel.dur+' '+igSel.trans+'</div>';
+    html+='<div class="ig-total">~'+Math.round(totalDist)+' km '+T('round_trip')+' · '+igSel.dur+' '+igSel.trans+'</div>';
     html+='<div class="ig-export">';
-    html+='<button class="ig-export-btn" onclick="window._igShowOnMap()" style="background:#8B6F47;color:#fff;border-color:#8B6F47;font-weight:500;width:100%;">🗺️ Voir sur la carte</button>';
+    html+='<button class="ig-export-btn" onclick="window._igShowOnMap()" style="background:#8B6F47;color:#fff;border-color:#8B6F47;font-weight:500;width:100%;">🗺️ '+T('view_on_map')+'</button>';
     html+='</div>';
-    html+='<button class="ig-back-btn" onclick="window._igShowStep(0)">Modifier mes choix</button>';
+    html+='<button class="ig-back-btn" onclick="window._igShowStep(0)">'+T('modify_choices')+'</button>';
     panel.innerHTML=html;
 
     window._igRoute=selected;window._igCity=city;
@@ -2398,8 +2400,8 @@ window._igRemoveStop=function(idx){
     var panel=document.getElementById('igResult');
     var city=window._igCity||'';
     var selected=window._igRoute;
-    var html='<div class="ig-result-header"><h3>Votre tournée fromage</h3>'+
-        '<p>'+selected.length+' étapes · '+igSel.dur+' '+igSel.trans+' depuis '+city+'</p></div>';
+    var html='<div class="ig-result-header"><h3>'+T('your_cheese_tour')+'</h3>'+
+        '<p>'+selected.length+' '+T('stops')+' · '+igSel.dur+' '+igSel.trans+' '+T('from_city')+' '+city+'</p></div>';
     var totalDist=0;
     selected.forEach(function(s,i){
         var badges='';
@@ -2424,11 +2426,11 @@ window._igRemoveStop=function(idx){
     var lastS=selected[selected.length-1];
     var retD=_haversine(lastS.lat,lastS.lon,igSel.lat,igSel.lon);
     totalDist+=retD;
-    html+='<div class="ig-total">~'+Math.round(totalDist)+' km aller-retour · '+igSel.dur+' '+igSel.trans+'</div>';
+    html+='<div class="ig-total">~'+Math.round(totalDist)+' km '+T('round_trip')+' · '+igSel.dur+' '+igSel.trans+'</div>';
     html+='<div class="ig-export">';
-    html+='<button class="ig-export-btn" onclick="window._igShowOnMap()" style="background:#8B6F47;color:#fff;border-color:#8B6F47;font-weight:500;width:100%;">🗺️ Voir sur la carte</button>';
+    html+='<button class="ig-export-btn" onclick="window._igShowOnMap()" style="background:#8B6F47;color:#fff;border-color:#8B6F47;font-weight:500;width:100%;">🗺️ '+T('view_on_map')+'</button>';
     html+='</div>';
-    html+='<button class="ig-back-btn" onclick="window._igShowStep(0)">Modifier mes choix</button>';
+    html+='<button class="ig-back-btn" onclick="window._igShowStep(0)">'+T('modify_choices')+'</button>';
     panel.innerHTML=html;
 };
 
@@ -2446,4 +2448,44 @@ window._onLangChange = function(lang) {
     // Update footer
     var footer = document.querySelector('.site-footer');
     if (footer) footer.innerHTML = T('footer');
+    // Update filter dropdown display text (value stays in FR for filtering logic)
+    ['fAnimal','fAnimalM','fLabel','fLabelM','fSaison','fSaisonM','fGout','fGoutM','fPate','fPateM'].forEach(function(id){
+        var sel = document.getElementById(id);
+        if (!sel) return;
+        Array.from(sel.options).forEach(function(o){
+            if (o.value === '') {
+                // Default "All" option — use data-t if present
+                var key = o.getAttribute('data-t');
+                if (key) o.textContent = T(key);
+            } else {
+                // Translate the value for display
+                o.textContent = typeof TF === 'function' ? TF(o.value) : o.value;
+            }
+        });
+    });
+    // Update install banner + iOS modal text if visible
+    ['installBanner','iosInstallModal'].forEach(function(bid){
+        var el = document.getElementById(bid);
+        if (!el) return;
+        el.querySelectorAll('[data-t]').forEach(function(node){
+            node.textContent = T(node.getAttribute('data-t'));
+        });
+    });
+    // Update map legend
+    var mleg = document.querySelector('.mleg');
+    if (mleg) {
+        var mt = mleg.querySelector('.mleg-t'); if (mt) mt.textContent = T('legend');
+        var items = mleg.querySelectorAll('.mleg-i');
+        var legKeys = ['cheese','producer','eponymous_commune','production_zone'];
+        items.forEach(function(el, i) {
+            if (legKeys[i]) {
+                var dot = el.querySelector('.mleg-d');
+                el.textContent = '';
+                if (dot) el.appendChild(dot);
+                el.appendChild(document.createTextNode(' ' + T(legKeys[i])));
+            }
+        });
+    }
+    // Refresh cluster labels (they update on next zoom/pan via T() calls)
+    if (window.S && window.S.map) window.S.map.fire('moveend');
 };
