@@ -50,6 +50,11 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css"/>
     <link rel="stylesheet" href="style.css?v=20260403c">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#8B6F47">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Fromages">
 </head>
 <body>
 
@@ -68,63 +73,64 @@
 
 <div class="top-bar" id="topBar">
     <header>
-        <button class="home-btn" id="homeBtn" onclick="window._goHome()">← Page principale</button>
+        <button class="home-btn" id="homeBtn" onclick="window._goHome()" data-t="home_btn">← Page principale</button>
         <a href="/" class="logo" onclick="event.preventDefault();window._goHome();" style="text-decoration:none;color:inherit;cursor:pointer;">Les Fromages du Bonheur</a>
         <div class="search-wrap">
-            <input type="text" id="searchInput" placeholder="Chercher un fromage..." autocomplete="off" aria-label="Rechercher un fromage">
+            <input type="text" id="searchInput" placeholder="Chercher un fromage..." autocomplete="off" aria-label="Rechercher un fromage" data-t-placeholder="search_placeholder">
             <div class="search-suggest" id="searchSuggest"></div>
         </div>
         <button class="filter-toggle" id="filterToggle">
-            Filtres <span class="arrow" id="filterArrow">▼</span>
+            data-t="filters">Filtres</span> <span class="arrow" id="filterArrow">▼</span>
         </button>
         <div class="nav-links">
             <!-- Itinéraire dropdown -->
             <div class="nav-dropdown" id="navItin">
-                <button class="nav-drop-btn" id="itinNavBtn">Itinéraire <span class="itin-badge" id="itinBadge"></span> <span class="nav-drop-arrow">▾</span></button>
+                <button class="nav-drop-btn" id="itinNavBtn" data-t="itinerary">Itinéraire</span><span class="itin-badge" id="itinBadge"></span> <span class="nav-drop-arrow">▾</span></button>
                 <div class="nav-drop-menu">
-                    <button onclick="window._toggleItin();this.closest('.nav-dropdown').classList.remove('open');">Mon itinéraire <span class="itin-badge-sm" id="itinBadgeSm"></span></button>
-                    <button onclick="window._openItinGen();this.closest('.nav-dropdown').classList.remove('open');">Créer un itinéraire</button>
+                    <button onclick="window._toggleItin();this.closest('.nav-dropdown').classList.remove('open');" data-t="my_itinerary">Mon itinéraire</span> <span class="itin-badge-sm" id="itinBadgeSm"></span></button>
+                    <button onclick="window._openItinGen();this.closest('.nav-dropdown').classList.remove('open');" data-t="create_itinerary">Créer un itinéraire</button>
                 </div>
             </div>
             <!-- En savoir plus dropdown -->
             <div class="nav-dropdown" id="navInfo">
-                <button class="nav-drop-btn">En savoir plus <span class="nav-drop-arrow">▾</span></button>
+                <button class="nav-drop-btn">data-t="learn_more">En savoir plus</span> <span class="nav-drop-arrow">▾</span></button>
                 <div class="nav-drop-menu">
-                    <button onclick="window._openPage('about');this.closest('.nav-dropdown').classList.remove('open');">À propos</button>
-                    <button onclick="window._openPage('contact');this.closest('.nav-dropdown').classList.remove('open');">Contact</button>
-                    <button onclick="window._openPage('definitions');this.closest('.nav-dropdown').classList.remove('open');">Définitions</button>
+                    <button onclick="window._openPage('about');this.closest('.nav-dropdown').classList.remove('open');" data-t="about">À propos</button>
+                    <button onclick="window._openPage('contact');this.closest('.nav-dropdown').classList.remove('open');" data-t="contact">Contact</button>
+                    <button onclick="window._openPage('definitions');this.closest('.nav-dropdown').classList.remove('open');" data-t="definitions">Définitions</button>
                     <a href="https://www.instagram.com/lesfromagesdubonheur/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/></svg>Instagram</a>
                 </div>
             </div>
             <button class="nav-fav-btn" id="navFavBtn" onclick="window._toggleDesktopFavs()">♥ <span id="navFavCount">0</span></button>
-            <button class="suggest-btn" onclick="window._openPage('suggest')" title="Suggérer un fromage">+ Suggérer un fromage</button>
+            <button class="suggest-btn" onclick="window._openPage('suggest')" title="Suggérer un fromage" data-t="suggest_cheese">+ Suggérer un fromage</button>
         </div>
+        <button class="lang-btn" id="langToggle" onclick="window.toggleLang()" style="background:none;border:1px solid #d4c5a9;color:#8B6F47;padding:4px 10px;border-radius:6px;font-size:0.8rem;cursor:pointer;font-family:Inter,sans-serif;white-space:nowrap;" data-t="lang_switch">🇬🇧 EN</button>
         <button class="mob-menu-btn" id="mobMenuBtn" onclick="window._openMobMenu()"><span></span></button>
     </header>
     <div class="filter-bar" id="filterBar">
-        <span class="bar-label">Filtrer par</span>
-        <select id="fAnimal"><option value="">Espèce</option></select>
-        <select id="fLabel"><option value="">Label</option></select>
-        <select id="fRegion"><option value="">Région</option></select>
-        <select id="fPate"><option value="">Pâte</option></select>
-        <select id="fSaison"><option value="">Saison</option></select>
-        <select id="fGout"><option value="">Goût</option></select>
-        <label class="pill" id="pillBio"><input type="checkbox" id="fBio">Bio</label>
-        <label class="pill" id="pillMonastic"><input type="checkbox" id="fMonastic">Monastique</label>
-        <label class="pill" id="pillEponyme"><input type="checkbox" id="fEponyme">Éponyme</label>
-        <span class="filter-reset" onclick="window._reset()">Réinitialiser</span>
+        <span class="bar-label" data-t="filter_by">Filtrer par</span>
+        <select id="fAnimal"><option value="" data-t="species">Espèce</option></select>
+        <select id="fLabel"><option value="" data-t="label">Label</option></select>
+        <select id="fRegion"><option value="" data-t="region">Région</option></select>
+        <select id="fPate"><option value="" data-t="paste_type">Pâte</option></select>
+        <select id="fSaison"><option value="" data-t="season">Saison</option></select>
+        <select id="fGout"><option value="" data-t="taste">Goût</option></select>
+        <label class="pill" id="pillBio"><input type="checkbox" id="fBio"><span data-t="organic">Bio</span></label>
+        <label class="pill" id="pillMonastic"><input type="checkbox" id="fMonastic"><span data-t="monastic">Monastique</span></label>
+        <label class="pill" id="pillEponyme"><input type="checkbox" id="fEponyme"><span data-t="eponymous">Éponyme</span></label>
+        <span class="filter-reset" onclick="window._reset()" data-t="reset">Réinitialiser</span>
     </div>
     <div class="view-bar">
-        <span class="bar-label">Vue</span>
+        <span class="bar-label" data-t="view">Vue</span>
         <div class="vtoggle">
-            <button class="vbtn active" onclick="window._view('map')">Carte</button>
-            <button class="vbtn" onclick="window._view('grid')">Tous les fromages</button>
+            <button class="vbtn active" onclick="window._view('map')" data-t="map">Carte</button>
+            <button class="vbtn" onclick="window._view('grid')" data-t="all_cheeses">Tous les fromages</button>
         </div>
     </div>
 </div>
 
 <!-- Mobile: floating reset button when filters are active -->
-<button class="mob-filter-reset" id="mobFilterReset" onclick="window._mobResetFilters()">✕ Réinitialiser filtres</button>
+<button class="mob-filter-reset" id="mobFilterReset" onclick="window._mobResetFilters()" data-t="reset_filters">✕ Réinitialiser filtres</button>
 
 <div class="app" id="app">
     <div id="map"></div>
@@ -133,38 +139,38 @@
 
 <!-- Floating zoom buttons: OUTSIDE the panel to avoid stacking/overflow issues -->
 <div class="panel-zoom-float" id="panelZoomFloat">
-    <button type="button" class="pzf-btn" onclick="if(window._panelZoom)window._panelZoom(1)" title="Zoomer" aria-label="Zoomer la carte">+</button>
-    <button type="button" class="pzf-btn" onclick="if(window._panelZoom)window._panelZoom(-1)" title="Dézoomer" aria-label="Dézoomer la carte">&minus;</button>
+    <button type="button" class="pzf-btn" onclick="if(window._panelZoom)window._panelZoom(1)" data-t-title="zoom_in" data-t-aria="zoom_in" title="Zoomer" aria-label="Zoomer la carte">+</button>
+    <button type="button" class="pzf-btn" onclick="if(window._panelZoom)window._panelZoom(-1)" data-t-title="zoom_out" data-t-aria="zoom_out" title="Dézoomer" aria-label="Dézoomer la carte">&minus;</button>
 </div>
 
 <div class="detail" id="detail">
     <div class="dnav">
         <button class="dclose dclose-desktop" onclick="window._closeDetail()" aria-label="Fermer le détail">&times;</button>
-        <button class="dreduce dreduce-mobile" onclick="var d=document.getElementById('detail');if(d.classList.contains('expanded')){d.scrollTop=0;d.classList.remove('expanded');}else{window._closeDetail();}">Réduire</button>
+        <button class="dreduce dreduce-mobile" onclick="var d=document.getElementById('detail');if(d.classList.contains('expanded')){d.scrollTop=0;d.classList.remove('expanded');}else{window._closeDetail();}" data-t="reduce">Réduire</button>
     </div>
     <div class="dimg" id="dImg"></div>
     <div class="dhead"><div class="dhead-left"><h2 id="dName"></h2><div class="dhead-sub" id="dLabel"></div></div><div id="dHeadShare"></div></div>
     <div class="detail-peek-actions">
-        <button class="detail-expand-btn" onclick="document.getElementById('detail').classList.add('expanded')">↑ Voir les détails</button>
-        <button class="detail-close-btn" onclick="window._closeDetail()">Fermer ↓</button>
+        <button class="detail-expand-btn" onclick="document.getElementById('detail').classList.add('expanded')" data-t="see_details">↑ Voir les détails</button>
+        <button class="detail-close-btn" onclick="window._closeDetail()" data-t="close_detail">Fermer ↓</button>
     </div>
     <div class="dbody" id="dBody"></div>
 </div>
 
 <div class="itin" id="itin">
     <div class="itin-head">
-        <h3>Mon itinéraire fromager</h3>
+        <h3 data-t="my_cheese_itinerary">Mon itinéraire fromager</h3>
         <span style="display:flex;align-items:center;gap:0.3rem;">
             <button class="itin-toggle" onclick="document.getElementById('itin').classList.toggle('collapsed')" title="Réduire / Agrandir">▼</button>
             <button class="itin-close" onclick="window._toggleItin()">&times;</button>
         </span>
     </div>
     <div class="itin-export" id="itinExport">
-        <div class="itin-export-title">Exporter l'itinéraire</div>
+        <div class="itin-export-title" data-t="export_itinerary">Exporter l'itinéraire</div>
         <div class="itin-export-grid">
-            <button class="itin-export-btn" onclick="window._exportItin('driving')" title="Google Maps — Voiture">🚗 Voiture</button>
-            <button class="itin-export-btn" onclick="window._exportItin('komoot')" title="Komoot — Vélo">🚴 Vélo</button>
-            <button class="itin-export-btn" onclick="window._exportItin('walking')" title="Google Maps — À pied">🚶 À pied</button>
+            <button class="itin-export-btn" onclick="window._exportItin('driving')" title="Google Maps — Voiture" data-t="car">🚗 Voiture</button>
+            <button class="itin-export-btn" onclick="window._exportItin('komoot')" title="Komoot — Vélo" data-t="bike">🚴 Vélo</button>
+            <button class="itin-export-btn" onclick="window._exportItin('walking')" title="Google Maps — À pied" data-t="walking">🚶 À pied</button>
         </div>
     </div>
     <div class="itin-body" id="itinBody"></div>
@@ -175,46 +181,46 @@
 <div class="filter-sheet" id="filterSheet">
     <div class="filter-sheet-handle"></div>
     <div class="filter-sheet-head">
-        <h3>Filtres</h3>
+        <h3 data-t="filters">Filtres</h3>
         <button class="filter-sheet-close" onclick="window._closeFilterSheet()" aria-label="Fermer les filtres">&times;</button>
     </div>
     <div class="filter-sheet-body">
         <div class="fs-group">
-            <span class="fs-label">Espèce</span>
-            <select id="fAnimalM"><option value="">Tous</option></select>
+            <span class="fs-label" data-t="species">Espèce</span>
+            <select id="fAnimalM"><option value="" data-t="all_m">Tous</option></select>
         </div>
         <div class="fs-group">
-            <span class="fs-label">Label</span>
+            <span class="fs-label" data-t="label">Label</span>
             <select id="fLabelM"><option value="">Tous</option></select>
         </div>
         <div class="fs-group">
-            <span class="fs-label">Région</span>
-            <select id="fRegionM"><option value="">Toutes</option></select>
+            <span class="fs-label" data-t="region">Région</span>
+            <select id="fRegionM"><option value="" data-t="all_f">Toutes</option></select>
         </div>
         <div class="fs-group">
-            <span class="fs-label">Type de pâte</span>
+            <span class="fs-label" data-t="paste_type_full">Type de pâte</span>
             <select id="fPateM"><option value="">Tous</option></select>
         </div>
         <div class="fs-group">
-            <span class="fs-label">Saison</span>
+            <span class="fs-label" data-t="season">Saison</span>
             <select id="fSaisonM"><option value="">Toutes</option></select>
         </div>
         <div class="fs-group">
-            <span class="fs-label">Goût</span>
+            <span class="fs-label" data-t="taste">Goût</span>
             <select id="fGoutM"><option value="">Tous</option></select>
         </div>
         <div class="fs-group">
-            <span class="fs-label">Labels spéciaux</span>
+            <span class="fs-label" data-t="special_labels">Labels spéciaux</span>
             <div class="fs-pills">
-                <label class="pill" id="pillBioM"><input type="checkbox" id="fBioM">Bio</label>
-                <label class="pill" id="pillMonasticM"><input type="checkbox" id="fMonasticM">Monastique</label>
-                <label class="pill" id="pillEponymeM"><input type="checkbox" id="fEponymeM">Éponyme</label>
+                <label class="pill" id="pillBioM"><input type="checkbox" id="fBioM"><span data-t="organic">Bio</span></label>
+                <label class="pill" id="pillMonasticM"><input type="checkbox" id="fMonasticM"><span data-t="monastic">Monastique</span></label>
+                <label class="pill" id="pillEponymeM"><input type="checkbox" id="fEponymeM"><span data-t="eponymous">Éponyme</span></label>
             </div>
         </div>
     </div>
     <div class="filter-sheet-btns">
-        <button class="mbtn mbtn-outline" onclick="window._resetFilters()">Réinitialiser</button>
-        <button class="mbtn" onclick="window._applyMobileFilters()">Appliquer</button>
+        <button class="mbtn mbtn-outline" onclick="window._resetFilters()" data-t="reset">Réinitialiser</button>
+        <button class="mbtn" onclick="window._applyMobileFilters()" data-t="apply">Appliquer</button>
     </div>
 </div>
 
@@ -244,11 +250,11 @@
 <div class="page-overlay" id="pageContact" onclick="if(event.target===this)window._closePage()">
     <div class="page-box">
         <div class="page-header">
-            <h2>Contact</h2>
+            <h2 data-t="contact_title">Contact</h2>
             <button class="page-close" onclick="window._closePage()">&times;</button>
         </div>
         <div class="page-content">
-            <p>Une question, une suggestion, une correction ? Écrivez-moi !</p>
+            <p data-t="contact_text">Une question, une suggestion, une correction ? Écrivez-moi !</p>
             <p><a href="mailto:lesfromagesdubonheur@gmail.com">lesfromagesdubonheur@gmail.com</a></p>
         </div>
     </div>
@@ -257,19 +263,19 @@
 <div class="page-overlay" id="pageSuggest" onclick="if(event.target===this)window._closePage()">
     <div class="page-box">
         <div class="page-header">
-            <h2>Suggérer un fromage</h2>
+            <h2 data-t="suggest_title">Suggérer un fromage</h2>
             <button class="page-close" onclick="window._closePage()">&times;</button>
         </div>
         <div class="page-content">
-            <p>Vous connaissez un fromage qui manque à notre carte ? Dites-le nous !</p>
+            <p data-t="suggest_text">Vous connaissez un fromage qui manque à notre carte ? Dites-le nous !</p>
             <form class="contact-form" onsubmit="event.preventDefault();window._sendSuggestion(this)">
-                <label>Nom du fromage *</label>
-                <input type="text" name="fromage" required placeholder="Ex : Tome des Bauges">
-                <label>Région / Département</label>
-                <input type="text" name="region" placeholder="Ex : Savoie">
-                <label>Informations complémentaires</label>
-                <textarea name="details" placeholder="Type de lait, producteur connu, lien web..."></textarea>
-                <button type="submit" class="form-submit">Envoyer la suggestion</button>
+                <label data-t="suggest_name">Nom du fromage *</label>
+                <input type="text" name="fromage" required placeholder="Ex : Tome des Bauges" data-t-placeholder="suggest_name_placeholder">
+                <label data-t="suggest_region">Région / Département</label>
+                <input type="text" name="region" placeholder="Ex : Savoie" data-t-placeholder="suggest_region_placeholder">
+                <label data-t="suggest_details">Informations complémentaires</label>
+                <textarea name="details" placeholder="Type de lait, producteur connu, lien web..." data-t-placeholder="suggest_details_placeholder"></textarea>
+                <button type="submit" class="form-submit" data-t="suggest_submit">Envoyer la suggestion</button>
             </form>
         </div>
     </div>
@@ -278,11 +284,11 @@
 <div class="page-overlay" id="pageDefinitions" onclick="if(event.target===this)window._closePage()">
     <div class="page-box">
         <div class="page-header">
-            <h2>Définitions</h2>
+            <h2 data-t="definitions_title">Définitions</h2>
             <button class="page-close" onclick="window._closePage()">&times;</button>
         </div>
         <div class="page-content">
-            <p>Cette page est en cours de construction. Revenez bientôt !</p>
+            <p data-t="definitions_text">Cette page est en cours de construction. Revenez bientôt !</p>
         </div>
     </div>
 </div>
@@ -292,10 +298,10 @@
 <div class="mob-menu" id="mobMenu">
     <button class="mob-menu-close" onclick="window._closeMobMenu()">&times;</button>
     <div class="mob-menu-items">
-        <button onclick="window._toggleItin();window._closeMobMenu();">Mon itinéraire <span id="mobItinCount"></span></button>
-        <button onclick="window._openPage('suggest');window._closeMobMenu();">Suggérer un fromage</button>
-        <button onclick="window._openPage('about');window._closeMobMenu();">À propos</button>
-        <button onclick="window._openPage('contact');window._closeMobMenu();">Contact</button>
+        <button onclick="window._toggleItin();window._closeMobMenu();" data-t="my_itinerary">Mon itinéraire</span> <span id="mobItinCount"></span></button>
+        <button onclick="window._openPage('suggest');window._closeMobMenu();" data-t="suggest_cheese">+ Suggérer un fromage</button>
+        <button onclick="window._openPage('about');window._closeMobMenu();" data-t="about">À propos</button>
+        <button onclick="window._openPage('contact');window._closeMobMenu();" data-t="contact">Contact</button>
     </div>
 </div>
 
@@ -303,34 +309,34 @@
 <nav class="mob-tab-bar" id="mobTabBar">
     <button class="mob-tab active" id="tabCarte" onclick="window._mobTab('map')">
         <svg viewBox="0 0 24 24"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z"/><path d="M8 2v16"/><path d="M16 6v16"/></svg>
-        <span>Carte</span>
+        <span data-t="tab_map">Carte</span>
     </button>
     <button class="mob-tab" id="tabFromages" onclick="window._mobTab('grid')">
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-        <span>Fromages</span>
+        <span data-t="tab_cheeses">Fromages</span>
     </button>
     <button class="mob-tab" id="tabItin" onclick="window._mobTab('itin')">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
-        <span>Itinéraire</span>
+        <span data-t="tab_itinerary">Itinéraire</span>
         <span class="tab-badge" id="tabItinBadge">0</span>
     </button>
     <button class="mob-tab" id="tabFav" onclick="window._mobTab('fav')">
         <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        <span>Favoris</span>
+        <span data-t="tab_favorites">Favoris</span>
         <span class="tab-badge" id="tabFavBadge">0</span>
     </button>
     <button class="mob-tab" id="tabPlus" onclick="window._mobTab('plus')">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
-        <span>Plus</span>
+        <span data-t="tab_more">Plus</span>
     </button>
 </nav>
 
 <!-- Mobile "Plus" menu overlay -->
 <div class="mob-plus-overlay" id="mobPlusOverlay" onclick="window._closeMobPlus()"></div>
 <div class="mob-plus-menu" id="mobPlusMenu">
-    <button onclick="window._openPage('about');window._closeMobPlus();">À propos</button>
-    <button onclick="window._openPage('contact');window._closeMobPlus();">Contact</button>
-    <button onclick="window._openPage('definitions');window._closeMobPlus();">Définitions</button>
+    <button onclick="window._openPage('about');window._closeMobPlus();" data-t="about">À propos</button>
+    <button onclick="window._openPage('contact');window._closeMobPlus();" data-t="contact">Contact</button>
+    <button onclick="window._openPage('definitions');window._closeMobPlus();" data-t="definitions">Définitions</button>
     <a href="https://www.instagram.com/lesfromagesdubonheur/" target="_blank" rel="noopener" onclick="window._closeMobPlus();" class="mob-plus-link"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:0.4rem;"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>Instagram</a>
 </div>
 
@@ -338,8 +344,8 @@
 <div class="ig-overlay" id="itinGenModal" style="display:none;" onclick="if(event.target===this)window._closeItinGen()">
 <div class="ig-modal">
     <div class="ig-header">
-        <h2>Votre itinéraire fromager</h2>
-        <p>En quelques clics, on vous prépare une tournée sur mesure</p>
+        <h2 data-t="your_cheese_itinerary">Votre itinéraire fromager</h2>
+        <p data-t="wizard_subtitle">En quelques clics, on vous prépare une tournée sur mesure</p>
         <button class="ig-close" onclick="window._closeItinGen()">&times;</button>
     </div>
     <div class="ig-body">
@@ -351,42 +357,42 @@
         </div>
         <!-- Step 1: Location -->
         <div class="ig-step active" id="igStep0">
-            <div class="ig-title">Où êtes-vous ?</div>
+            <div class="ig-title" data-t="where_are_you">Où êtes-vous ?</div>
             <div class="ig-loc-options">
                 <button class="ig-loc-btn" onclick="window._igSelectLoc(this,'geo')">
                     <span class="ig-loc-icon">📍</span>
-                    <div><div class="ig-loc-label">Ma position actuelle</div><div class="ig-loc-sub">Utiliser la géolocalisation</div></div>
+                    <div><div class="ig-loc-label" data-t="my_current_location">Ma position actuelle</div><div class="ig-loc-sub" data-t="use_geolocation">Utiliser la géolocalisation</div></div>
                 </button>
                 <button class="ig-loc-btn" onclick="window._igSelectLoc(this,'city')">
                     <span class="ig-loc-icon">🏙️</span>
-                    <div><div class="ig-loc-label">Entrer une ville</div><div class="ig-loc-sub">Tapez votre point de départ</div></div>
+                    <div><div class="ig-loc-label" data-t="enter_city">Entrer une ville</div><div class="ig-loc-sub" data-t="type_starting_point">Tapez votre point de départ</div></div>
                 </button>
-                <input class="ig-city-input" id="igCityInput" type="text" placeholder="Ex : Lyon, Dijon, Strasbourg..." list="igCityList">
+                <input class="ig-city-input" id="igCityInput" type="text" placeholder="Ex : Lyon, Dijon, Strasbourg..." data-t-placeholder="city_placeholder" list="igCityList">
                 <datalist id="igCityList"></datalist>
             </div>
         </div>
         <!-- Step 2: Duration -->
         <div class="ig-step" id="igStep1">
-            <div class="ig-title">Combien de temps ?</div>
+            <div class="ig-title" data-t="how_long">Combien de temps ?</div>
             <div class="ig-dur-grid">
-                <div class="ig-pill" onclick="window._igSelectPill(this)" data-dur="Demi-journée" data-radius="80" data-stops="4"><span class="ig-pill-emoji">☀️</span><span class="ig-pill-label">Demi-journée</span><span class="ig-pill-detail">2-4 étapes</span></div>
-                <div class="ig-pill" onclick="window._igSelectPill(this)" data-dur="Journée" data-radius="150" data-stops="6"><span class="ig-pill-emoji">🌅</span><span class="ig-pill-label">Journée</span><span class="ig-pill-detail">4-6 étapes</span></div>
-                <div class="ig-pill" onclick="window._igSelectPill(this)" data-dur="Week-end" data-radius="300" data-stops="10"><span class="ig-pill-emoji">🏕️</span><span class="ig-pill-label">Week-end</span><span class="ig-pill-detail">2 jours · 6-10 étapes</span></div>
-                <div class="ig-pill" onclick="window._igSelectPill(this)" data-dur="Vacances" data-radius="500" data-stops="15"><span class="ig-pill-emoji">🗺️</span><span class="ig-pill-label">Vacances</span><span class="ig-pill-detail">3+ jours · 10+ étapes</span></div>
+                <div class="ig-pill" onclick="window._igSelectPill(this)" data-dur="Demi-journée" data-radius="80" data-stops="4"><span class="ig-pill-emoji">☀️</span><span class="ig-pill-label" data-t="half_day">Demi-journée</span><span class="ig-pill-detail" data-t="half_day_detail">2-4 étapes</span></div>
+                <div class="ig-pill" onclick="window._igSelectPill(this)" data-dur="Journée" data-radius="150" data-stops="6"><span class="ig-pill-emoji">🌅</span><span class="ig-pill-label" data-t="full_day">Journée</span><span class="ig-pill-detail" data-t="full_day_detail">4-6 étapes</span></div>
+                <div class="ig-pill" onclick="window._igSelectPill(this)" data-dur="Week-end" data-radius="300" data-stops="10"><span class="ig-pill-emoji">🏕️</span><span class="ig-pill-label" data-t="weekend">Week-end</span><span class="ig-pill-detail" data-t="weekend_detail">2 jours · 6-10 étapes</span></div>
+                <div class="ig-pill" onclick="window._igSelectPill(this)" data-dur="Vacances" data-radius="500" data-stops="15"><span class="ig-pill-emoji">🗺️</span><span class="ig-pill-label" data-t="vacation">Vacances</span><span class="ig-pill-detail" data-t="vacation_detail">3+ jours · 10+ étapes</span></div>
             </div>
         </div>
         <!-- Step 3: Transport -->
         <div class="ig-step" id="igStep2">
-            <div class="ig-title">Comment vous déplacez-vous ?</div>
+            <div class="ig-title" data-t="how_travel">Comment vous déplacez-vous ?</div>
             <div class="ig-trans-grid">
-                <div class="ig-pill" onclick="window._igSelectPill(this)" data-trans="en voiture"><span class="ig-pill-emoji">🚗</span><span class="ig-pill-label">Voiture</span></div>
-                <div class="ig-pill" onclick="window._igSelectPill(this)" data-trans="à vélo"><span class="ig-pill-emoji">🚲</span><span class="ig-pill-label">Vélo</span></div>
-                <div class="ig-pill" onclick="window._igSelectPill(this)" data-trans="à pied"><span class="ig-pill-emoji">🥾</span><span class="ig-pill-label">À pied</span></div>
+                <div class="ig-pill" onclick="window._igSelectPill(this)" data-trans="en voiture"><span class="ig-pill-emoji">🚗</span><span class="ig-pill-label" data-t="by_car">Voiture</span></div>
+                <div class="ig-pill" onclick="window._igSelectPill(this)" data-trans="à vélo"><span class="ig-pill-emoji">🚲</span><span class="ig-pill-label" data-t="by_bike">Vélo</span></div>
+                <div class="ig-pill" onclick="window._igSelectPill(this)" data-trans="à pied"><span class="ig-pill-emoji">🥾</span><span class="ig-pill-label" data-t="on_foot">À pied</span></div>
             </div>
         </div>
         <!-- Step 4: Preferences -->
         <div class="ig-step" id="igStep3">
-            <div class="ig-title">Vos envies ? <span style="font-size:0.75rem;color:#bbb;">(optionnel)</span></div>
+            <div class="ig-title" data-t="your_preferences">Vos envies ?</span> <span style="font-size:0.75rem;color:#bbb;" data-t="optional">(optionnel)</span></div>
             <div class="ig-pref-grid">
                 <span class="ig-chip" onclick="window._igTogglePref(this)" data-pref="aop">AOP / AOC</span>
                 <span class="ig-chip" onclick="window._igTogglePref(this)" data-pref="bio">Bio</span>
@@ -403,8 +409,8 @@
         <div class="ig-result" id="igResult"></div>
     </div>
     <div class="ig-footer" id="igFooter">
-        <button class="ig-btn ig-btn-outline" id="igBtnBack" onclick="window._igBack()" style="display:none;">Retour</button>
-        <button class="ig-btn ig-btn-primary" id="igBtnNext" onclick="window._igNext()">Suivant</button>
+        <button class="ig-btn ig-btn-outline" id="igBtnBack" onclick="window._igBack()" style="display:none;" data-t="back">Retour</button>
+        <button class="ig-btn ig-btn-primary" id="igBtnNext" onclick="window._igNext()" data-t="next">Suivant</button>
     </div>
 </div>
 </div>
@@ -415,7 +421,75 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
+<script src="i18n.js?v=20260406a"></script>
 <script src="data.js?v=20260403c"></script>
 <script src="app.js?v=20260403d"></script>
+<script>
+// ── Service Worker Registration ──
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(function(){});
+}
+
+// ── PWA Install Banner ──
+(function(){
+  var deferredPrompt = null;
+  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+  if (isStandalone) return; // Already installed
+
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    showInstallBanner('android');
+  });
+
+  // Show iOS install hint after 15s engagement on mobile
+  if (isIOS) {
+    setTimeout(function(){ showInstallBanner('ios'); }, 15000);
+  }
+
+  function showInstallBanner(type) {
+    if (document.getElementById('installBanner')) return;
+    if (localStorage.getItem('fdh_install_dismissed')) return;
+
+    var banner = document.createElement('div');
+    banner.id = 'installBanner';
+    banner.style.cssText = 'position:fixed;bottom:70px;left:50%;transform:translateX(-50%);z-index:9999;background:#8B6F47;color:#fff;padding:10px 18px;border-radius:12px;font-size:0.9rem;font-family:Inter,sans-serif;display:flex;align-items:center;gap:10px;box-shadow:0 4px 20px rgba(0,0,0,0.3);max-width:90vw;';
+
+    if (type === 'android') {
+      banner.innerHTML = '<span data-t="install_app">' + T('install_app') + '</span><button onclick="window._pwaInstall()" style="background:#fff;color:#8B6F47;border:none;padding:6px 14px;border-radius:8px;font-weight:600;cursor:pointer;font-size:0.85rem;">OK</button><button onclick="window._pwaClose()" style="background:none;border:none;color:#fff;cursor:pointer;font-size:1.2rem;padding:0 4px;">✕</button>';
+    } else {
+      banner.innerHTML = '<span>' + T('install_app') + '</span><button onclick="window._pwaShowIOS()" style="background:#fff;color:#8B6F47;border:none;padding:6px 14px;border-radius:8px;font-weight:600;cursor:pointer;font-size:0.85rem;">?</button><button onclick="window._pwaClose()" style="background:none;border:none;color:#fff;cursor:pointer;font-size:1.2rem;padding:0 4px;">✕</button>';
+    }
+    document.body.appendChild(banner);
+  }
+
+  window._pwaInstall = function() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(function(){ deferredPrompt = null; });
+    }
+    var b = document.getElementById('installBanner');
+    if (b) b.remove();
+  };
+
+  window._pwaShowIOS = function() {
+    var b = document.getElementById('installBanner');
+    if (b) b.remove();
+    var modal = document.createElement('div');
+    modal.id = 'iosInstallModal';
+    modal.style.cssText = 'position:fixed;bottom:70px;left:50%;transform:translateX(-50%);z-index:9999;background:#fff;color:#333;padding:20px;border-radius:16px;font-size:0.9rem;font-family:Inter,sans-serif;box-shadow:0 4px 24px rgba(0,0,0,0.3);max-width:320px;width:90vw;';
+    modal.innerHTML = '<h4 style="margin:0 0 12px;color:#8B6F47;">' + T('install_ios_title') + '</h4><ol style="margin:0;padding-left:20px;line-height:1.8;"><li>' + T('install_ios_step1') + '</li><li>' + T('install_ios_step2') + '</li><li>' + T('install_ios_step3') + '</li></ol><button onclick="this.parentElement.remove()" style="margin-top:14px;width:100%;background:#8B6F47;color:#fff;border:none;padding:10px;border-radius:8px;font-weight:600;cursor:pointer;">' + T('install_got_it') + '</button>';
+    document.body.appendChild(modal);
+  };
+
+  window._pwaClose = function() {
+    var b = document.getElementById('installBanner');
+    if (b) b.remove();
+    localStorage.setItem('fdh_install_dismissed', '1');
+  };
+})();
+</script>
 </body>
 </html>

@@ -417,7 +417,7 @@ function popFilters(){
         if(c.lb)lb.add(c.lb);
         if(c.rg)c.rg.forEach(function(r){rg.add(r);});
         if(c.tp){pa.add(c.tp);S.pateNames[c.tp]=getPateShort(c.tp);}
-        if(c.go&&c.go!=='-'&&c.go!=='Non précisé')go.add(c.go);
+        if(c.go&&c.go!=='-'&&c.go!==T('not_specified'))go.add(c.go);
     });
     function pop(id,set,sh){
         var sel=document.getElementById(id);
@@ -926,12 +926,12 @@ function renderGrid(){
         if(c.ao&&c.ao.aop){var b1=document.createElement('span');b1.className='badge b-aop';b1.textContent='AOP';bg.appendChild(b1);}
         if(c.ao&&c.ao.aoc){var b1c=document.createElement('span');b1c.className='badge b-aoc';b1c.textContent='AOC';bg.appendChild(b1c);}
         if(c.ao&&c.ao.igp){var b1g=document.createElement('span');b1g.className='badge b-igp';b1g.textContent='IGP';bg.appendChild(b1g);}
-        if(isMonastic(c)){var b2=document.createElement('span');b2.className='badge b-mon';b2.textContent='Monastique';bg.appendChild(b2);}
-        if(hasEponyme(c)){var b3=document.createElement('span');b3.className='badge b-epo';b3.textContent='Éponyme';bg.appendChild(b3);}
+        if(isMonastic(c)){var b2=document.createElement('span');b2.className='badge b-mon';b2.textContent=T('monastic');bg.appendChild(b2);}
+        if(hasEponyme(c)){var b3=document.createElement('span');b3.className='badge b-epo';b3.textContent=T('eponymous');bg.appendChild(b3);}
         var pr=document.createElement('div');pr.className='ccard-pr';pr.textContent=c.pr&&c.pr.length>0?c.pr[0].n:'';
         body.appendChild(lb);body.appendChild(an);body.appendChild(bg);body.appendChild(pr);
         // "Voir sur la carte" button
-        var mapBtn=document.createElement('button');mapBtn.className='ccard-map-btn';mapBtn.textContent='Voir sur la carte';
+        var mapBtn=document.createElement('button');mapBtn.className='ccard-map-btn';mapBtn.textContent=T('view_on_map');
         mapBtn.onclick=(function(i){return function(e){e.stopPropagation();window._view('map');setTimeout(function(){window._focus(i);},200);};})(idx);
         body.appendChild(mapBtn);
         card.appendChild(body);gi.appendChild(card);
@@ -1001,8 +1001,8 @@ window._focus=function(idx){
     if(c.ao&&c.ao.da){var b1=document.createElement('span');b1.className='badge b-aop';b1.textContent='AOP';bx.appendChild(b1);}
     if(c.ao&&c.ao.dc_aoc){var b1c=document.createElement('span');b1c.className='badge b-aoc';b1c.textContent='AOC';bx.appendChild(b1c);}
     if(c.ao&&c.ao.di){var b1g=document.createElement('span');b1g.className='badge b-igp';b1g.textContent='IGP';bx.appendChild(b1g);}
-    if(isMonastic(c)){var bm=document.createElement('span');bm.className='badge b-mon';bm.textContent='Monastique';bx.appendChild(bm);}
-    if(hasEponyme(c)){var be=document.createElement('span');be.className='badge b-epo';be.textContent='Éponyme';bx.appendChild(be);}
+    if(isMonastic(c)){var bm=document.createElement('span');bm.className='badge b-mon';bm.textContent=T('monastic');bx.appendChild(bm);}
+    if(hasEponyme(c)){var be=document.createElement('span');be.className='badge b-epo';be.textContent=T('eponymous');bx.appendChild(be);}
     labelRow.appendChild(bx);
     // Share button
     var shareBtn=document.createElement('button');shareBtn.className='dshare';
@@ -1012,14 +1012,14 @@ window._focus=function(idx){
         if(navigator.clipboard&&navigator.clipboard.writeText){
             navigator.clipboard.writeText(url).then(function(){
                 shareBtn.classList.add('dshare-ok');
-                shareBtn.innerHTML='✓ Lien copié !';
+                shareBtn.innerHTML=T('link_copied');
                 setTimeout(function(){
                     shareBtn.classList.remove('dshare-ok');
                     shareBtn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Partager';
                 },2000);
             });
         }else{
-            prompt('Copier ce lien :',url);
+            prompt(T('copy_link'),url);
         }
     };
     if(isMobile()){
@@ -1034,7 +1034,7 @@ window._focus=function(idx){
     // Favorite button
     var favBtn=document.createElement('button');favBtn.className='dfav';
     var _isFav=isFav(c.nm);
-    favBtn.innerHTML=(_isFav?'♥':'♡')+' '+(_isFav?'Favori':'Ajouter aux favoris');
+    favBtn.innerHTML=(_isFav?'♥':'♡')+' '+(_isFav?T('favorite'):T('add_to_favorites'));
     if(_isFav)favBtn.classList.add('dfav-active');
     favBtn.onclick=function(){
         var added=toggleFav(c.nm);
@@ -1070,14 +1070,14 @@ window._focus=function(idx){
         if(!v||v==='-')return;
         var d=document.createElement('div');d.className='ditem';
         var dl=document.createElement('div');dl.className='ditem-l';dl.textContent=l;
-        var dv=document.createElement('div');dv.className='ditem-v';dv.textContent=v||'Non précisé';
+        var dv=document.createElement('div');dv.className='ditem-v';dv.textContent=v||T('not_specified');
         d.appendChild(dl);d.appendChild(dv);grid.appendChild(d);
     }
-    addI('Espèce',c.an);addI('Type de lait',c.lc||'Non précisé');addI('Type de pâte',c.tp);
-    addI('Affinage',c.af||'Non précisé');addI('Saison optimale',c.sa);addI('Goût',c.go);
+    addI(T('species'),c.an);addI(T('milk_type'),c.lc||T('not_specified'));addI(T('paste_type_full'),c.tp);
+    addI(T('aging'),c.af||T('not_specified'));addI(T('best_season'),c.sa);addI(T('taste'),c.go);
     if(grid.children.length>0){
         if(isMobile()){
-            db.appendChild(mkSec('Caractéristiques', function(inner){inner.appendChild(grid);}, false));
+            db.appendChild(mkSec(T('characteristics'), function(inner){inner.appendChild(grid);}, false));
         }else{
             db.appendChild(grid);
         }
@@ -1105,21 +1105,21 @@ window._focus=function(idx){
 
     // Fun Fact — open by default (most interesting content)
     if(c.ff&&c.ff!=='-'){
-        db.appendChild(mkSec('Fun Fact', function(inner){
+        db.appendChild(mkSec(T('fun_fact'), function(inner){
             var t1=document.createElement('div');t1.className='dtext';t1.textContent=c.ff;
             inner.appendChild(t1);
         }, false));
     }
     // Monastique — collapsed on mobile
     if(isMonastic(c)){
-        db.appendChild(mkSec('Héritage monastique', function(inner){
+        db.appendChild(mkSec(T('monastic_heritage'), function(inner){
             var t2=document.createElement('div');t2.className='dtext';t2.textContent=c.fm;
             inner.appendChild(t2);
         }, false));
     }
     // AOP/AOC/IGP details — collapsed on mobile
     if(c.ao&&(c.ao.da||c.ao.dc_aoc||c.ao.di)){
-        db.appendChild(mkSec('Appellation', function(inner){
+        db.appendChild(mkSec(T('appellation'), function(inner){
             var aoGrid=document.createElement('div');aoGrid.className='dgrid';
             if(c.ao.da){var d1=document.createElement('div');d1.className='ditem';d1.innerHTML='<div class="ditem-l">Date AOP</div><div class="ditem-v">'+c.ao.da.replace(/\.0$/,'')+'</div>';aoGrid.appendChild(d1);}
             if(c.ao.dc_aoc){var d2=document.createElement('div');d2.className='ditem';d2.innerHTML='<div class="ditem-l">Date AOC</div><div class="ditem-v">'+c.ao.dc_aoc.replace(/\.0$/,'')+'</div>';aoGrid.appendChild(d2);}
@@ -1129,13 +1129,13 @@ window._focus=function(idx){
             inner.appendChild(aoGrid);
             if(c.ao.sp&&c.ao.sp!=='-'){
                 var spDiv=document.createElement('div');spDiv.className='dtext';spDiv.style.marginTop='0.6rem';
-                var spLbl=document.createElement('div');spLbl.className='dtext-l';spLbl.textContent='Saisonnalité de production';
+                var spLbl=document.createElement('div');spLbl.className='dtext-l';spLbl.textContent=T('production_seasonality');
                 spDiv.appendChild(spLbl);spDiv.appendChild(document.createTextNode(c.ao.sp));
                 inner.appendChild(spDiv);
             }
             if(c.ao.cm&&c.ao.cm!=='-'){
                 var rec=document.createElement('div');rec.className='dtext';rec.style.marginTop='0.6rem';
-                var cmLbl=document.createElement('div');cmLbl.className='dtext-l';cmLbl.textContent='Commentaire';
+                var cmLbl=document.createElement('div');cmLbl.className='dtext-l';cmLbl.textContent=T('comment');
                 rec.appendChild(cmLbl);rec.appendChild(document.createTextNode(c.ao.cm));
                 inner.appendChild(rec);
             }
@@ -1143,10 +1143,10 @@ window._focus=function(idx){
     }
     // Producers — collapsed on mobile
     if(c.pr&&c.pr.length>0){
-        db.appendChild(mkSec('Producteurs ('+c.pr.length+')', function(inner){
+        db.appendChild(mkSec(T('producers')+' ('+c.pr.length+')', function(inner){
             if(c.pr.length>1){
                 var hint=document.createElement('div');hint.style.cssText='font-size:0.72rem;color:#999;margin-bottom:0.5rem;';
-                hint.textContent='Cliquez sur un producteur pour le localiser sur la carte';
+                hint.textContent=T('click_producer_locate');
                 inner.appendChild(hint);
             }
             var ul=document.createElement('ul');ul.className='prlist';
@@ -1158,8 +1158,8 @@ window._focus=function(idx){
                     ns.onclick=function(e){e.stopPropagation();window._zoomProducer(p,c.nm);};
                 }
                 var dv=document.createElement('div');dv.style.cssText='display:flex;gap:0.3rem;align-items:center;';
-                if(p.b){var bg=document.createElement('span');bg.className='prbadge';bg.textContent='Bio';dv.appendChild(bg);}
-                var btn=document.createElement('button');btn.className='ibtn';btn.textContent='+Itinéraire';
+                if(p.b){var bg=document.createElement('span');bg.className='prbadge';bg.textContent=T('organic');dv.appendChild(bg);}
+                var btn=document.createElement('button');btn.className='ibtn';btn.textContent=T('add_to_itinerary');
                 btn.onclick=function(e){e.stopPropagation();window._addItin(p,c.nm);};
                 dv.appendChild(btn);li.appendChild(ns);li.appendChild(dv);ul.appendChild(li);
             });
@@ -1168,7 +1168,7 @@ window._focus=function(idx){
     }
     // Éponymes — collapsed on mobile
     if(hasEponyme(c)){
-        db.appendChild(mkSec('Communes éponymes', function(inner){
+        db.appendChild(mkSec(T('eponymous_municipalities'), function(inner){
             var t6=document.createElement('div');t6.className='dtext';
             t6.textContent=c.ep.filter(function(e){return e&&e.nom;}).map(function(e){return e.nom;}).join(', ');
             inner.appendChild(t6);
@@ -1469,7 +1469,7 @@ function updateMobFilterReset(){
 // ── ITINERARY ──
 window._addItin=function(pr,cn){
     if(S.itin.some(function(s){return s.pr.n===pr.n&&s.cn===cn;})){
-        showToast('Déjà dans l\'itinéraire');return;
+        showToast(T('already_in_itinerary'));return;
     }
     S.itin.push({pr:pr,cn:cn});
     _saveItin();
@@ -1504,9 +1504,9 @@ function renderItin(){
     var hasGeoStart=S.itin.length>0&&S.itin[0].isGeo;
     if(S.userLoc&&!hasGeoStart){
         var gb=document.createElement('button');gb.className='mbtn mbtn-outline';gb.style.marginBottom='0.6rem';
-        gb.textContent='📍 Ma position comme départ';
+        gb.textContent=T('my_location_start');
         gb.onclick=function(){
-            S.itin.unshift({pr:{n:'Ma position',la:S.userLoc.lat,lo:S.userLoc.lon},cn:'Point de départ',isGeo:true});
+            S.itin.unshift({pr:{n:T('my_position'),la:S.userLoc.lat,lo:S.userLoc.lon},cn:T('starting_point'),isGeo:true});
             _saveItin();renderItin();drawRoute();
         };
         body.appendChild(gb);
@@ -1537,7 +1537,7 @@ function renderItin(){
         body.appendChild(td);
     }
 
-    var rb=document.createElement('button');rb.className='mbtn';rb.textContent='Tracer l\'itinéraire sur la carte';
+    var rb=document.createElement('button');rb.className='mbtn';rb.textContent=T('draw_on_map');
     rb.onclick=function(){drawRoute();};
     body.appendChild(rb);
 
@@ -1550,10 +1550,10 @@ function renderItin(){
 }
 
 window._exportItin=function(mode){
-    if(S.itin.length<2){showToast('Ajoutez au moins 2 étapes');return;}
+    if(S.itin.length<2){showToast(T('add_at_least_2'));return;}
     // Filter stops with valid coordinates
     var valid=S.itin.filter(function(s){return s.pr.la&&s.pr.lo;});
-    if(valid.length<2){showToast('Coordonnées GPS manquantes');return;}
+    if(valid.length<2){showToast(T('missing_gps'));return;}
 
     if(mode==='driving'||mode==='walking'){
         // Google Maps Directions API URL format — works on desktop + mobile app
@@ -1563,7 +1563,7 @@ window._exportItin=function(mode){
             var prod=s.pr.n||'';
             // Use producer name if available, otherwise cheese name, with coords as fallback
             var label=prod||name;
-            if(label&&label!=='Point de départ') return encodeURIComponent(label)+',France';
+            if(label&&label!==T('starting_point')) return encodeURIComponent(label)+',France';
             return s.pr.la+','+s.pr.lo;
         }
         var origin=gmLabel(valid[0]);
@@ -1679,7 +1679,7 @@ function addGeoCtrl(){
         onAdd:function(){
             var btn=L.DomUtil.create('div');btn.className='mctrl';
             btn.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B6F47" stroke-width="2.5"><circle cx="12" cy="12" r="4"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>';
-            btn.title='Ma position';
+            btn.title=T('my_position');
             L.DomEvent.disableClickPropagation(btn);
             L.DomEvent.on(btn,'click',function(){doGeolocate();});
             return btn;
@@ -1689,13 +1689,13 @@ function addGeoCtrl(){
 }
 
 function doGeolocate(){
-    if(!navigator.geolocation){alert('Géolocalisation non disponible.');return;}
+    if(!navigator.geolocation){alert(T('geolocation_unavailable'));return;}
     navigator.geolocation.getCurrentPosition(function(pos){
         var lat=pos.coords.latitude,lon=pos.coords.longitude;
         S.userLoc={lat:lat,lon:lon};
         if(S.geoMarker)S.map.removeLayer(S.geoMarker);
         S.geoMarker=L.circleMarker([lat,lon],{radius:10,fillColor:'#2196F3',color:'#fff',weight:3,opacity:1,fillOpacity:0.9}).addTo(S.map);
-        S.geoMarker.bindPopup('Vous êtes ici').openPopup();
+        S.geoMarker.bindPopup(T('you_are_here')).openPopup();
         S.map.setView([lat,lon],6);
     },function(err){
         console.warn('Géoloc:',err.message);
@@ -1707,7 +1707,7 @@ function addZoneCtrl(){
         options:{position:'topright'},
         onAdd:function(){
             var btn=L.DomUtil.create('button');btn.className='ztoggle';
-            btn.textContent='Zones de production';
+            btn.textContent=T('production_zones');
             L.DomEvent.disableClickPropagation(btn);
             L.DomEvent.on(btn,'click',function(){
                 S.zoneOn=!S.zoneOn;btn.classList.toggle('active');
@@ -1743,12 +1743,12 @@ function showGeoPrompt(){
     try{if(localStorage.getItem('lfb_welcome_seen'))return;}catch(e){}
     var overlay=document.createElement('div');overlay.className='geo-overlay';overlay.id='geoOverlay';
     var box=document.createElement('div');box.className='geo-prompt';
-    box.innerHTML='<h3>Bienvenue !</h3>'+
-    '<p>Découvrez les fromages français, localisez les producteurs et créez votre itinéraire fromager.</p>'+
+    box.innerHTML='<h3>'+T('welcome')+'</h3>'+
+    '<p>'+T('welcome_text')+'</p>'+
     '<div class="geo-prompt-btns" style="flex-direction:column;gap:0.4rem;">'+
-    '<button class="mbtn" id="geoYes" style="width:100%;">📍 Me localiser et explorer</button>'+
-    '<button class="mbtn mbtn-outline" id="geoItin" style="width:100%;">🗺️ Créer un itinéraire fromager</button>'+
-    '<button class="mbtn mbtn-outline" id="geoNo" style="width:100%;border:none;color:#999;font-size:0.8rem;">Explorer la carte directement</button>'+
+    '<button class="mbtn" id="geoYes" style="width:100%;">'+T('locate_explore')+'</button>'+
+    '<button class="mbtn mbtn-outline" id="geoItin" style="width:100%;">'+T('create_cheese_itinerary')+'</button>'+
+    '<button class="mbtn mbtn-outline" id="geoNo" style="width:100%;border:none;color:#999;font-size:0.8rem;">'+T('explore_map')+'</button>'+
     '</div>';
     document.body.appendChild(overlay);document.body.appendChild(box);
     document.getElementById('geoYes').onclick=function(){
@@ -1802,7 +1802,7 @@ function updateSuggestions(){
     // 3) Animal matches
     var anSet=new Set();
     S.data.cheeses.forEach(function(c){
-        if(c.an&&N(c.an).indexOf(q)>-1&&!anSet.has(c.an)){anSet.add(c.an);matches.push({type:'animal',nm:c.an,sub:'Espèce'});}
+        if(c.an&&N(c.an).indexOf(q)>-1&&!anSet.has(c.an)){anSet.add(c.an);matches.push({type:'animal',nm:c.an,sub:T('species')});}
     });
 
     if(matches.length===0){sugBox.classList.remove('active');applyF();return;}
@@ -2126,7 +2126,7 @@ function _igShowStep(n){
         document.getElementById('igStep'+n).classList.add('active');
         // Steps 0-2: auto-advance, hide Next. Step 3: show Generate.
         if(n===3){
-            btnNext.textContent='Générer mon itinéraire';
+            btnNext.textContent=T('generate_itinerary');
             btnNext.className='ig-btn ig-btn-generate';
             btnNext.style.display='';
         }else{
@@ -2224,7 +2224,7 @@ function _igBuildResult(){
         var key=city.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
         if(ITIN_CITIES[key]){igSel.lat=ITIN_CITIES[key].la;igSel.lon=ITIN_CITIES[key].lo;}
         else{igSel.lat=46.6;igSel.lon=2.5;}
-    }else{city='Ma position';}
+    }else{city=T('my_position');}
 
     // Radius & max expansion: distance from start (one-way), kept realistic for round trip
     var IG_RADII={
@@ -2304,7 +2304,7 @@ function _igBuildResult(){
         if(s.aop)badges+=' <span class="ig-badge ig-b-aop">AOP</span>';
         if(s.bio)badges+=' <span class="ig-badge ig-b-bio">Bio</span>';
         if(s.monastique)badges+=' <span class="ig-badge" style="background:#EDE7F6;color:#6A1B9A;">Monastique</span>';
-        var detail='<span style="font-size:0.68rem;color:#999;">'+[s.animal,s.pate,s.gout].filter(function(x){return x&&x!=='-'&&x!=='Non précisé';}).join(' · ')+'</span>';
+        var detail='<span style="font-size:0.68rem;color:#999;">'+[s.animal,s.pate,s.gout].filter(function(x){return x&&x!=='-'&&x!==T('not_specified');}).join(' · ')+'</span>';
         var distText;
         if(i===0){distText='↓ '+Math.round(s.dist)+' km';}
         else{var seg=_haversine(selected[i-1].lat,selected[i-1].lon,s.lat,s.lon);totalDist+=seg;
@@ -2370,7 +2370,7 @@ window._igShowOnMap=function(){
     S.itin=[];
     // Add starting city/position as first stop
     if(igSel.lat&&igSel.lon){
-        S.itin.push({pr:{n:window._igCity||'Départ',la:igSel.lat,lo:igSel.lon},cn:'Point de départ',isGeo:true});
+        S.itin.push({pr:{n:window._igCity||'Départ',la:igSel.lat,lo:igSel.lon},cn:T('starting_point'),isGeo:true});
     }
     window._igRoute.forEach(function(s){
         S.itin.push({pr:{n:s.name,la:s.lat,lo:s.lon,b:!!s.bio},cn:s.cheese});
@@ -2406,7 +2406,7 @@ window._igRemoveStop=function(idx){
         if(s.aop)badges+=' <span class="ig-badge ig-b-aop">AOP</span>';
         if(s.bio)badges+=' <span class="ig-badge ig-b-bio">Bio</span>';
         if(s.monastique)badges+=' <span class="ig-badge" style="background:#EDE7F6;color:#6A1B9A;">Monastique</span>';
-        var detail='<span style="font-size:0.68rem;color:#999;">'+[s.animal,s.pate,s.gout].filter(function(x){return x&&x!=='-'&&x!=='Non précisé';}).join(' · ')+'</span>';
+        var detail='<span style="font-size:0.68rem;color:#999;">'+[s.animal,s.pate,s.gout].filter(function(x){return x&&x!=='-'&&x!==T('not_specified');}).join(' · ')+'</span>';
         var distText;
         if(i===0){distText='Départ · à '+Math.round(s.dist)+' km';}
         else{var seg=_haversine(selected[i-1].lat,selected[i-1].lon,s.lat,s.lon);totalDist+=seg;
@@ -2440,3 +2440,10 @@ document.addEventListener('contextmenu',function(e){
     if(e.target.closest('.detail,.ccard,.prlist,.dgrid')){e.preventDefault();}
 });
 console.log('%c⚠️ Les données de ce site sont protégées. Toute extraction automatisée est interdite.','font-size:16px;color:red;font-weight:bold;');
+
+// ── LANGUAGE CHANGE HANDLER ──
+window._onLangChange = function(lang) {
+    // Update footer
+    var footer = document.querySelector('.site-footer');
+    if (footer) footer.innerHTML = T('footer');
+};
