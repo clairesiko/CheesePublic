@@ -456,6 +456,8 @@ function getPateShort(tp){
     if(p.indexOf('persillee')>-1||p.indexOf('persille')>-1)return'Persillée';
     if(p.indexOf('non-cuite')>-1||p.indexOf('non cuite')>-1)return'Pressée non-cuite';
     if(p.indexOf('cuite')>-1)return'Pressée cuite';
+    if(p.indexOf('fondu')>-1)return'Fondue';
+    if(p.indexOf('filee')>-1)return'Filée';
     return tp||'Autre';
 }
 
@@ -821,7 +823,12 @@ function renderGrid(){
         var favs=getFavs();
         if(favs.length===0){
             var emptyFav=document.createElement('div');emptyFav.className='empty-state';
-            emptyFav.innerHTML='<div style="font-size:2rem;">♡</div><h3>'+T('no_favorites_yet')+'</h3><p>'+T('favorites_hint')+'</p><button onclick="S.showFavs=false;var btn=document.getElementById(\'navFavBtn\');if(btn)btn.classList.remove(\'active\');window._view(\'grid\');" style="margin-top:1rem;padding:0.5rem 1rem;border:1px solid #e8e4de;border-radius:20px;background:#fff;cursor:pointer;font-size:0.85rem;color:#8B6F47;font-family:Inter,sans-serif;">'+T('view_all_cheeses')+'</button>';
+            emptyFav.innerHTML='<div style="font-size:2rem;">♡</div><h3>'+T('no_favorites_yet')+'</h3><p>'+T('favorites_hint')+'</p>';
+            var viewAllBtn=document.createElement('button');
+            viewAllBtn.textContent=T('view_all_cheeses');
+            viewAllBtn.style.cssText='margin-top:1rem;padding:0.5rem 1rem;border:1px solid #e8e4de;border-radius:20px;background:#fff;cursor:pointer;font-size:0.85rem;color:#8B6F47;font-family:Inter,sans-serif;';
+            viewAllBtn.onclick=function(){S.showFavs=false;var btn=document.getElementById('navFavBtn');if(btn)btn.classList.remove('active');window._view('grid');};
+            emptyFav.appendChild(viewAllBtn);
             gv.appendChild(emptyFav);
             return;
         }
@@ -929,8 +936,7 @@ function renderGrid(){
         if(c.ao&&c.ao.igp){var b1g=document.createElement('span');b1g.className='badge b-igp';b1g.textContent='IGP';bg.appendChild(b1g);}
         if(isMonastic(c)){var b2=document.createElement('span');b2.className='badge b-mon';b2.textContent=T('monastic');bg.appendChild(b2);}
         if(hasEponyme(c)){var b3=document.createElement('span');b3.className='badge b-epo';b3.textContent=T('eponymous');bg.appendChild(b3);}
-        var pr=document.createElement('div');pr.className='ccard-pr';pr.textContent=c.pr&&c.pr.length>0?c.pr[0].n:'';
-        body.appendChild(lb);body.appendChild(an);body.appendChild(bg);body.appendChild(pr);
+        body.appendChild(lb);body.appendChild(an);body.appendChild(bg);
         // "Voir sur la carte" button
         var mapBtn=document.createElement('button');mapBtn.className='ccard-map-btn';mapBtn.textContent=T('view_on_map');
         mapBtn.onclick=(function(i){return function(e){e.stopPropagation();window._view('map');setTimeout(function(){window._focus(i);},200);};})(idx);
@@ -1558,23 +1564,20 @@ window._exportItin=function(mode){
     if(valid.length<2){showToast(T('missing_gps'));return;}
 
     if(mode==='driving'||mode==='walking'){
-        // Google Maps Directions API URL format — works on desktop + mobile app
-        // Use named waypoints so mobile app shows producer/cheese names instead of "Dropped pin"
-        function gmLabel(s){
-            var name=s.cn||'';
-            var prod=s.pr.n||'';
-            // Use producer name if available, otherwise cheese name, with coords as fallback
-            var label=prod||name;
-            if(label&&label!==T('starting_point')) return encodeURIComponent(label)+',France';
+        // Google Maps Directions — "Name+@lat,lon" anchors the name to exact coordinates
+        // This shows the producer name AND navigates to the right place (not a text-search guess)
+        function gmStop(s){
+            var name=s.pr.n||s.cn||'';
+            if(name&&name!==T('starting_point')) return encodeURIComponent(name)+'@'+s.pr.la+','+s.pr.lo;
             return s.pr.la+','+s.pr.lo;
         }
-        var origin=gmLabel(valid[0]);
-        var dest=gmLabel(valid[valid.length-1]);
+        var origin=gmStop(valid[0]);
+        var dest=gmStop(valid[valid.length-1]);
         var tm=mode==='driving'?'driving':'walking';
         var url='https://www.google.com/maps/dir/?api=1&travelmode='+tm+'&origin='+origin+'&destination='+dest;
         if(valid.length>2){
             var wps=[];
-            for(var i=1;i<valid.length-1;i++){wps.push(gmLabel(valid[i]));}
+            for(var i=1;i<valid.length-1;i++){wps.push(gmStop(valid[i]));}
             url+='&waypoints='+wps.join('|');
         }
         window.open(url,'_blank');
