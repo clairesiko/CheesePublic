@@ -1,13 +1,18 @@
 // Service Worker — Les Fromages du Bonheur
-const CACHE_NAME = 'fromages-v5';
+const CACHE_NAME = 'fromages-v6';
 const ASSETS = [
   '/',
   '/index.html',
   '/app.js',
+  '/i18n.js',
   '/data.js',
   '/style.css',
   '/icon-192.png',
   '/icon-512.png',
+  '/favicon-32.png',
+  '/apple-touch-icon.png',
+  '/logo.png',
+  '/manifest.json',
   'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css',
   'https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js',
