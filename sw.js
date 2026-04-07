@@ -1,5 +1,5 @@
 // Service Worker — Les Fromages du Bonheur
-const CACHE_NAME = 'fromages-v3';
+const CACHE_NAME = 'fromages-v5';
 const ASSETS = [
   '/',
   '/index.html',

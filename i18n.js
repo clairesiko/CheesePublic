@@ -477,6 +477,16 @@ var fieldTranslations = {
     'Pâte fraîche': 'Fresh cheese',
     'Pâte filée': 'Stretched curd cheese',
     'Fromage fondu': 'Processed cheese',
+    // Short pâte names (used in filter dropdowns)
+    'Croûte fleurie': 'Bloomy rind',
+    'Croûte lavée': 'Washed rind',
+    'Croûte naturelle': 'Natural rind',
+    'Persillée': 'Blue cheese',
+    'Pressée cuite': 'Cooked pressed',
+    'Pressée non-cuite': 'Uncooked pressed',
+    'Fondue': 'Processed',
+    'Filée': 'Stretched curd',
+    'Autre': 'Other',
 
     // Goût
     'Doux': 'Mild',

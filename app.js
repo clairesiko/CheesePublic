@@ -1567,8 +1567,10 @@ window._exportItin=function(mode){
         // Google Maps Directions — "Name+@lat,lon" anchors the name to exact coordinates
         // This shows the producer name AND navigates to the right place (not a text-search guess)
         function gmStop(s){
+            // For user geolocation stops, use plain coordinates (no name to anchor)
+            if(s.isGeo) return s.pr.la+','+s.pr.lo;
             var name=s.pr.n||s.cn||'';
-            if(name&&name!==T('starting_point')) return encodeURIComponent(name)+'@'+s.pr.la+','+s.pr.lo;
+            if(name) return encodeURIComponent(name)+'@'+s.pr.la+','+s.pr.lo;
             return s.pr.la+','+s.pr.lo;
         }
         var origin=gmStop(valid[0]);
@@ -2462,7 +2464,10 @@ window._onLangChange = function(lang) {
                 if (key) o.textContent = T(key);
             } else {
                 // Translate the value for display
-                o.textContent = typeof TF === 'function' ? TF(o.value) : o.value;
+                // For pâte filters, show short name translated (e.g. "Bloomy rind" not "Soft cheese, bloomy rind")
+                var isPate = (id === 'fPate' || id === 'fPateM');
+                var display = isPate ? getPateShort(o.value) : o.value;
+                o.textContent = typeof TF === 'function' ? TF(display) : display;
             }
         });
     });
