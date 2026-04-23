@@ -27,6 +27,11 @@ body{font-family:'Inter',sans-serif;color:#3a3226;background:#faf8f5;min-height:
 .page-nav .nav-links a.active{text-decoration:underline;font-weight:600;}
 .page-nav .back-link{color:#5a4230;text-decoration:none;font-size:0.85rem;font-weight:500;}
 .page-nav .back-link:hover{text-decoration:underline;}
+.lang-toggle{background:none;border:1px solid #d4c5a9;color:#8B6F47;padding:4px 10px;border-radius:6px;font-size:0.8rem;cursor:pointer;font-family:Inter,sans-serif;margin-left:0.5rem;}
+.lang-en{display:none;}
+html[lang="en"] .lang-fr{display:none;}
+html[lang="en"] .lang-en{display:block;}
+html[lang="en"] .lang-en.inline{display:inline;}
 .container{max-width:680px;margin:0 auto;padding:2.5rem 1.5rem 3rem;}
 h1{font-family:'Playfair Display',serif;font-size:1.8rem;color:#5a4230;margin-bottom:1.5rem;text-align:center;}
 h2{font-family:'Playfair Display',serif;font-size:1.15rem;color:#5a4230;margin:2rem 0 0.8rem;padding-top:1.5rem;border-top:1px solid #f0ede8;}
@@ -47,33 +52,74 @@ footer a{color:#5a4230;text-decoration:none;}
 <nav class="page-nav">
     <a href="index.html" class="logo">Les Fromages du Bonheur</a>
     <div class="nav-links">
-        <a href="index.html">Carte</a>
-        <a href="index.html">Fromages A-Z</a>
-        <a href="definition.html">Lexique</a>
-        <a href="about.html" class="active">À propos</a>
-        <a href="contact.html">Contact</a>
+        <a href="index.html"><span class="lang-fr">Carte</span><span class="lang-en inline">Map</span></a>
+        <a href="index.html"><span class="lang-fr">Fromages A-Z</span><span class="lang-en inline">Cheeses A-Z</span></a>
+        <a href="definition.html"><span class="lang-fr">Lexique</span><span class="lang-en inline">Glossary</span></a>
+        <a href="about.html" class="active"><span class="lang-fr">À propos</span><span class="lang-en inline">About</span></a>
+        <a href="contact.html"><span class="lang-fr">Contact</span><span class="lang-en inline">Contact</span></a>
         <a href="https://www.instagram.com/lesfromagesdubonheur/" target="_blank" rel="noopener" title="Instagram" style="display:inline-flex;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg></a>
+        <button class="lang-toggle" id="langToggleBtn" onclick="toggleLang()">🇬🇧 EN</button>
     </div>
 </nav>
 
 <div class="container">
-    <h1>À propos</h1>
+    <div class="lang-fr">
+        <h1>À propos</h1>
 
-    <p>J'ai voulu créer la carte interactive la plus exhaustive des fromages de France — pour découvrir chaque fromage, trouver les producteurs, et créer ses propres itinéraires fromagers pour aller les goûter. En voiture, à vélo ou à pied !</p>
+        <p>J'ai voulu créer la carte interactive la plus exhaustive des fromages de France — pour découvrir chaque fromage, trouver les producteurs, et créer ses propres itinéraires fromagers pour aller les goûter. En voiture, à vélo ou à pied !</p>
 
-    <p>Tout est parti d'une envie simple — découvrir les fromages de France où que je sois. Et d'une fascination : comment avec trois laits — vache, chèvre, brebis — arrive-t-on à une telle myriade de fromages ? Derrière chaque fromage, il y a aussi un savoir-faire ancestral perpétué par des gens passionnés. J'ai essayé de le mettre en valeur, notamment à travers les producteurs fermiers sélectionnés sur le site.</p>
+        <p>Tout est parti d'une envie simple — découvrir les fromages de France où que je sois. Et d'une fascination : comment avec trois laits — vache, chèvre, brebis — arrive-t-on à une telle myriade de fromages ? Derrière chaque fromage, il y a aussi un savoir-faire ancestral perpétué par des gens passionnés. J'ai essayé de le mettre en valeur, notamment à travers les producteurs fermiers sélectionnés sur le site.</p>
 
-    <h2>Sur le site</h2>
+        <h2>Sur le site</h2>
 
-    <p>Chaque fiche fromage indique son type de pâte, son affinage, sa saison idéale, son goût, son histoire — origine monastique, ou commune éponyme quand elle existe... Il y a aussi des détails sur les labels AOP, AOC, IGP. On peut localiser les producteurs sur la carte et créer ses itinéraires fromagers exportables.</p>
+        <p>Chaque fiche fromage indique son type de pâte, son affinage, sa saison idéale, son goût, son histoire — origine monastique, ou commune éponyme quand elle existe... Il y a aussi des détails sur les labels AOP, AOC, IGP. On peut localiser les producteurs sur la carte et créer ses itinéraires fromagers exportables.</p>
 
-    <p>La base ne sera probablement jamais complète — ni pour les fromages, ni pour les producteurs ! J'ai commencé par la France métropolitaine, mais j'aimerais agrandir, et il me manque certainement des fromages même en métropole. Un fromage qui manque ? Un producteur à ajouter ? N'hésitez pas à le <a href="contact.html">suggérer</a> !</p>
+        <p>La base ne sera probablement jamais complète — ni pour les fromages, ni pour les producteurs ! J'ai commencé par la France métropolitaine, mais j'aimerais agrandir, et il me manque certainement des fromages même en métropole. Un fromage qui manque ? Un producteur à ajouter ? N'hésitez pas à le <a href="contact.html">suggérer</a> !</p>
 
-    <p class="signature">— Claire</p>
+        <p class="signature">— Claire</p>
+    </div>
+
+    <div class="lang-en">
+        <h1>About</h1>
+
+        <p>I wanted to build the most exhaustive interactive map of French cheeses — to help you discover each cheese, find its producers, and plan your own cheese itineraries to go taste them. By car, by bike, or on foot!</p>
+
+        <p>It started with a simple desire — to discover the cheeses of France wherever I happened to be. And with a fascination: how do we get such a dazzling variety of cheeses from just three milks — cow, goat, sheep? Behind every cheese, there's also ancestral know-how kept alive by passionate people. I've tried to highlight that, especially through the farmstead producers featured on the site.</p>
+
+        <h2>On the site</h2>
+
+        <p>Each cheese page lists its paste type, aging, peak season, taste, and story — its monastic origin, or the village it's named after when there is one. You'll also find details about the AOP, AOC, and IGP designations. You can locate producers on the map and build exportable cheese itineraries.</p>
+
+        <p>The database will probably never be complete — neither for cheeses nor producers! I started with mainland France, but I'd love to expand, and I'm certainly missing a few cheeses even there. A cheese missing? A producer to add? Please <a href="contact.html">suggest it</a>!</p>
+
+        <p class="signature">— Claire</p>
+    </div>
 </div>
 
 <footer>
-    &copy; 2025–2026 <a href="mailto:lesfromagesdubonheur@gmail.com">Les Fromages du Bonheur</a> · Carte interactive des fromages de France · <a href="https://www.instagram.com/lesfromagesdubonheur/" target="_blank" rel="noopener">Instagram</a>
+    &copy; 2025–2026 <a href="mailto:lesfromagesdubonheur@gmail.com">Les Fromages du Bonheur</a> ·
+    <span class="lang-fr">Carte interactive des fromages de France</span>
+    <span class="lang-en inline">Interactive map of French cheeses</span>
+    · <a href="https://www.instagram.com/lesfromagesdubonheur/" target="_blank" rel="noopener">Instagram</a>
 </footer>
+
+<script>
+(function(){
+    var stored = localStorage.getItem('fdh_lang') || 'fr';
+    document.documentElement.lang = stored;
+    updateBtn(stored);
+    function updateBtn(lang){
+        var b = document.getElementById('langToggleBtn');
+        if(b) b.textContent = lang === 'fr' ? '🇬🇧 EN' : '🇫🇷 FR';
+    }
+    window.toggleLang = function(){
+        var cur = document.documentElement.lang;
+        var next = cur === 'fr' ? 'en' : 'fr';
+        document.documentElement.lang = next;
+        localStorage.setItem('fdh_lang', next);
+        updateBtn(next);
+    };
+})();
+</script>
 </body>
 </html>

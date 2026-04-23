@@ -10,11 +10,10 @@
 <meta name="robots" content="index, follow">
 <meta name="robots" content="noai, noimageai">
 <meta name="msvalidate.01" content="244EFD9C87BFC51592B8D1F227DD6A39" />
-<!-- Block known AI crawlers and scrapers -->
+<!-- Block known AI crawlers and scrapers (Google-Extended intentionally allowed for AI Overviews visibility) -->
 <meta name="GPTBot" content="noindex, nofollow">
 <meta name="CCBot" content="noindex, nofollow">
 <meta name="anthropic-index" content="disallow">
-<meta name="Google-Extended" content="noindex, nofollow">
 <link rel="canonical" href="https://www.lesfromagesdubonheur.com/">
 
 <!-- Open Graph (Facebook, LinkedIn, WhatsApp) -->
@@ -91,6 +90,8 @@
                     <button onclick="window._openItinGen();this.closest('.nav-dropdown').classList.remove('open');" data-t="create_itinerary">Créer un itinéraire</button>
                 </div>
             </div>
+            <!-- Chroniques standalone top-level button (matches .nav-drop-btn size/style) -->
+            <a href="chroniques.html" class="nav-chronique-btn" style="padding:0.32rem 0.7rem;border-radius:8px;font-size:0.78rem;color:#fff;font-weight:600;white-space:nowrap;font-family:'Inter',sans-serif;background:#8B6F47;border:1px solid #8B6F47;text-decoration:none;display:inline-flex;align-items:center;" data-t="chroniques_nav">Chroniques</a>
             <!-- En savoir plus dropdown -->
             <div class="nav-dropdown" id="navInfo">
                 <button class="nav-drop-btn"><span data-t="learn_more">En savoir plus</span> <span class="nav-drop-arrow">▾</span></button>
@@ -102,7 +103,7 @@
                 </div>
             </div>
             <button class="nav-fav-btn" id="navFavBtn" onclick="window._toggleDesktopFavs()">♥ <span id="navFavCount">0</span></button>
-            <button class="suggest-btn" onclick="window._openPage('suggest')" title="Suggérer un fromage" data-t="suggest_cheese">+ Suggérer un fromage</button>
+            <button class="suggest-btn" onclick="window._openPage('suggest')" title="Suggérer un fromage" data-t="suggest_cheese">Suggérer un fromage</button>
         </div>
         <button class="lang-btn" id="langToggle" onclick="window.toggleLang()" style="background:none;border:1px solid #d4c5a9;color:#8B6F47;padding:4px 10px;border-radius:6px;font-size:0.8rem;cursor:pointer;font-family:Inter,sans-serif;white-space:nowrap;" data-t="lang_switch">🇬🇧 EN</button>
         <button class="mob-menu-btn" id="mobMenuBtn" onclick="window._openMobMenu()"><span></span></button>
@@ -299,7 +300,7 @@
     <button class="mob-menu-close" onclick="window._closeMobMenu()">&times;</button>
     <div class="mob-menu-items">
         <button onclick="window._toggleItin();window._closeMobMenu();"><span data-t="my_itinerary">Mon itinéraire</span> <span id="mobItinCount"></span></button>
-        <button onclick="window._openPage('suggest');window._closeMobMenu();" data-t="suggest_cheese">+ Suggérer un fromage</button>
+        <button onclick="window._openPage('suggest');window._closeMobMenu();" data-t="suggest_cheese">Suggérer un fromage</button>
         <button onclick="window._openPage('about');window._closeMobMenu();" data-t="about">À propos</button>
         <button onclick="window._openPage('contact');window._closeMobMenu();" data-t="contact">Contact</button>
     </div>
@@ -335,6 +336,7 @@
 <div class="mob-plus-overlay" id="mobPlusOverlay" onclick="window._closeMobPlus()"></div>
 <div class="mob-plus-menu" id="mobPlusMenu">
     <button id="mobInstallBtn" onclick="window._pwaInstallOrGuide();window._closeMobPlus();" style="display:none;font-weight:600;color:#8B6F47;" data-t="install_app">Install app</button>
+    <a href="chroniques.html" class="mob-plus-link" style="font-weight:500;color:#8B6F47;" data-t="chroniques_nav">Chroniques</a>
     <button onclick="window._openPage('about');window._closeMobPlus();" data-t="about">À propos</button>
     <button onclick="window._openPage('contact');window._closeMobPlus();" data-t="contact">Contact</button>
     <button onclick="window._openPage('definitions');window._closeMobPlus();" data-t="definitions">Définitions</button>
@@ -422,9 +424,9 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
-<script src="i18n.js?v=20260407d"></script>
+<script src="i18n.js?v=20260423a"></script>
 <script src="data.js?v=20260403c"></script>
-<script src="app.js?v=20260407d"></script>
+<script src="app.js?v=20260423a"></script>
 <script>
 // ── Service Worker Registration ──
 if ('serviceWorker' in navigator) {

@@ -460,6 +460,8 @@ function getPateShort(tp){
     if(p.indexOf('filee')>-1)return'Filée';
     return tp||'Autre';
 }
+// Expose to global scope so window._onLangChange (defined outside the IIFE) can reach it
+window.getPateShort=getPateShort;
 
 function applyF(){
     if(!S.data)return;
@@ -2479,7 +2481,7 @@ window._onLangChange = function(lang) {
             node.textContent = T(node.getAttribute('data-t'));
         });
     });
-    // Update map legend
+    // Update map legend (bottom-right box)
     var mleg = document.querySelector('.mleg');
     if (mleg) {
         var mt = mleg.querySelector('.mleg-t'); if (mt) mt.textContent = T('legend');
@@ -2494,6 +2496,24 @@ window._onLangChange = function(lang) {
             }
         });
     }
+    // Update "Zones de production" toggle button (top-right)
+    var zbtn = document.querySelector('.ztoggle');
+    if (zbtn) zbtn.textContent = T('production_zones');
+    // Update inline legend inside the cheese detail panel (if open)
+    var dlegs = document.querySelectorAll('.dlegend');
+    dlegs.forEach(function(dl){
+        var dt = dl.querySelector('.dleg-title'); if (dt) dt.textContent = T('map_legend');
+        var rows = dl.querySelectorAll('.dleg-row');
+        var rowKeys = ['cheese','producer','eponymous_commune','production_zone'];
+        rows.forEach(function(el, i){
+            if (rowKeys[i]) {
+                var dot = el.querySelector('.dleg-dot');
+                el.textContent = '';
+                if (dot) el.appendChild(dot);
+                el.appendChild(document.createTextNode(' ' + T(rowKeys[i])));
+            }
+        });
+    });
     // Refresh cluster labels (they update on next zoom/pan via T() calls)
     if (window.S && window.S.map) window.S.map.fire('moveend');
 };

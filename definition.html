@@ -25,6 +25,11 @@ body{font-family:'Inter',sans-serif;color:#3a3226;background:#faf8f5;min-height:
 .page-nav .nav-links a{color:#5a4230;text-decoration:none;font-size:0.88rem;font-weight:500;padding:0.3rem 0;}
 .page-nav .nav-links a:hover{text-decoration:underline;}
 .page-nav .nav-links a.active{text-decoration:underline;font-weight:600;}
+.lang-toggle{background:none;border:1px solid #d4c5a9;color:#8B6F47;padding:4px 10px;border-radius:6px;font-size:0.8rem;cursor:pointer;font-family:Inter,sans-serif;margin-left:0.5rem;}
+.lang-en{display:none;}
+html[lang="en"] .lang-fr{display:none;}
+html[lang="en"] .lang-en{display:block;}
+html[lang="en"] .lang-en.inline{display:inline;}
 .container{max-width:680px;margin:0 auto;padding:2.5rem 1.5rem 3rem;text-align:center;}
 h1{font-family:'Playfair Display',serif;font-size:1.8rem;color:#5a4230;margin-bottom:1.5rem;}
 .wip-icon{font-size:4rem;margin-bottom:1rem;}
@@ -46,24 +51,54 @@ footer a{color:#5a4230;text-decoration:none;}
 <nav class="page-nav">
     <a href="index.html" class="logo">Les Fromages du Bonheur</a>
     <div class="nav-links">
-        <a href="index.html">Carte</a>
-        <a href="index.html">Fromages A-Z</a>
-        <a href="definition.html" class="active">Lexique</a>
-        <a href="about.html">À propos</a>
-        <a href="contact.html">Contact</a>
+        <a href="index.html"><span class="lang-fr">Carte</span><span class="lang-en inline">Map</span></a>
+        <a href="index.html"><span class="lang-fr">Fromages A-Z</span><span class="lang-en inline">Cheeses A-Z</span></a>
+        <a href="definition.html" class="active"><span class="lang-fr">Lexique</span><span class="lang-en inline">Glossary</span></a>
+        <a href="about.html"><span class="lang-fr">À propos</span><span class="lang-en inline">About</span></a>
+        <a href="contact.html"><span class="lang-fr">Contact</span><span class="lang-en inline">Contact</span></a>
+        <button class="lang-toggle" id="langToggleBtn" onclick="toggleLang()">🇬🇧 EN</button>
     </div>
 </nav>
 
 <div class="container">
     <div class="wip-icon">&#128516;</div>
-    <h1>Lexique du fromage</h1>
-    <p class="wip-text">Cette page est en cours de construction !</p>
-    <p class="wip-detail">Bientôt ici : les définitions de tous les termes fromagers — AOP, AOC, IGP, types de pâtes, affinage, terroir, lait cru, et bien plus encore.</p>
-    <a href="index.html" class="back-btn">Explorer la carte</a>
+    <div class="lang-fr">
+        <h1>Lexique du fromage</h1>
+        <p class="wip-text">Cette page est en cours de construction !</p>
+        <p class="wip-detail">Bientôt ici : les définitions de tous les termes fromagers — AOP, AOC, IGP, types de pâtes, affinage, terroir, lait cru, et bien plus encore.</p>
+        <a href="index.html" class="back-btn">Explorer la carte</a>
+    </div>
+    <div class="lang-en">
+        <h1>Cheese glossary</h1>
+        <p class="wip-text">This page is under construction!</p>
+        <p class="wip-detail">Coming soon: definitions of all cheese terminology — AOP, AOC, IGP, paste types, aging, terroir, raw milk, and much more.</p>
+        <a href="index.html" class="back-btn">Explore the map</a>
+    </div>
 </div>
 
 <footer>
-    &copy; 2025–2026 <a href="mailto:lesfromagesdubonheur@gmail.com">Les Fromages du Bonheur</a> · <a href="index.html">Carte interactive des fromages de France</a> · <a href="https://www.instagram.com/lesfromagesdubonheur/" target="_blank" rel="noopener">Instagram</a>
+    &copy; 2025–2026 <a href="mailto:lesfromagesdubonheur@gmail.com">Les Fromages du Bonheur</a> ·
+    <a href="index.html"><span class="lang-fr">Carte interactive des fromages de France</span><span class="lang-en inline">Interactive map of French cheeses</span></a>
+    · <a href="https://www.instagram.com/lesfromagesdubonheur/" target="_blank" rel="noopener">Instagram</a>
 </footer>
+
+<script>
+(function(){
+    var stored = localStorage.getItem('fdh_lang') || 'fr';
+    document.documentElement.lang = stored;
+    updateBtn(stored);
+    function updateBtn(lang){
+        var b = document.getElementById('langToggleBtn');
+        if(b) b.textContent = lang === 'fr' ? '🇬🇧 EN' : '🇫🇷 FR';
+    }
+    window.toggleLang = function(){
+        var cur = document.documentElement.lang;
+        var next = cur === 'fr' ? 'en' : 'fr';
+        document.documentElement.lang = next;
+        localStorage.setItem('fdh_lang', next);
+        updateBtn(next);
+    };
+})();
+</script>
 </body>
 </html>

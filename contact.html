@@ -25,6 +25,11 @@ body{font-family:'Inter',sans-serif;color:#3a3226;background:#faf8f5;min-height:
 .page-nav .nav-links a{color:#5a4230;text-decoration:none;font-size:0.88rem;font-weight:500;padding:0.3rem 0;}
 .page-nav .nav-links a:hover{text-decoration:underline;}
 .page-nav .nav-links a.active{text-decoration:underline;font-weight:600;}
+.lang-toggle{background:none;border:1px solid #d4c5a9;color:#8B6F47;padding:4px 10px;border-radius:6px;font-size:0.8rem;cursor:pointer;font-family:Inter,sans-serif;margin-left:0.5rem;}
+.lang-en{display:none;}
+html[lang="en"] .lang-fr{display:none;}
+html[lang="en"] .lang-en{display:block;}
+html[lang="en"] .lang-en.inline{display:inline;}
 .container{max-width:680px;margin:0 auto;padding:2.5rem 1.5rem 3rem;}
 h1{font-family:'Playfair Display',serif;font-size:1.8rem;color:#5a4230;margin-bottom:1.5rem;text-align:center;}
 p{font-size:0.95rem;line-height:1.75;margin-bottom:1rem;}
@@ -54,42 +59,90 @@ footer a{color:#5a4230;text-decoration:none;}
 <nav class="page-nav">
     <a href="index.html" class="logo">Les Fromages du Bonheur</a>
     <div class="nav-links">
-        <a href="index.html">Carte</a>
-        <a href="index.html">Fromages A-Z</a>
-        <a href="definition.html">Lexique</a>
-        <a href="about.html">À propos</a>
-        <a href="contact.html" class="active">Contact</a>
+        <a href="index.html"><span class="lang-fr">Carte</span><span class="lang-en inline">Map</span></a>
+        <a href="index.html"><span class="lang-fr">Fromages A-Z</span><span class="lang-en inline">Cheeses A-Z</span></a>
+        <a href="definition.html"><span class="lang-fr">Lexique</span><span class="lang-en inline">Glossary</span></a>
+        <a href="about.html"><span class="lang-fr">À propos</span><span class="lang-en inline">About</span></a>
+        <a href="contact.html" class="active"><span class="lang-fr">Contact</span><span class="lang-en inline">Contact</span></a>
         <a href="https://www.instagram.com/lesfromagesdubonheur/" target="_blank" rel="noopener" title="Instagram" style="display:inline-flex;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg></a>
+        <button class="lang-toggle" id="langToggleBtn" onclick="toggleLang()">🇬🇧 EN</button>
     </div>
 </nav>
 
 <div class="container">
     <h1>Contact</h1>
 
-    <p>Une question, une suggestion, une correction ? N'hésitez pas à écrire !</p>
+    <div class="lang-fr">
+        <p>Une question, une suggestion, une correction ? N'hésitez pas à écrire !</p>
 
-    <div class="contact-box">
-        <p>Envoyez un email à</p>
-        <a class="email" href="mailto:lesfromagesdubonheur@gmail.com">lesfromagesdubonheur@gmail.com</a>
+        <div class="contact-box">
+            <p>Envoyez un email à</p>
+            <a class="email" href="mailto:lesfromagesdubonheur@gmail.com">lesfromagesdubonheur@gmail.com</a>
+        </div>
+
+        <div class="suggest-section">
+            <h2>Suggérer un fromage ou un producteur</h2>
+            <p>Vous connaissez un fromage qui manque à notre carte ? Un producteur fermier à ajouter ? Dites-le nous !</p>
+            <form class="contact-form" action="mailto:lesfromagesdubonheur@gmail.com" method="post" enctype="text/plain">
+                <label>Nom du fromage *</label>
+                <input type="text" name="fromage" required placeholder="Ex : Tome des Bauges">
+                <label>Région / Département</label>
+                <input type="text" name="region" placeholder="Ex : Savoie">
+                <label>Informations complémentaires</label>
+                <textarea name="details" placeholder="Type de lait, producteur connu, lien web..."></textarea>
+                <button type="submit" class="form-submit">Envoyer la suggestion</button>
+            </form>
+        </div>
     </div>
 
-    <div class="suggest-section">
-        <h2>Suggérer un fromage ou un producteur</h2>
-        <p>Vous connaissez un fromage qui manque à notre carte ? Un producteur fermier à ajouter ? Dites-le nous !</p>
-        <form class="contact-form" action="mailto:lesfromagesdubonheur@gmail.com" method="post" enctype="text/plain">
-            <label>Nom du fromage *</label>
-            <input type="text" name="fromage" required placeholder="Ex : Tome des Bauges">
-            <label>Région / Département</label>
-            <input type="text" name="region" placeholder="Ex : Savoie">
-            <label>Informations complémentaires</label>
-            <textarea name="details" placeholder="Type de lait, producteur connu, lien web..."></textarea>
-            <button type="submit" class="form-submit">Envoyer la suggestion</button>
-        </form>
+    <div class="lang-en">
+        <p>A question, a suggestion, a correction? Feel free to reach out!</p>
+
+        <div class="contact-box">
+            <p>Send an email to</p>
+            <a class="email" href="mailto:lesfromagesdubonheur@gmail.com">lesfromagesdubonheur@gmail.com</a>
+        </div>
+
+        <div class="suggest-section">
+            <h2>Suggest a cheese or a producer</h2>
+            <p>Do you know a cheese missing from our map? A farmstead producer to add? Tell us!</p>
+            <form class="contact-form" action="mailto:lesfromagesdubonheur@gmail.com" method="post" enctype="text/plain">
+                <label>Cheese name *</label>
+                <input type="text" name="fromage" required placeholder="E.g. Tome des Bauges">
+                <label>Region / Department</label>
+                <input type="text" name="region" placeholder="E.g. Savoie">
+                <label>Additional information</label>
+                <textarea name="details" placeholder="Milk type, known producer, web link..."></textarea>
+                <button type="submit" class="form-submit">Send suggestion</button>
+            </form>
+        </div>
     </div>
 </div>
 
 <footer>
-    &copy; 2025–2026 <a href="mailto:lesfromagesdubonheur@gmail.com">Les Fromages du Bonheur</a> · Carte interactive des fromages de France · <a href="https://www.instagram.com/lesfromagesdubonheur/" target="_blank" rel="noopener">Instagram</a>
+    &copy; 2025–2026 <a href="mailto:lesfromagesdubonheur@gmail.com">Les Fromages du Bonheur</a> ·
+    <span class="lang-fr">Carte interactive des fromages de France</span>
+    <span class="lang-en inline">Interactive map of French cheeses</span>
+    · <a href="https://www.instagram.com/lesfromagesdubonheur/" target="_blank" rel="noopener">Instagram</a>
 </footer>
+
+<script>
+(function(){
+    var stored = localStorage.getItem('fdh_lang') || 'fr';
+    document.documentElement.lang = stored;
+    updateBtn(stored);
+    function updateBtn(lang){
+        var b = document.getElementById('langToggleBtn');
+        if(b) b.textContent = lang === 'fr' ? '🇬🇧 EN' : '🇫🇷 FR';
+    }
+    window.toggleLang = function(){
+        var cur = document.documentElement.lang;
+        var next = cur === 'fr' ? 'en' : 'fr';
+        document.documentElement.lang = next;
+        localStorage.setItem('fdh_lang', next);
+        updateBtn(next);
+    };
+})();
+</script>
 </body>
 </html>

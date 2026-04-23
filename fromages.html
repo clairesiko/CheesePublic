@@ -25,6 +25,11 @@ body{font-family:'Inter',sans-serif;color:#3a3226;background:#faf8f5;min-height:
 .page-nav .nav-links a{color:#5a4230;text-decoration:none;font-size:0.88rem;font-weight:500;padding:0.3rem 0;}
 .page-nav .nav-links a:hover{text-decoration:underline;}
 .page-nav .nav-links a.active{text-decoration:underline;font-weight:600;}
+.lang-toggle{background:none;border:1px solid #d4c5a9;color:#8B6F47;padding:4px 10px;border-radius:6px;font-size:0.8rem;cursor:pointer;font-family:Inter,sans-serif;margin-left:0.5rem;}
+.lang-en{display:none;}
+html[lang="en"] .lang-fr{display:none;}
+html[lang="en"] .lang-en{display:block;}
+html[lang="en"] .lang-en.inline{display:inline;}
 .container{max-width:900px;margin:0 auto;padding:2rem 1.5rem 3rem;}
 h1{font-family:'Playfair Display',serif;font-size:1.8rem;color:#5a4230;margin-bottom:0.5rem;text-align:center;}
 .subtitle{text-align:center;color:#8a7a66;font-size:0.9rem;margin-bottom:1.5rem;}
@@ -62,17 +67,18 @@ footer a{color:#5a4230;text-decoration:none;}
 <nav class="page-nav">
     <a href="/" class="logo">Les Fromages du Bonheur</a>
     <div class="nav-links">
-        <a href="/">Carte</a>
-        <a href="/fromages.html" class="active">Fromages A-Z</a>
-        <a href="/definition.html">Lexique</a>
-        <a href="/about.html">À propos</a>
-        <a href="/contact.html">Contact</a>
+        <a href="/"><span class="lang-fr">Carte</span><span class="lang-en inline">Map</span></a>
+        <a href="/fromages.html" class="active"><span class="lang-fr">Fromages A-Z</span><span class="lang-en inline">Cheeses A-Z</span></a>
+        <a href="/definition.html"><span class="lang-fr">Lexique</span><span class="lang-en inline">Glossary</span></a>
+        <a href="/about.html"><span class="lang-fr">À propos</span><span class="lang-en inline">About</span></a>
+        <a href="/contact.html"><span class="lang-fr">Contact</span><span class="lang-en inline">Contact</span></a>
         <a href="https://www.instagram.com/lesfromagesdubonheur/" target="_blank" rel="noopener" title="Instagram" style="display:inline-flex;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg></a>
+        <button class="lang-toggle" id="langToggleBtn" onclick="toggleLang()">🇬🇧 EN</button>
     </div>
 </nav>
 
 <div class="container">
-    <h1>Les fromages de France de A à Z</h1>
+    <h1><span class="lang-fr">Les fromages de France de A à Z</span><span class="lang-en inline">French cheeses from A to Z</span></h1>
     <p class="subtitle" id="countText">Chargement...</p>
 
     <input type="text" class="search-box" id="searchBox" placeholder="Rechercher un fromage..." autocomplete="off">
@@ -82,12 +88,38 @@ footer a{color:#5a4230;text-decoration:none;}
 </div>
 
 <footer>
-    &copy; 2025–2026 <a href="mailto:lesfromagesdubonheur@gmail.com">Les Fromages du Bonheur</a> · <a href="/">Carte interactive des fromages de France</a> · <a href="https://www.instagram.com/lesfromagesdubonheur/" target="_blank" rel="noopener">Instagram</a>
+    &copy; 2025–2026 <a href="mailto:lesfromagesdubonheur@gmail.com">Les Fromages du Bonheur</a> ·
+    <a href="/"><span class="lang-fr">Carte interactive des fromages de France</span><span class="lang-en inline">Interactive map of French cheeses</span></a>
+    · <a href="https://www.instagram.com/lesfromagesdubonheur/" target="_blank" rel="noopener">Instagram</a>
 </footer>
 
 <script src="data.js"></script>
 <script>
 (function(){
+    // Language handling
+    var stored = localStorage.getItem('fdh_lang') || 'fr';
+    document.documentElement.lang = stored;
+    function getLang(){ return document.documentElement.lang || 'fr'; }
+    function updateBtn(lang){
+        var b = document.getElementById('langToggleBtn');
+        if(b) b.textContent = lang === 'fr' ? '🇬🇧 EN' : '🇫🇷 FR';
+    }
+    function updateSearchPlaceholder(){
+        var sb = document.getElementById('searchBox');
+        if(sb) sb.placeholder = getLang() === 'fr' ? 'Rechercher un fromage...' : 'Search for a cheese...';
+    }
+    updateBtn(stored);
+    updateSearchPlaceholder();
+    window.toggleLang = function(){
+        var cur = getLang();
+        var next = cur === 'fr' ? 'en' : 'fr';
+        document.documentElement.lang = next;
+        localStorage.setItem('fdh_lang', next);
+        updateBtn(next);
+        updateSearchPlaceholder();
+        rerender();
+    };
+
     var raw=JSON.parse(atob(CHEESE_DATA_B64));
     var cheeses=raw.cheeses||raw;
     cheeses.sort(function(a,b){return (a.nm||'').localeCompare(b.nm||'','fr');});
@@ -100,7 +132,14 @@ footer a{color:#5a4230;text-decoration:none;}
         byLetter[first].push(c);
     });
 
-    document.getElementById('countText').textContent=cheeses.length+' fromages répertoriés';
+    function countLabel(n){
+        if(getLang()==='en'){
+            return n + ' cheese' + (n>1?'s':'') + ' listed';
+        }
+        return n + ' fromage' + (n>1?'s':'') + ' répertorié' + (n>1?'s':'');
+    }
+
+    document.getElementById('countText').textContent = countLabel(cheeses.length);
 
     // Letter nav
     var navHtml='';
@@ -121,11 +160,16 @@ footer a{color:#5a4230;text-decoration:none;}
             else if(c.ao.di)html+='<span class="badge badge-igp">IGP</span>';
             else if(c.ao.dc_aoc)html+='<span class="badge badge-aop">AOC</span>';
         }
-        if(c.lb&&c.lb.indexOf('Fermier')>=0)html+='<span class="badge badge-fermier">Fermier</span>';
+        if(c.lb&&c.lb.indexOf('Fermier')>=0){
+            var lbl = getLang()==='en' ? 'Farmstead' : 'Fermier';
+            html+='<span class="badge badge-fermier">'+lbl+'</span>';
+        }
         return html;
     }
 
+    var lastFiltered = null;
     function renderList(filtered){
+        lastFiltered = filtered;
         var grouped={};
         filtered.forEach(function(c){
             var first=(c.nm||'?')[0].toUpperCase();
@@ -147,8 +191,10 @@ footer a{color:#5a4230;text-decoration:none;}
             html+='</div></div>';
         });
         document.getElementById('cheeseList').innerHTML=html;
-        document.getElementById('countText').textContent=filtered.length+' fromage'+(filtered.length>1?'s':'')+' répertorié'+(filtered.length>1?'s':'');
+        document.getElementById('countText').textContent = countLabel(filtered.length);
     }
+
+    function rerender(){ if(lastFiltered) renderList(lastFiltered); }
 
     renderList(cheeses);
 

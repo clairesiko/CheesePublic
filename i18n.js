@@ -30,7 +30,8 @@ var translations = {
     'about': 'À propos',
     'contact': 'Contact',
     'definitions': 'Définitions',
-    'suggest_cheese': '+ Suggérer un fromage',
+    'chroniques_nav': 'Chroniques',
+    'suggest_cheese': 'Suggérer un fromage',
     'my_itinerary': 'Mon itinéraire',
     'create_itinerary': 'Créer un itinéraire',
 
@@ -258,7 +259,8 @@ var translations = {
     'about': 'About',
     'contact': 'Contact',
     'definitions': 'Definitions',
-    'suggest_cheese': '+ Suggest a cheese',
+    'chroniques_nav': 'Newsletter',
+    'suggest_cheese': 'Suggest a cheese',
     'my_itinerary': 'My itinerary',
     'create_itinerary': 'Create an itinerary',
 
