@@ -1,0 +1,19 @@
+{
+  "posts": [
+    {
+      "slug": "bienvenue",
+      "date": "2026-04-23",
+      "category": "actualites",
+      "coverEmoji": "✉️",
+      "cover": "",
+      "title": {
+        "fr": "Bienvenue aux Chroniques Fromagères",
+        "en": "Welcome to the Cheese Chronicles"
+      },
+      "excerpt": {
+        "fr": "Un nouveau chapitre pour Les Fromages du Bonheur : une publication mensuelle, entre newsletter et blog, pour partager histoires, itinéraires et découvertes.",
+        "en": "A new chapter for Les Fromages du Bonheur: a monthly publication, part newsletter part blog, to share stories, itineraries and discoveries."
+      }
+    }
+  ]
+}
