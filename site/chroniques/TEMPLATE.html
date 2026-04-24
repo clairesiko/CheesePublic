@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<!--
+    ═══════════════════════════════════════════════════════════════
+    CHRONICLE TEMPLATE
+    ═══════════════════════════════════════════════════════════════
+    This is a blank template for writing a new chronicle.
+
+    HOW TO USE:
+    1. Duplicate this file and rename the copy to your slug (e.g., "tournee-jura.html")
+       Use lowercase, no spaces, hyphens between words.
+    2. Search (Ctrl+F / Cmd+F) for "EDIT:" in this file. You'll find every
+       spot you need to update, with a comment explaining what to do.
+    3. When done, add your chronicle to posts.json and sitemap.xml
+       (see EDIT_GUIDE.md, Recipe 4, for the full walkthrough).
+
+    DO NOT DEPLOY THIS TEMPLATE FILE ITSELF — only your copies.
+    ═══════════════════════════════════════════════════════════════
+-->
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- EDIT: page title shown in browser tabs and Google results -->
+<title>Titre de la chronique — Les Fromages du Bonheur</title>
+
+<!-- EDIT: short description (~150 chars) for Google search snippets -->
+<meta name="description" content="Résumé de votre chronique en une phrase.">
+
+<meta name="robots" content="index, follow">
+<meta name="robots" content="noai, noimageai">
+
+<!-- EDIT: replace YOUR-SLUG with your filename (without .html) -->
+<link rel="canonical" href="https://www.lesfromagesdubonheur.com/site/chroniques/YOUR-SLUG.html">
+
+<!-- EDIT: same title as above -->
+<meta property="og:title" content="Titre de la chronique — Les Fromages du Bonheur">
+<!-- EDIT: same description as above -->
+<meta property="og:description" content="Résumé de votre chronique en une phrase.">
+<meta property="og:type" content="article">
+<!-- EDIT: same URL as canonical -->
+<meta property="og:url" content="https://www.lesfromagesdubonheur.com/site/chroniques/YOUR-SLUG.html">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="Les Fromages du Bonheur">
+
+<!-- EDIT: date in YYYY-MM-DD format -->
+<meta property="article:published_time" content="2026-05-15">
+<meta property="article:author" content="Claire">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧀</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;color:#3a3226;background:#faf8f5;min-height:100vh;}
+.page-nav{background:rgba(250,248,245,0.97);border-bottom:1px solid rgba(139,111,71,0.1);padding:0.8rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;position:sticky;top:0;z-index:10;}
+.page-nav .logo{font-family:'Playfair Display',serif;font-size:1.3rem;color:#5a4230;text-decoration:none;font-weight:700;}
+.page-nav .nav-links{display:flex;gap:1rem;align-items:center;}
+.page-nav .nav-links a{color:#5a4230;text-decoration:none;font-size:0.88rem;font-weight:500;padding:0.3rem 0;}
+.page-nav .nav-links a:hover{text-decoration:underline;}
+.page-nav .nav-links a.active{text-decoration:underline;font-weight:600;}
+.lang-toggle{background:none;border:1px solid #d4c5a9;color:#8B6F47;padding:4px 10px;border-radius:6px;font-size:0.8rem;cursor:pointer;font-family:Inter,sans-serif;}
+
+.breadcrumb{max-width:720px;margin:0 auto;padding:1.2rem 1.5rem 0;font-size:0.82rem;color:#8a7a66;}
+.breadcrumb a{color:#8B6F47;text-decoration:none;}
+.breadcrumb a:hover{text-decoration:underline;}
+
+article{max-width:720px;margin:0 auto;padding:1rem 1.5rem 2rem;}
+.post-header{margin-bottom:1.8rem;}
+.post-tag{display:inline-block;background:#f5efe5;color:#6d563a;padding:0.2rem 0.7rem;border-radius:10px;font-size:0.78rem;font-weight:500;margin-bottom:0.8rem;}
+.post-header h1{font-family:'Playfair Display',serif;font-size:2rem;color:#5a4230;line-height:1.25;margin-bottom:0.6rem;}
+.post-meta{font-size:0.85rem;color:#8a7a66;display:flex;gap:0.8rem;align-items:center;}
+
+.post-hero{aspect-ratio:16/9;background:#ede6d8;border-radius:12px;margin-bottom:2rem;display:flex;align-items:center;justify-content:center;font-size:5rem;overflow:hidden;}
+.post-hero img{width:100%;height:100%;object-fit:cover;display:block;}
+
+.post-body{font-size:1.02rem;line-height:1.75;color:#3a3226;}
+.post-body p{margin-bottom:1.1rem;}
+.post-body h2{font-family:'Playfair Display',serif;font-size:1.4rem;color:#5a4230;margin:2rem 0 0.8rem;}
+.post-body h3{font-family:'Playfair Display',serif;font-size:1.15rem;color:#5a4230;margin:1.5rem 0 0.6rem;}
+.post-body a{color:#8B6F47;text-decoration:underline;}
+.post-body a:hover{color:#6d563a;}
+.post-body ul,.post-body ol{margin:0 0 1.1rem 1.3rem;}
+.post-body li{margin-bottom:0.4rem;}
+.post-body blockquote{border-left:3px solid #8B6F47;padding:0.2rem 0 0.2rem 1rem;color:#6a5a4a;font-style:italic;margin:1.2rem 0;}
+.post-body strong{color:#5a4230;}
+
+.signature{text-align:right;font-family:'Playfair Display',serif;font-size:1.1rem;color:#5a4230;margin:2rem 0 0;}
+
+.signup-strip{max-width:680px;margin:3rem auto 0;background:#fff;border:1px solid #ede6d8;border-radius:14px;padding:1.8rem;text-align:center;box-shadow:0 6px 24px rgba(139,111,71,0.08);}
+.signup-strip h2{font-family:'Playfair Display',serif;font-size:1.3rem;color:#5a4230;margin-bottom:0.6rem;}
+.signup-strip p{font-size:0.92rem;color:#6a5a4a;margin-bottom:1.1rem;line-height:1.55;}
+.signup-form{display:flex;gap:0.5rem;max-width:420px;margin:0 auto;flex-wrap:wrap;}
+.signup-form input{flex:1;min-width:180px;font-family:'Inter',sans-serif;font-size:16px;padding:0.75rem 0.9rem;border:1px solid #d4c5a9;border-radius:8px;background:#fdfcf9;outline:none;}
+.signup-form input:focus{border-color:#8B6F47;}
+.signup-form button{font-family:'Inter',sans-serif;font-size:0.95rem;font-weight:600;padding:0.75rem 1.2rem;background:#8B6F47;color:#fff;border:none;border-radius:8px;cursor:pointer;white-space:nowrap;}
+.signup-form button:hover{background:#6d563a;}
+.signup-status{margin-top:0.6rem;font-size:0.85rem;min-height:1.2em;}
+.signup-status.ok{color:#4a7a3a;}
+.signup-link{display:inline-block;margin-top:0.6rem;font-size:0.82rem;color:#8a7a66;}
+.signup-link a{color:#8B6F47;}
+
+.back-to-blog{max-width:720px;margin:2rem auto 0;padding:0 1.5rem;text-align:center;}
+.back-to-blog a{color:#8B6F47;text-decoration:none;font-weight:500;font-size:0.92rem;}
+.back-to-blog a:hover{text-decoration:underline;}
+
+footer{text-align:center;padding:2rem 1rem;font-size:0.78rem;color:#b5a48a;border-top:1px solid #f0ede8;margin-top:2rem;}
+footer a{color:#5a4230;text-decoration:none;}
+
+.lang-en{display:none;}
+html[lang="en"] .lang-fr{display:none;}
+html[lang="en"] .lang-en{display:block;}
+html[lang="en"] .lang-en.inline{display:inline;}
+
+@media(max-width:600px){
+    article{padding:0.5rem 1rem 1.5rem;}
+    .breadcrumb{padding:1rem 1rem 0;}
+    .post-header h1{font-size:1.5rem;}
+    .post-body{font-size:0.97rem;}
+    .post-body h2{font-size:1.2rem;}
+    .signup-strip{padding:1.4rem 1.1rem;margin:2rem auto 0;}
+    .page-nav{padding:0.6rem 1rem;}
+    .page-nav .nav-links{gap:0.6rem;}
+    .page-nav .nav-links a{font-size:0.82rem;}
+}
+</style>
+</head>
+<body>
+<nav class="page-nav">
+    <a href="../index.html" class="logo">Les Fromages du Bonheur</a>
+    <div class="nav-links">
+        <a href="../index.html"><span class="lang-fr">Carte</span><span class="lang-en inline">Map</span></a>
+        <a href="../chroniques.html" class="active">
+            <span class="lang-fr">Chronique</span>
+            <span class="lang-en inline">Chronicles</span>
+        </a>
+        <a href="../about.html"><span class="lang-fr">À propos</span><span class="lang-en inline">About</span></a>
+        <a href="../contact.html">Contact</a>
+        <button class="lang-toggle" id="langToggleBtn" onclick="toggleLang()">🇬🇧 EN</button>
+    </div>
+</nav>
+
+<div class="breadcrumb">
+    <a href="../chroniques.html">
+        <span class="lang-fr">← Toutes les chroniques</span>
+        <span class="lang-en inline">← All chronicles</span>
+    </a>
+</div>
+
+<article>
+    <div class="post-header">
+        <!-- EDIT: pick ONE category. Valid values: Histoires/Stories, Itinéraires/Itineraries, Communauté/Community, Actualités/News -->
+        <span class="post-tag">
+            <span class="lang-fr">Histoires</span>
+            <span class="lang-en inline">Stories</span>
+        </span>
+        <!-- EDIT: your headline in French -->
+        <div class="lang-fr">
+            <h1>Titre de la chronique</h1>
+        </div>
+        <!-- EDIT: same headline translated to English -->
+        <div class="lang-en">
+            <h1>Chronicle title</h1>
+        </div>
+        <div class="post-meta">
+            <!-- EDIT: publication date (French format: "15 mai 2026", English format: "May 15, 2026") -->
+            <span>
+                <span class="lang-fr">15 mai 2026</span>
+                <span class="lang-en inline">May 15, 2026</span>
+            </span>
+            <span>·</span>
+            <span>Claire</span>
+        </div>
+    </div>
+
+    <!-- EDIT: cover image or emoji.
+         Option A (emoji): replace 🧀 with your emoji.
+         Option B (image): replace <span>🧀</span> with <img src="../img/your-photo.jpg" alt="Description">
+    -->
+    <div class="post-hero">
+        <span>🧀</span>
+    </div>
+
+    <div class="post-body">
+        <!-- ═══════════════════════════════════════════════
+             FRENCH VERSION — write your chronicle here
+             ═══════════════════════════════════════════════ -->
+        <div class="lang-fr">
+            <p>Premier paragraphe : un paragraphe d'accroche qui donne envie de lire la suite. 2-3 phrases.</p>
+
+            <p>Deuxième paragraphe : le contexte. Où êtes-vous ? De quoi parlez-vous ? Pourquoi maintenant ?</p>
+
+            <h2>Un sous-titre pour structurer</h2>
+
+            <p>Corps de votre chronique. <strong>Le gras</strong> pour insister, <em>l'italique</em> pour nuancer, <a href="../index.html">des liens</a> quand c'est utile.</p>
+
+            <p>Autre paragraphe. Vous pouvez enchaîner autant de paragraphes que vous voulez.</p>
+
+            <blockquote>Une citation, une anecdote, une remarque d'un producteur. Ça casse le rythme visuel et ajoute de la vie.</blockquote>
+
+            <h2>Un deuxième sous-titre</h2>
+
+            <p>Suite de votre récit. Faites des listes quand c'est plus clair :</p>
+
+            <ul>
+                <li>Un premier point</li>
+                <li>Un deuxième point</li>
+                <li>Un troisième point</li>
+            </ul>
+
+            <p>Paragraphe de clôture. Une conclusion, une invitation, une question ouverte.</p>
+
+            <p class="signature">— Claire</p>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════
+             ENGLISH VERSION — translate the French above
+             ═══════════════════════════════════════════════ -->
+        <div class="lang-en">
+            <p>Opening paragraph: a hook that makes the reader want to keep going. 2-3 sentences.</p>
+
+            <p>Second paragraph: the context. Where are you? What is this about? Why now?</p>
+
+            <h2>A subheading to structure things</h2>
+
+            <p>The body of your chronicle. <strong>Bold</strong> to emphasize, <em>italics</em> for nuance, <a href="../index.html">links</a> when useful.</p>
+
+            <p>Another paragraph. Add as many paragraphs as you like.</p>
+
+            <blockquote>A quote, an anecdote, a remark from a producer. It breaks the visual rhythm and adds life.</blockquote>
+
+            <h2>A second subheading</h2>
+
+            <p>Continue your story. Use lists when clearer:</p>
+
+            <ul>
+                <li>A first point</li>
+                <li>A second point</li>
+                <li>A third point</li>
+            </ul>
+
+            <p>Closing paragraph. A conclusion, an invitation, an open question.</p>
+
+            <p class="signature">— Claire</p>
+        </div>
+    </div>
+</article>
+
+<div class="signup-strip">
+    <div class="lang-fr">
+        <h2>Vous avez aimé cette chronique ?</h2>
+        <p>Recevez la prochaine directement dans votre boîte mail.</p>
+    </div>
+    <div class="lang-en">
+        <h2>Did you like this chronicle?</h2>
+        <p>Receive the next one directly in your inbox.</p>
+    </div>
+    <!-- ══════════════════════════════════════════════════
+         NEWSLETTER PROVIDER FORM PLACEHOLDER (post-footer variant)
+         Once you wire in Kit/Substack, replace the form below
+         with your provider's embed. Until then, this form
+         opens a pre-filled email to lesfromagesdubonheur@gmail.com.
+         ══════════════════════════════════════════════════ -->
+    <form class="signup-form" onsubmit="handlePostSignup(event)">
+        <input type="email" id="postEmail" name="email" placeholder="votre@email.com" required autocomplete="email">
+        <button type="submit">
+            <span class="lang-fr">S'inscrire</span>
+            <span class="lang-en inline">Subscribe</span>
+        </button>
+    </form>
+    <div class="signup-status" id="postSignupStatus" aria-live="polite"></div>
+    <div class="signup-link">
+        <a href="../chroniques.html">
+            <span class="lang-fr">En savoir plus sur les Chroniques →</span>
+            <span class="lang-en inline">Learn more about the Chronicles →</span>
+        </a>
+    </div>
+</div>
+
+<div class="back-to-blog">
+    <a href="../chroniques.html">
+        <span class="lang-fr">← Retour à toutes les chroniques</span>
+        <span class="lang-en inline">← Back to all chronicles</span>
+    </a>
+</div>
+
+<footer>
+    &copy; 2025–2026 <a href="mailto:lesfromagesdubonheur@gmail.com">Les Fromages du Bonheur</a> ·
+    <span class="lang-fr">Carte interactive des fromages de France</span>
+    <span class="lang-en">Interactive map of French cheeses</span>
+    · <a href="https://www.instagram.com/lesfromagesdubonheur/" target="_blank" rel="noopener">Instagram</a>
+</footer>
+
+<script>
+// ── Language toggle ──
+(function(){
+    var stored = localStorage.getItem('fdh_lang') || 'fr';
+    document.documentElement.lang = stored;
+    updateBtn(stored);
+    function updateBtn(lang){
+        var b = document.getElementById('langToggleBtn');
+        if(b) b.textContent = lang === 'fr' ? '🇬🇧 EN' : '🇫🇷 FR';
+    }
+    window.toggleLang = function(){
+        var cur = document.documentElement.lang;
+        var next = cur === 'fr' ? 'en' : 'fr';
+        document.documentElement.lang = next;
+        localStorage.setItem('fdh_lang', next);
+        updateBtn(next);
+        // EDIT: update both titles below to match your <title> tag at the top of the file
+        document.title = next === 'fr'
+            ? 'Titre de la chronique — Les Fromages du Bonheur'
+            : 'Chronicle title — Les Fromages du Bonheur';
+    };
+})();
+
+// ── Post-footer signup: one-click subscribe via FormSubmit ──
+function handlePostSignup(e){
+    e.preventDefault();
+    var email = document.getElementById('postEmail').value.trim();
+    var status = document.getElementById('postSignupStatus');
+    if(!email){return;}
+    var lang = document.documentElement.lang;
+    status.className = 'signup-status';
+    status.textContent = lang === 'fr' ? 'Envoi en cours…' : 'Sending…';
+
+    var fd = new FormData();
+    fd.append('email', email);
+    fd.append('_subject', lang === 'fr' ? 'Inscription Chroniques Fromagères' : 'Cheese Chronicles signup');
+    fd.append('_captcha', 'false');
+    fd.append('_template', 'table');
+    fd.append('language', lang);
+
+    fetch('https://formsubmit.co/ajax/lesfromagesdubonheur@gmail.com', {
+        method: 'POST',
+        headers: {'Accept': 'application/json'},
+        body: fd
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+        if(data && (data.success === 'true' || data.success === true)){
+            status.className = 'signup-status ok';
+            status.textContent = lang === 'fr'
+                ? '✓ Merci, vous êtes inscrit(e) !'
+                : '✓ Thank you, you are subscribed!';
+            document.getElementById('postEmail').value = '';
+        } else {
+            throw new Error('Submission failed');
+        }
+    })
+    .catch(function(){
+        status.className = 'signup-status err';
+        status.textContent = lang === 'fr'
+            ? 'Erreur — réessayez ou écrivez à lesfromagesdubonheur@gmail.com'
+            : 'Error — try again or email lesfromagesdubonheur@gmail.com';
+    });
+}
+</script>
+</body>
+</html>
