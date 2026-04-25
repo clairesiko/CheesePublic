@@ -263,7 +263,7 @@ function render(){
         var cover = p.cover
             ? '<img src="' + p.cover + '" alt="' + title.replace(/"/g,'&quot;') + '" loading="lazy">'
             : '<span>' + (p.coverEmoji || '🧀') + '</span>';
-        return '<a class="post-card" href="chroniques/' + p.slug + '.html">' +
+        return '<a class="post-card" href="site/chroniques/' + p.slug + '.html">' +
             '<div class="post-cover">' + cover + '</div>' +
             '<div class="post-body">' +
                 '<div class="post-meta">' +
@@ -280,26 +280,50 @@ function render(){
     }).join('');
 }
 
-// ── Signup form placeholder handler (works for both forms) ──
-// When Kit/Substack embed is wired in, this function can be removed.
+// ── Signup form handler: one-click subscribe via FormSubmit ──
+// Posts the email to formsubmit.co, which forwards it to Claire's Gmail.
+// No mail client opens, no popup — user stays on the page.
+// NOTE: First submission after deploy triggers a one-time activation email
+//       from FormSubmit that Claire must click to enable the endpoint.
 function handleSignup(e, inputId, statusId){
     e.preventDefault();
     var email = document.getElementById(inputId).value.trim();
     var status = document.getElementById(statusId);
     if(!email){return;}
     var lang = document.documentElement.lang;
-    var subject = lang === 'fr'
-        ? 'Inscription Chroniques Fromagères'
-        : 'Cheese Chronicles signup';
-    var body = lang === 'fr'
-        ? 'Bonjour Claire,\n\nJe souhaite m\'inscrire aux Chroniques Fromagères.\n\nMon email : ' + email
-        : 'Hi Claire,\n\nI would like to subscribe to the Cheese Chronicles.\n\nMy email: ' + email;
-    window.location.href = 'mailto:lesfromagesdubonheur@gmail.com?subject=' +
-        encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-    status.className = 'signup-status ok';
-    status.textContent = lang === 'fr'
-        ? '✓ Merci ! Une fenêtre mail va s\'ouvrir pour finaliser.'
-        : '✓ Thank you! A mail window will open to finalize.';
+    status.className = 'signup-status';
+    status.textContent = lang === 'fr' ? 'Envoi en cours…' : 'Sending…';
+
+    var fd = new FormData();
+    fd.append('email', email);
+    fd.append('_subject', lang === 'fr' ? 'Inscription Chroniques Fromagères' : 'Cheese Chronicles signup');
+    fd.append('_captcha', 'false');
+    fd.append('_template', 'table');
+    fd.append('language', lang);
+
+    fetch('https://formsubmit.co/ajax/lesfromagesdubonheur@gmail.com', {
+        method: 'POST',
+        headers: {'Accept': 'application/json'},
+        body: fd
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+        if(data && (data.success === 'true' || data.success === true)){
+            status.className = 'signup-status ok';
+            status.textContent = lang === 'fr'
+                ? '✓ Merci, vous êtes inscrit(e) !'
+                : '✓ Thank you, you are subscribed!';
+            document.getElementById(inputId).value = '';
+        } else {
+            throw new Error('Submission failed');
+        }
+    })
+    .catch(function(){
+        status.className = 'signup-status err';
+        status.textContent = lang === 'fr'
+            ? 'Erreur — réessayez ou écrivez à lesfromagesdubonheur@gmail.com'
+            : 'Error — try again or email lesfromagesdubonheur@gmail.com';
+    });
 }
 
 // Category filter clicks
@@ -335,7 +359,7 @@ var INLINE_POSTS = {
 };
 
 // Try to load the manifest dynamically; fall back to inline data on failure.
-fetch('chroniques/posts.json', {cache:'no-store'})
+fetch('site/chroniques/posts.json', {cache:'no-store'})
     .then(function(r){
         if(!r.ok) throw new Error('HTTP ' + r.status);
         return r.json();
