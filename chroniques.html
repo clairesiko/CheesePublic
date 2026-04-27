@@ -35,16 +35,6 @@ body{font-family:'Inter',sans-serif;color:#3a3226;background:#faf8f5;min-height:
 .container{max-width:1080px;margin:0 auto;padding:1.5rem 1.5rem 3rem;}
 
 .signup-card{max-width:620px;margin:1.8rem auto 2.5rem;background:#fff;border:1px solid #ede6d8;border-radius:14px;padding:1.8rem 1.8rem 1.6rem;box-shadow:0 6px 24px rgba(139,111,71,0.08);}
-.signup-form{display:flex;flex-direction:column;gap:0.7rem;max-width:440px;margin:0 auto;}
-.signup-form input[type="email"]{font-family:'Inter',sans-serif;font-size:16px;padding:0.85rem 1rem;border:1px solid #d4c5a9;border-radius:8px;background:#fdfcf9;color:#3a3226;outline:none;transition:border-color 0.2s;}
-.signup-form input[type="email"]:focus{border-color:#8B6F47;}
-.signup-form button{font-family:'Inter',sans-serif;font-size:1rem;font-weight:600;padding:0.85rem 1rem;background:#8B6F47;color:#fff;border:none;border-radius:8px;cursor:pointer;transition:background 0.2s;}
-.signup-form button:hover{background:#6d563a;}
-.signup-form .consent{font-size:0.75rem;color:#8a7a66;text-align:center;margin-top:0.3rem;line-height:1.5;}
-.signup-form .consent a{color:#5a4230;}
-.signup-status{margin-top:0.8rem;text-align:center;font-size:0.9rem;font-weight:500;min-height:1.2em;}
-.signup-status.ok{color:#4a7a3a;}
-.signup-status.err{color:#b2533a;}
 
 /* ── Archive section ── */
 .section-divider{max-width:1080px;margin:1.5rem auto 2rem;padding:0 1.5rem;display:flex;align-items:center;gap:1rem;}
@@ -127,26 +117,12 @@ html[lang="en"] .lang-en.inline{display:inline;}
      PRIMARY SIGNUP — hero-adjacent
      ═══════════════════════════════════════════════ -->
 <div class="signup-card">
-    <!-- ══════════════════════════════════════════════════
-         NEWSLETTER PROVIDER FORM PLACEHOLDER
-         Replace the <form> below with the embed code from
-         your newsletter provider (Kit recommended for up
-         to 10k free subs, or Substack for truly unlimited).
-         Keep the classes .signup-form, input[type=email],
-         and button so the existing styles still apply.
-         ══════════════════════════════════════════════════ -->
-    <form class="signup-form" id="chroniquesForm" onsubmit="handleSignup(event, 'nlEmail', 'signupStatus')">
-        <input type="email" id="nlEmail" name="email" placeholder="votre@email.com" required autocomplete="email">
-        <button type="submit">
-            <span class="lang-fr">Recevoir les Chroniques</span>
-            <span class="lang-en inline">Subscribe to the Chronicles</span>
-        </button>
-        <div class="consent">
-            <span class="lang-fr">1 à 3 chroniques par mois, pas plus. Désinscription en un clic. Votre adresse reste privée.</span>
-            <span class="lang-en">1 to 3 chronicles per month, no more. One-click unsubscribe. Your address stays private.</span>
-        </div>
-        <div class="signup-status" id="signupStatus" aria-live="polite"></div>
-    </form>
+    <!-- EmailOctopus embedded signup form -->
+    <script async src="https://eomail5.com/form/49c0c282-424e-11f1-955d-31d505c5f027.js" data-form="49c0c282-424e-11f1-955d-31d505c5f027"></script>
+    <div style="font-size:0.75rem;color:#8a7a66;text-align:center;margin-top:0.8rem;line-height:1.5;">
+        <span class="lang-fr">1 à 3 chroniques par mois, pas plus. Désinscription en un clic. Votre adresse reste privée.</span>
+        <span class="lang-en">1 to 3 chronicles per month, no more. One-click unsubscribe. Your address stays private.</span>
+    </div>
 </div>
 
 <!-- ═══════════════════════════════════════════════
@@ -278,52 +254,6 @@ function render(){
             '</div>' +
         '</a>';
     }).join('');
-}
-
-// ── Signup form handler: one-click subscribe via FormSubmit ──
-// Posts the email to formsubmit.co, which forwards it to Claire's Gmail.
-// No mail client opens, no popup — user stays on the page.
-// NOTE: First submission after deploy triggers a one-time activation email
-//       from FormSubmit that Claire must click to enable the endpoint.
-function handleSignup(e, inputId, statusId){
-    e.preventDefault();
-    var email = document.getElementById(inputId).value.trim();
-    var status = document.getElementById(statusId);
-    if(!email){return;}
-    var lang = document.documentElement.lang;
-    status.className = 'signup-status';
-    status.textContent = lang === 'fr' ? 'Envoi en cours…' : 'Sending…';
-
-    var fd = new FormData();
-    fd.append('email', email);
-    fd.append('_subject', lang === 'fr' ? 'Inscription Chroniques Fromagères' : 'Cheese Chronicles signup');
-    fd.append('_captcha', 'false');
-    fd.append('_template', 'table');
-    fd.append('language', lang);
-
-    fetch('https://formsubmit.co/ajax/lesfromagesdubonheur@gmail.com', {
-        method: 'POST',
-        headers: {'Accept': 'application/json'},
-        body: fd
-    })
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-        if(data && (data.success === 'true' || data.success === true)){
-            status.className = 'signup-status ok';
-            status.textContent = lang === 'fr'
-                ? '✓ Merci, vous êtes inscrit(e) !'
-                : '✓ Thank you, you are subscribed!';
-            document.getElementById(inputId).value = '';
-        } else {
-            throw new Error('Submission failed');
-        }
-    })
-    .catch(function(){
-        status.className = 'signup-status err';
-        status.textContent = lang === 'fr'
-            ? 'Erreur — réessayez ou écrivez à lesfromagesdubonheur@gmail.com'
-            : 'Error — try again or email lesfromagesdubonheur@gmail.com';
-    });
 }
 
 // Category filter clicks
