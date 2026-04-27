@@ -89,13 +89,6 @@ article{max-width:720px;margin:0 auto;padding:1rem 1.5rem 2rem;}
 .signup-strip{max-width:680px;margin:3rem auto 0;background:#fff;border:1px solid #ede6d8;border-radius:14px;padding:1.8rem;text-align:center;box-shadow:0 6px 24px rgba(139,111,71,0.08);}
 .signup-strip h2{font-family:'Playfair Display',serif;font-size:1.3rem;color:#5a4230;margin-bottom:0.6rem;}
 .signup-strip p{font-size:0.92rem;color:#6a5a4a;margin-bottom:1.1rem;line-height:1.55;}
-.signup-form{display:flex;gap:0.5rem;max-width:420px;margin:0 auto;flex-wrap:wrap;}
-.signup-form input{flex:1;min-width:180px;font-family:'Inter',sans-serif;font-size:16px;padding:0.75rem 0.9rem;border:1px solid #d4c5a9;border-radius:8px;background:#fdfcf9;outline:none;}
-.signup-form input:focus{border-color:#8B6F47;}
-.signup-form button{font-family:'Inter',sans-serif;font-size:0.95rem;font-weight:600;padding:0.75rem 1.2rem;background:#8B6F47;color:#fff;border:none;border-radius:8px;cursor:pointer;white-space:nowrap;}
-.signup-form button:hover{background:#6d563a;}
-.signup-status{margin-top:0.6rem;font-size:0.85rem;min-height:1.2em;}
-.signup-status.ok{color:#4a7a3a;}
 .signup-link{display:inline-block;margin-top:0.6rem;font-size:0.82rem;color:#8a7a66;}
 .signup-link a{color:#8B6F47;}
 
@@ -254,20 +247,8 @@ html[lang="en"] .lang-en.inline{display:inline;}
         <h2>Did you like this chronicle?</h2>
         <p>Receive the next one directly in your inbox.</p>
     </div>
-    <!-- ══════════════════════════════════════════════════
-         NEWSLETTER PROVIDER FORM PLACEHOLDER (post-footer variant)
-         Once you wire in Kit/Substack, replace the form below
-         with your provider's embed. Until then, this form
-         opens a pre-filled email to lesfromagesdubonheur@gmail.com.
-         ══════════════════════════════════════════════════ -->
-    <form class="signup-form" onsubmit="handlePostSignup(event)">
-        <input type="email" id="postEmail" name="email" placeholder="votre@email.com" required autocomplete="email">
-        <button type="submit">
-            <span class="lang-fr">S'inscrire</span>
-            <span class="lang-en inline">Subscribe</span>
-        </button>
-    </form>
-    <div class="signup-status" id="postSignupStatus" aria-live="polite"></div>
+    <!-- EmailOctopus embedded signup form -->
+    <script async src="https://eomail5.com/form/49c0c282-424e-11f1-955d-31d505c5f027.js" data-form="49c0c282-424e-11f1-955d-31d505c5f027"></script>
     <div class="signup-link">
         <a href="../chroniques.html">
             <span class="lang-fr">En savoir plus sur les Chroniques →</span>
@@ -313,47 +294,6 @@ html[lang="en"] .lang-en.inline{display:inline;}
     };
 })();
 
-// ── Post-footer signup: one-click subscribe via FormSubmit ──
-function handlePostSignup(e){
-    e.preventDefault();
-    var email = document.getElementById('postEmail').value.trim();
-    var status = document.getElementById('postSignupStatus');
-    if(!email){return;}
-    var lang = document.documentElement.lang;
-    status.className = 'signup-status';
-    status.textContent = lang === 'fr' ? 'Envoi en cours…' : 'Sending…';
-
-    var fd = new FormData();
-    fd.append('email', email);
-    fd.append('_subject', lang === 'fr' ? 'Inscription Chroniques Fromagères' : 'Cheese Chronicles signup');
-    fd.append('_captcha', 'false');
-    fd.append('_template', 'table');
-    fd.append('language', lang);
-
-    fetch('https://formsubmit.co/ajax/lesfromagesdubonheur@gmail.com', {
-        method: 'POST',
-        headers: {'Accept': 'application/json'},
-        body: fd
-    })
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-        if(data && (data.success === 'true' || data.success === true)){
-            status.className = 'signup-status ok';
-            status.textContent = lang === 'fr'
-                ? '✓ Merci, vous êtes inscrit(e) !'
-                : '✓ Thank you, you are subscribed!';
-            document.getElementById('postEmail').value = '';
-        } else {
-            throw new Error('Submission failed');
-        }
-    })
-    .catch(function(){
-        status.className = 'signup-status err';
-        status.textContent = lang === 'fr'
-            ? 'Erreur — réessayez ou écrivez à lesfromagesdubonheur@gmail.com'
-            : 'Error — try again or email lesfromagesdubonheur@gmail.com';
-    });
-}
 </script>
 </body>
 </html>
