@@ -15,12 +15,12 @@
 <meta property="og:locale" content="fr_FR">
 <meta property="og:site_name" content="Les Fromages du Bonheur">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧀</text></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Fraunces:opsz,wght@9..144,400..700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Inter',sans-serif;color:#3a3226;background:#faf8f5;min-height:100vh;}
 .page-nav{background:rgba(250,248,245,0.97);border-bottom:1px solid rgba(139,111,71,0.1);padding:0.8rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;}
-.page-nav .logo{font-family:'Playfair Display',serif;font-size:1.3rem;color:#5a4230;text-decoration:none;font-weight:700;}
+.page-nav .logo{font-family:'Fraunces',serif;font-size:1.3rem;color:#5a4230;text-decoration:none;font-weight:700;}
 .page-nav .nav-links{display:flex;gap:1rem;align-items:center;}
 .page-nav .nav-links a{color:#5a4230;text-decoration:none;font-size:0.88rem;font-weight:500;padding:0.3rem 0;}
 .page-nav .nav-links a:hover{text-decoration:underline;}
@@ -31,7 +31,7 @@ html[lang="en"] .lang-fr{display:none;}
 html[lang="en"] .lang-en{display:block;}
 html[lang="en"] .lang-en.inline{display:inline;}
 .container{max-width:900px;margin:0 auto;padding:2rem 1.5rem 3rem;}
-h1{font-family:'Playfair Display',serif;font-size:1.8rem;color:#5a4230;margin-bottom:0.5rem;text-align:center;}
+h1{font-family:'Fraunces',serif;font-size:1.8rem;color:#5a4230;margin-bottom:0.5rem;text-align:center;}
 .subtitle{text-align:center;color:#8a7a66;font-size:0.9rem;margin-bottom:1.5rem;}
 .search-box{display:block;width:100%;max-width:400px;margin:0 auto 1.5rem;padding:0.6rem 1rem;border:1px solid #d4cec5;border-radius:8px;font-size:0.9rem;font-family:'Inter',sans-serif;background:#fff;}
 .search-box:focus{outline:none;border-color:#5a4230;}
@@ -40,7 +40,7 @@ h1{font-family:'Playfair Display',serif;font-size:1.8rem;color:#5a4230;margin-bo
 .letter-nav a:hover,.letter-nav a.active{background:#8B6F47;color:#fff;}
 .letter-nav a.empty{opacity:0.35;pointer-events:none;}
 .letter-group{margin-bottom:1.5rem;}
-.letter-group h2{font-family:'Playfair Display',serif;font-size:1.3rem;color:#5a4230;padding-bottom:0.4rem;border-bottom:2px solid #efe9df;margin-bottom:0.6rem;scroll-margin-top:60px;}
+.letter-group h2{font-family:'Fraunces',serif;font-size:1.3rem;color:#5a4230;padding-bottom:0.4rem;border-bottom:2px solid #efe9df;margin-bottom:0.6rem;scroll-margin-top:60px;}
 .cheese-list{display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;}
 .cheese-item{display:flex;align-items:baseline;gap:0.4rem;padding:0.4rem 0.6rem;border-radius:6px;transition:background 0.15s;}
 .cheese-item:hover{background:#efe9df;}
@@ -61,21 +61,109 @@ footer a{color:#5a4230;text-decoration:none;}
     .page-nav{padding:0.6rem 1rem;}
     .page-nav .nav-links{gap:0.6rem;}
 }
+
+footer .footer-row{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1rem;max-width:1080px;margin:0 auto;align-items:center;}
+footer{padding:1.5rem 1.5rem 2rem;font-size:0.78rem;color:#b5a48a;border-top:1px solid #f0ede8;margin-top:3rem;background:#fbf8f1;}
+footer a{color:#5a4230;text-decoration:none;}
+footer a:hover{text-decoration:underline;}
+
+.page-nav{background:#5a4230 !important;border-bottom:none !important;color:#f4ece0;}
+.page-nav .logo{color:#f4ece0 !important;font-family:'Fraunces','Fraunces',serif !important;}
+.page-nav .nav-links a{color:#f4ece0 !important;}
+.page-nav .nav-links a:hover{text-decoration:underline;color:#f4ece0;}
+.page-nav .nav-links a.active{color:#f4ece0 !important;border-bottom:2px solid #f4ece0;padding-bottom:1px;}
+.page-nav .lang-toggle{background:#f4ece0 !important;color:#5a4230 !important;border:none !important;font-weight:600;}
+.page-nav svg{stroke:#f4ece0 !important;}
+/* Darker beige footer */
+footer{background:#f3eddb !important;border-top:1px solid #d4c5a9 !important;}
+
+/* Brown header (unified site-wide) */
+.brown-header{background:#5a4230;color:#f4ece0;padding:14px 22px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50;}
+.brown-header .logo{font-family:'Fraunces','Fraunces',serif;font-weight:600;font-size:1.1rem;color:#f4ece0 !important;letter-spacing:-0.01em;text-decoration:none;}
+.brown-header nav{display:flex;gap:24px;font-size:0.86rem;align-items:center;}
+.brown-header .nav-item{position:relative;color:#f4ece0;font-weight:500;cursor:pointer;padding:6px 0;}
+.brown-header .nav-item .arrow{font-size:0.7rem;opacity:0.7;margin-left:3px;}
+.brown-header .nav-dropdown{position:absolute;top:100%;left:-12px;background:#fff;border:0.5px solid #e8dfce;border-radius:6px;padding:6px 0;min-width:200px;display:none;box-shadow:0 4px 16px rgba(90,66,48,0.1);z-index:100;}
+.brown-header .nav-item:hover .nav-dropdown{display:block;}
+.brown-header .nav-dropdown a{display:block;padding:8px 16px;color:#3a3226;font-size:0.86rem;text-decoration:none;}
+.brown-header .nav-dropdown a:hover{background:#fbf3e6;}
+.brown-header .lang-pill{background:#f4ece0;color:#5a4230;padding:3px 12px;border-radius:5px;font-size:0.74rem;font-weight:600;cursor:pointer;border:none;font-family:inherit;}
+/* Hide old page-nav if present */
+.page-nav{display:none !important;}
+/* Darker beige footer site-wide */
+footer{background:#f0e8d6 !important;border-top:1px solid #e0d5b8 !important;color:#6a5a4a !important;}
+footer a{color:#5a4230 !important;}
+footer .footer-row,footer .row{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1rem;max-width:1080px;margin:0 auto;align-items:center;}
+@media(max-width:760px){.brown-header{padding:12px 16px;}.brown-header .logo{font-size:0.98rem;}.brown-header nav{gap:12px;font-size:0.8rem;}}
+
+
+/* ── Mobile burger menu (2026-05-19) ── */
+.mob-burger{display:none;background:none;border:none;cursor:pointer;padding:8px;margin-left:auto;}
+.mob-burger span{display:block;width:24px;height:2px;background:#f4ece0;margin:5px 0;border-radius:2px;transition:all 0.2s;}
+.mob-drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:998;animation:mob-fade-in 0.2s;}
+.mob-drawer-overlay.open{display:block;}
+@keyframes mob-fade-in{from{opacity:0;}to{opacity:1;}}
+.mob-drawer{position:fixed;top:0;right:-110%;width:310px;max-width:85vw;height:100vh;background:#fdfcf8;z-index:999;transition:right 0.25s ease;display:flex;flex-direction:column;box-shadow:-4px 0 24px rgba(0,0,0,0.18);overflow-y:auto;}
+.mob-drawer.open{right:0;}
+.mob-drawer-head{background:#5a4230;color:#f4ece0;padding:18px 20px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.mob-drawer-logo{font-family:'Fraunces',serif;font-size:1rem;font-weight:600;color:#f4ece0;text-decoration:none;letter-spacing:-0.01em;}
+.mob-drawer-close{background:none;border:none;color:#f4ece0;font-size:30px;cursor:pointer;line-height:1;padding:0;}
+.mob-drawer-nav{flex:1;padding:6px 0;}
+.mob-drawer-nav > a{display:block;padding:14px 22px;color:#3a3226;font-size:0.98rem;font-weight:500;text-decoration:none;border-bottom:1px solid #f0e8d6;font-family:'Inter',sans-serif;}
+.mob-drawer-nav > a:active{background:#fbf3e6;}
+.mob-drawer-group{border-bottom:1px solid #f0e8d6;padding-bottom:6px;}
+.mob-drawer-label{padding:16px 22px 4px;color:#8a7a66;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;font-family:'Inter',sans-serif;}
+.mob-drawer-group a{display:block;padding:10px 22px 10px 32px;color:#3a3226;font-size:0.92rem;text-decoration:none;font-family:'Inter',sans-serif;}
+.mob-drawer-group a:active{background:#fbf3e6;}
+.mob-drawer-foot{padding:18px 22px 24px;border-top:1px solid #e8dfce;display:flex;flex-direction:column;gap:14px;flex-shrink:0;}
+.mob-drawer-support{color:#8B6F47;font-weight:600;text-decoration:none;font-size:0.95rem;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:6px;}
+.mob-drawer-insta{color:#5a4230;text-decoration:none;font-size:0.9rem;display:flex;align-items:center;gap:8px;font-family:'Inter',sans-serif;}
+.mob-drawer-insta svg{width:18px;height:18px;}
+.mob-drawer-lang{background:#5a4230;color:#f4ece0;border:none;padding:10px 14px;border-radius:6px;font-size:0.85rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
+@media(max-width:760px){
+  .brown-header nav > a:not(.logo),
+  .brown-header nav .nav-item,
+  .brown-header nav .bh-item,
+  .brown-header nav .lang-pill,
+  .brown-header nav button.lang-pill{display:none !important;}
+  .brown-header nav{gap:0 !important;}
+  .mob-burger{display:flex !important;flex-direction:column;align-items:center;justify-content:center;}
+}
+
 </style>
 </head>
 <body>
-<nav class="page-nav">
-    <a href="/" class="logo">Les Fromages du Bonheur</a>
-    <div class="nav-links">
-        <a href="/"><span class="lang-fr">Carte</span><span class="lang-en inline">Map</span></a>
-        <a href="/fromages.html" class="active"><span class="lang-fr">Fromages A-Z</span><span class="lang-en inline">Cheeses A-Z</span></a>
-        <a href="/definition.html"><span class="lang-fr">Lexique</span><span class="lang-en inline">Glossary</span></a>
-        <a href="/about.html"><span class="lang-fr">À propos</span><span class="lang-en inline">About</span></a>
-        <a href="/contact.html"><span class="lang-fr">Contact</span><span class="lang-en inline">Contact</span></a>
-        <a href="https://www.instagram.com/lesfromagesdubonheur/" target="_blank" rel="noopener" title="Instagram" style="display:inline-flex;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg></a>
-        <button class="lang-toggle" id="langToggleBtn" onclick="toggleLang()">🇬🇧 EN</button>
-    </div>
-</nav>
+<!-- Support banner (dismissible, persists in localStorage 30d) -->
+<div id="supportBanner" style="display:none;background:#fbf3e6;border-bottom:1px solid #e8dfce;padding:9px 18px;font-size:0.82rem;color:#3a3226;line-height:1.5;font-family:'Inter',sans-serif;">
+  <div style="max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+    <span><span class="lang-fr">Les Fromages du Bonheur est un projet indépendant, si vous voulez le soutenir c'est <a href="https://ko-fi.com/lesfromagesdubonheur" target="_blank" rel="noopener" style="color:#5a4230;font-weight:500;text-decoration:underline;text-underline-offset:2px;">ici</a>&nbsp;!</span><span class="lang-en">Les Fromages du Bonheur is an independent project. If this site is useful to you, the price of a coffee helps keep it alive. <a href="https://ko-fi.com/lesfromagesdubonheur" target="_blank" rel="noopener" style="color:#5a4230;font-weight:500;text-decoration:underline;text-underline-offset:2px;">Support</a>.</span></span>
+    <button onclick="document.getElementById('supportBanner').style.display='none';try{localStorage.setItem('fdb_banner_dismissed',Date.now())}catch(e){}" aria-label="Fermer" style="background:none;border:none;color:#b8a888;font-size:18px;cursor:pointer;padding:0 4px;line-height:1;">×</button>
+  </div>
+</div>
+<script>(function(){try{var d=localStorage.getItem('fdb_banner_dismissed');var T=30*24*60*60*1000;if(!d||(Date.now()-parseInt(d,10))>T)document.getElementById('supportBanner').style.display='block';}catch(e){document.getElementById('supportBanner').style.display='block';}})();</script>
+
+<header class="brown-header">
+  <a href="index.html" class="logo">Les Fromages du Bonheur</a>
+  <nav>
+    <a href="carte.html" class="nav-link" style="color:#f4ece0;text-decoration:none;font-weight:500;font-size:0.86rem;"><span class="lang-fr">Carte</span><span class="lang-en inline">Map</span></a>
+    <span class="nav-item"><a href="gazette.html" style="color:inherit;text-decoration:none;"><span class="lang-fr">Gazette</span><span class="lang-en inline">Gazette</span></a> <span class="arrow">▾</span>
+      <span class="nav-dropdown">
+        <a href="gazette.html#inscription"><span class="lang-fr">S'inscrire à la Gazette</span><span class="lang-en inline">Subscribe to the Gazette</span></a>
+        <a href="anciennes-gazettes.html"><span class="lang-fr">Anciennes Gazettes</span><span class="lang-en inline">Past Gazettes</span></a>
+      </span>
+    </span>
+    <span class="nav-item"><a href="about.html" style="color:inherit;text-decoration:none;"><span class="lang-fr">À Propos</span><span class="lang-en inline">About</span></a> <span class="arrow">▾</span>
+      <span class="nav-dropdown">
+        <a href="about.html"><span class="lang-fr">Notre histoire</span><span class="lang-en inline">Our story</span></a>
+        <a href="abc-du-fromage.html"><span class="lang-fr">ABC du Fromage</span><span class="lang-en inline">Cheese ABCs</span></a>
+        <a href="guide.html"><span class="lang-fr">Guide</span><span class="lang-en inline">Guide</span></a>
+        <a href="suggest.html"><span class="lang-fr">Suggérer un fromage</span><span class="lang-en inline">Suggest a cheese</span></a>
+        <a href="contact.html">Contact</a>
+      </span>
+    </span>
+    <button class="lang-pill" id="langToggleBtn" onclick="toggleLang()">🇬🇧 EN</button>
+  <button class="mob-burger" aria-label="Menu" onclick="window._toggleMobDrawer()"><span></span><span></span><span></span></button></nav>
+</header>
 
 <div class="container">
     <h1><span class="lang-fr">Les fromages de France de A à Z</span><span class="lang-en inline">French cheeses from A to Z</span></h1>
@@ -88,9 +176,18 @@ footer a{color:#5a4230;text-decoration:none;}
 </div>
 
 <footer>
-    &copy; 2025–2026 <a href="mailto:lesfromagesdubonheur@gmail.com">Les Fromages du Bonheur</a> ·
-    <a href="/"><span class="lang-fr">Carte interactive des fromages de France</span><span class="lang-en inline">Interactive map of French cheeses</span></a>
-    · <a href="https://www.instagram.com/lesfromagesdubonheur/" target="_blank" rel="noopener">Instagram</a>
+    <div class="row">
+        <div style="display:flex;gap:20px;flex-wrap:wrap;">
+            <a href="carte.html" style="color:#5a4230;text-decoration:none;"><span class="lang-fr">Carte</span><span class="lang-en inline">Map</span></a>
+            <a href="gazette.html" style="color:#5a4230;text-decoration:none;">Gazette</a>
+            <a href="about.html" style="color:#5a4230;text-decoration:none;"><span class="lang-fr">À Propos</span><span class="lang-en inline">About</span></a>
+        </div>
+        <div style="display:inline-flex;gap:14px;align-items:center;">
+            <a href="https://ko-fi.com/lesfromagesdubonheur" target="_blank" rel="noopener" style="color:#5a4230;font-weight:500;text-decoration:none;"><span class="lang-fr">Soutenir</span><span class="lang-en inline">Support</span></a>
+            <a href="https://www.instagram.com/lesfromagesdubonheur/" target="_blank" rel="noopener" aria-label="Instagram" style="display:inline-flex;align-items:center;gap:6px;color:#5a4230;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg><span style="font-weight:500;">Instagram</span></a>
+        </div>
+    </div>
+    <div style="text-align:center;margin-top:12px;font-size:0.72rem;color:#a89878;">© 2025–2026 <a href="mailto:lesfromagesdubonheur@gmail.com" style="color:#5a4230;">Les Fromages du Bonheur</a> · <span class="lang-fr">Carte interactive des fromages de France</span><span class="lang-en inline">Interactive map of French cheeses</span></div>
 </footer>
 
 <script src="data.js"></script>
@@ -205,6 +302,47 @@ footer a{color:#5a4230;text-decoration:none;}
         renderList(filtered);
     });
 })();
+</script>
+
+<!-- Mobile drawer (2026-05-19) -->
+<div class="mob-drawer-overlay" id="mobDrawerOverlay" onclick="window._toggleMobDrawer()"></div>
+<aside class="mob-drawer" id="mobDrawer">
+  <div class="mob-drawer-head">
+    <a href="index.html" class="mob-drawer-logo">Les Fromages du Bonheur</a>
+    <button class="mob-drawer-close" aria-label="Fermer" onclick="window._toggleMobDrawer()">&times;</button>
+  </div>
+  <nav class="mob-drawer-nav">
+    <a href="carte.html"><span class="lang-fr">Carte</span><span class="lang-en inline">Map</span></a>
+    <div class="mob-drawer-group">
+      <div class="mob-drawer-label"><span class="lang-fr">Gazette</span><span class="lang-en inline">Gazette</span></div>
+      <a href="gazette.html#inscription"><span class="lang-fr">S'inscrire à la Gazette</span><span class="lang-en inline">Subscribe to the Gazette</span></a>
+      <a href="anciennes-gazettes.html"><span class="lang-fr">Anciennes Gazettes</span><span class="lang-en inline">Past Gazettes</span></a>
+    </div>
+    <div class="mob-drawer-group">
+      <div class="mob-drawer-label"><span class="lang-fr">À Propos</span><span class="lang-en inline">About</span></div>
+      <a href="about.html"><span class="lang-fr">Notre histoire</span><span class="lang-en inline">Our story</span></a>
+      <a href="abc-du-fromage.html"><span class="lang-fr">ABC du Fromage</span><span class="lang-en inline">Cheese ABCs</span></a>
+      <a href="guide.html"><span class="lang-fr">Guide</span><span class="lang-en inline">Guide</span></a>
+      <a href="suggest.html"><span class="lang-fr">Suggérer un fromage</span><span class="lang-en inline">Suggest a cheese</span></a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </nav>
+  <div class="mob-drawer-foot">
+    <a href="https://ko-fi.com/lesfromagesdubonheur" target="_blank" rel="noopener" class="mob-drawer-support">&#10084; <span class="lang-fr">Soutenir le projet</span><span class="lang-en inline">Support the project</span></a>
+    <a href="https://www.instagram.com/lesfromagesdubonheur/" target="_blank" rel="noopener" class="mob-drawer-insta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>Instagram</a>
+    <button class="mob-drawer-lang" onclick="window.toggleLang && window.toggleLang()"><span class="lang-fr">English</span><span class="lang-en inline">Français</span></button>
+  </div>
+</aside>
+<script>
+window._toggleMobDrawer=function(){
+  var d=document.getElementById('mobDrawer');
+  var o=document.getElementById('mobDrawerOverlay');
+  if(!d||!o)return;
+  var willOpen=!d.classList.contains('open');
+  d.classList.toggle('open',willOpen);
+  o.classList.toggle('open',willOpen);
+  document.body.style.overflow=willOpen?'hidden':'';
+};
 </script>
 </body>
 </html>

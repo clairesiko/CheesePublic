@@ -280,7 +280,29 @@ function initMap(){
     setTopPadding();
     window.addEventListener('resize',function(){setTopPadding();S.map.invalidateSize();});
 
-    S.map=L.map('map',{zoomControl:false}).setView([46.5,2.5],6);
+    S.map=L.map('map',{zoomControl:false,doubleClickZoom:true,touchZoom:true,tap:true,tapTolerance:15,bounceAtZoomLimits:false}).setView([46.5,2.5],6);
+    // Mobile double-tap to zoom — explicit handler for iOS Safari reliability
+    (function(){
+      var lastTap=0,lastX=0,lastY=0,DOUBLE_TAP_MS=320,DOUBLE_TAP_PX=30;
+      var mapEl=document.getElementById('map');
+      if(!mapEl)return;
+      mapEl.addEventListener('touchend',function(ev){
+        if(ev.changedTouches.length!==1)return;
+        var t=ev.changedTouches[0],now=Date.now();
+        var dt=now-lastTap,dx=Math.abs(t.clientX-lastX),dy=Math.abs(t.clientY-lastY);
+        if(dt>0 && dt<DOUBLE_TAP_MS && dx<DOUBLE_TAP_PX && dy<DOUBLE_TAP_PX){
+          ev.preventDefault();
+          var rect=mapEl.getBoundingClientRect();
+          var pt=L.point(t.clientX-rect.left,t.clientY-rect.top);
+          var latlng=S.map.containerPointToLatLng(pt);
+          var newZoom=Math.min(S.map.getMaxZoom(),S.map.getZoom()+1);
+          S.map.setView(latlng,newZoom,{animate:true});
+          lastTap=0;
+        } else {
+          lastTap=now;lastX=t.clientX;lastY=t.clientY;
+        }
+      },{passive:false});
+    })();
     L.control.zoom({position:'topleft',zoomInTitle:'Zoomer',zoomOutTitle:'Dézoomer'}).addTo(S.map);
     var retina=L.Browser.retina?'@2x':'';
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}'+retina+'.png',{
@@ -463,14 +485,15 @@ function getPateShort(tp){
 // Expose to global scope so window._onLangChange (defined outside the IIFE) can reach it
 window.getPateShort=getPateShort;
 
+function _getMulti(id){var el=document.getElementById(id);if(!el)return [];if(el.multiple){return Array.from(el.selectedOptions).map(function(o){return o.value;}).filter(Boolean);}return el.value?[el.value]:[];}
 function applyF(){
     if(!S.data)return;
-    var an=document.getElementById('fAnimal').value;
-    var lb=document.getElementById('fLabel').value;
-    var rg=document.getElementById('fRegion').value;
-    var pa=document.getElementById('fPate').value;
-    var sa=document.getElementById('fSaison').value;
-    var go=document.getElementById('fGout').value;
+    var an=_getMulti('fAnimal');
+    var lb=_getMulti('fLabel');
+    var rg=_getMulti('fRegion');
+    var pa=_getMulti('fPate');
+    var sa=_getMulti('fSaison');
+    var go=_getMulti('fGout');
     var bi=document.getElementById('fBio').checked;
     var mo=document.getElementById('fMonastic').checked;
     var ep=document.getElementById('fEponyme').checked;
@@ -479,12 +502,12 @@ function applyF(){
     S.filtered=[];
     S.data.cheeses.forEach(function(c,i){
         var ok=true;
-        if(an&&N(c.an).indexOf(N(an))===-1)ok=false;
-        if(lb&&N(c.lb)!==N(lb))ok=false;
-        if(rg&&(!c.rg||!c.rg.some(function(r){return N(r)===N(rg);})))ok=false;
-        if(pa&&N(c.tp)!==N(pa))ok=false;
-        if(sa&&N(c.sa||'').indexOf(N(sa))===-1)ok=false;
-        if(go&&N(c.go||'').indexOf(N(go))===-1)ok=false;
+        if(an.length&&!an.some(function(v){return N(c.an).indexOf(N(v))>-1;}))ok=false;
+        if(lb.length&&!lb.some(function(v){return N(c.lb)===N(v);}))ok=false;
+        if(rg.length&&!rg.some(function(v){return c.rg&&c.rg.some(function(r){return N(r)===N(v);});}))ok=false;
+        if(pa.length&&!pa.some(function(v){return N(c.tp)===N(v);}))ok=false;
+        if(sa.length&&!sa.some(function(v){return N(c.sa||'').indexOf(N(v))>-1;}))ok=false;
+        if(go.length&&!go.some(function(v){return N(c.go||'').indexOf(N(v))>-1;}))ok=false;
         if(bi&&!hasBio(c))ok=false;
         if(mo&&!isMonastic(c))ok=false;
         if(ep&&!hasEponyme(c))ok=false;
@@ -1454,7 +1477,14 @@ window._view=function(v){
 };
 
 window._reset=function(){
-    ['fAnimal','fLabel','fRegion','fPate','fSaison','fGout'].forEach(function(id){document.getElementById(id).value='';});
+    ['fAnimal','fLabel','fRegion','fPate','fSaison','fGout'].forEach(function(id){
+        var el=document.getElementById(id);
+        if(!el)return;
+        if(el.multiple){
+            Array.from(el.options).forEach(function(o){o.selected=false;});
+            el.dispatchEvent(new Event('change',{bubbles:true}));
+        } else { el.value=''; }
+    });
     document.getElementById('fBio').checked=false;
     document.getElementById('fMonastic').checked=false;
     document.getElementById('fEponyme').checked=false;

@@ -1011,3 +1011,601 @@ select:focus{outline:none;border-color:#8B6F47;}
 
 /* ── ANTI-SCRAPING ── */
 .detail,.ccard,.prlist,.dgrid,.ditem-v{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}
+/* ── B.8 / B.12 — 2026-05-18 brown header + single-row filter chips ── */
+.top-bar{background:#5a4230 !important;backdrop-filter:none;-webkit-backdrop-filter:none;border-bottom:none !important;}
+.top-bar header{color:#f4ece0;}
+.top-bar .logo{color:#f4ece0 !important;font-family:'Playfair Display',serif;}
+.top-bar header a{color:#f4ece0;}
+.top-bar .search-wrap input{background:rgba(255,255,255,0.12);color:#f4ece0;border-color:rgba(244,236,224,0.25);}
+.top-bar .search-wrap input::placeholder{color:rgba(244,236,224,0.6);}
+.top-bar .search-wrap::before{filter:invert(1) opacity(0.7);}
+.top-bar .nav-drop-btn,.top-bar .nav-fav-btn,.top-bar .filter-toggle{color:#f4ece0 !important;background:transparent;border-color:rgba(244,236,224,0.25);}
+.top-bar .nav-drop-btn:hover,.top-bar .filter-toggle:hover{background:rgba(244,236,224,0.1);}
+.top-bar .lang-btn{background:#f4ece0 !important;color:#5a4230 !important;border-color:transparent !important;font-weight:600;}
+.top-bar .nav-drop-menu{background:#fff;border:0.5px solid #e8dfce;}
+.top-bar .nav-drop-menu a,.top-bar .nav-drop-menu button{color:#3a3226;}
+.top-bar .nav-drop-menu a:hover,.top-bar .nav-drop-menu button:hover{background:#fbf3e6;}
+
+/* Single-row filter bar that scrolls horizontally on narrow screens */
+.filter-bar{flex-wrap:nowrap !important;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;padding-bottom:0.5rem !important;background:#fdfcf8;}
+.filter-bar > *{flex-shrink:0;}
+.filter-bar select,.filter-bar .pill{background:#fbf3e6;border:0.5px solid #e8dfce;border-radius:20px;padding:0.32rem 0.8rem;color:#5a4230;}
+.filter-bar .filter-reset{color:#8b7a66;text-decoration:underline;font-size:0.8rem;margin-left:auto;flex-shrink:0;}
+
+/* Nos Favoris / Vos Favoris chips (B.13 placeholder — wires to DB later) */
+.filter-bar .fav-chip{padding:0.32rem 0.9rem;border-radius:20px;font-size:0.82rem;font-weight:500;cursor:pointer;flex-shrink:0;border:0.5px solid #5a4230;}
+.filter-bar .fav-chip.nos{background:#5a4230;color:#f4ece0;}
+.filter-bar .fav-chip.vos{background:transparent;color:#5a4230;}
+
+
+/* ── Map UI fixes per Claire 2026-05-18 ── */
+/* Remove magnifier emoji from search */
+.top-bar .search-wrap::before{content:'' !important;display:none !important;}
+.top-bar .search-wrap input{padding-left:0.9rem !important;}
+
+/* Remove hearts/favorites count button in top nav */
+.top-bar .nav-fav-btn{display:none !important;}
+
+/* Filter bar responsive: multi-line wrap, no horizontal scroll */
+.filter-bar{flex-wrap:wrap !important;overflow:visible !important;padding-bottom:0.6rem !important;gap:0.5rem 0.6rem !important;}
+
+/* Equal-width filter dropdowns (Espèce, Label, Région, Pâte, Saison, Goût) */
+.filter-bar select{min-width:120px !important;width:auto !important;flex:0 0 calc(33.333% - 0.5rem) !important;max-width:160px !important;background:#fbf3e6 !important;color:#5a4230 !important;border:0.5px solid #e8dfce !important;border-radius:8px !important;padding:0.4rem 0.7rem !important;}
+@media(min-width:900px){
+  .filter-bar select{flex:0 0 calc(16.666% - 0.5rem) !important;max-width:140px !important;}
+}
+@media(max-width:600px){
+  .filter-bar select{flex:0 0 calc(50% - 0.3rem) !important;max-width:none !important;}
+}
+
+/* Beige label color */
+.filter-bar .bar-label,.view-bar .bar-label{color:#8b7a66 !important;}
+
+/* Pill toggles (Bio, Monastique, Éponyme) match beige */
+.filter-bar .pill{background:#fbf3e6 !important;border:0.5px solid #e8dfce !important;color:#5a4230 !important;border-radius:20px !important;padding:0.32rem 0.8rem !important;}
+
+/* Favoris chips with ❤️ */
+.filter-bar .fav-chip{padding:0.32rem 0.8rem;border-radius:20px;font-size:0.82rem;font-weight:500;cursor:pointer;border:0.5px solid #5a4230;display:inline-flex;align-items:center;gap:5px;}
+.filter-bar .fav-chip.nos{background:#5a4230;color:#f4ece0;}
+.filter-bar .fav-chip.vos{background:transparent;color:#5a4230;}
+.filter-bar .fav-chip::before{content:'❤';font-size:0.9em;}
+
+/* View toggle (Carte / Tous les fromages) — move into top header area visually */
+.view-bar{padding:0.4rem 1.5rem !important;background:#5a4230 !important;border-bottom:0.5px solid rgba(244,236,224,0.15) !important;}
+.view-bar .bar-label{color:#f4ece0 !important;opacity:0.7;}
+.view-bar .vtoggle{display:inline-flex;background:rgba(244,236,224,0.1);border-radius:6px;padding:3px;}
+.view-bar .vbtn{background:transparent;color:#f4ece0 !important;border:none;padding:5px 14px;font-size:0.82rem;cursor:pointer;border-radius:4px;font-weight:500;}
+.view-bar .vbtn.active{background:#f4ece0 !important;color:#5a4230 !important;}
+
+/* Filter reset link in beige */
+.filter-bar .filter-reset{color:#8b7a66 !important;}
+
+
+/* ── Map header reorganization 2026-05-19 — Filtres + Itinéraire LEFT, Gazette + À Propos + EN RIGHT ── */
+.top-bar header{justify-content:space-between !important;gap:1rem !important;flex-wrap:wrap !important;}
+/* The .search-wrap should stay near logo; .filter-toggle should sit near it */
+.top-bar header .logo{order:1;flex-shrink:0;}
+.top-bar header .search-wrap{order:2;flex:1 1 200px;max-width:260px;}
+.top-bar header .filter-toggle{order:3;flex-shrink:0;}
+.top-bar header .nav-links{order:5;margin-left:auto;flex-shrink:0;display:flex;gap:1.2rem;align-items:center;}
+.top-bar header .lang-btn{order:6;flex-shrink:0;}
+.top-bar header .mob-menu-btn{order:7;}
+.top-bar header .nav-dropdown{order:4;}
+.top-bar header #navItin{order:4;} /* Itinéraire stays after Filtres on the left side */
+/* On desktop, Filtres + Itinéraire are LEFT-adjacent; Gazette + À Propos go RIGHT */
+@media(min-width:900px){
+  .top-bar header #navItin{order:3.5;margin-right:auto;}
+  .top-bar header #navGazette,.top-bar header #navApropos{order:5;}
+}
+/* Equal spacing between all nav buttons */
+.top-bar .nav-drop-btn,.top-bar .filter-toggle,.top-bar .nav-fav-btn{padding:0.4rem 0.85rem !important;}
+
+/* Filter bar on desktop fits on one line */
+@media(min-width:1100px){
+  .filter-bar{flex-wrap:nowrap !important;overflow:visible !important;}
+  .filter-bar select{flex:1 1 0 !important;min-width:90px !important;max-width:140px !important;}
+}
+@media(min-width:768px) and (max-width:1099px){
+  .filter-bar{flex-wrap:wrap !important;}
+  .filter-bar select{flex:0 0 calc(33.333% - 0.5rem) !important;}
+}
+
+/* View bar (Carte / Tous les fromages) — sit right below header, brown subtle band */
+.view-bar{padding:0.4rem 1.5rem !important;background:rgba(90,66,48,0.92) !important;border-bottom:0.5px solid rgba(244,236,224,0.15) !important;}
+
+
+
+/* ── Map polish 2026-05-19 ── */
+.filter-bar .bar-label{color:#5a4230 !important;font-weight:600 !important;text-transform:uppercase;letter-spacing:0.6px;font-size:0.78rem;}
+.view-bar{background:transparent !important;border-bottom:none !important;padding:0.4rem 1.5rem !important;}
+.view-bar .bar-label{color:#8b7a66 !important;}
+.view-bar .vbtn{color:#5a4230 !important;background:transparent;border:0.5px solid #d4c5a9;}
+.view-bar .vbtn.active{background:#5a4230 !important;color:#f4ece0 !important;border-color:#5a4230;}
+/* Remove any brown horizontal line between header and map */
+.filter-bar{border-bottom:none !important;}
+.top-bar{box-shadow:0 1px 0 rgba(232,223,206,0.5);}
+
+
+/* ── 2026-05-19 — no brown between filter bar and map ── */
+.top-bar{border-bottom:none !important;box-shadow:none !important;}
+.filter-bar,.view-bar{border-bottom:none !important;}
+#map{margin-top:0 !important;}
+
+
+/* ── 2026-05-19 — Map header: brown logo row + beige action row + Guide stands out ── */
+/* Make TOP bar (logo, Gazette, À Propos, EN) brown — already brown */
+/* Then create a SECONDARY action row in warm beige below for Filtres, Itinéraire, Guide */
+.top-bar .filter-bar{background:#fbf3e6 !important;border-top:1px solid rgba(90,66,48,0.08);}
+.top-bar .filter-toggle,.top-bar .nav-drop-btn{background:#fbf3e6 !important;color:#5a4230 !important;border:0.5px solid #d4c5a9 !important;}
+/* Restructure: filter-toggle (Filtres) AND nav-dropdown (Itinéraire) AND howItWorksBtn (Guide) sit in a beige row below the brown header */
+/* Use flexbox order to put Filtres → Itinéraire → Guide left-to-right */
+.top-bar header .filter-toggle#filterToggle{order:3;}
+.top-bar header #navItin{order:4;margin-right:0 !important;}
+.top-bar header .filter-toggle#howItWorksBtn,.top-bar header .guide-btn{order:5;}
+
+/* Guide button stands out — filled brown */
+.top-bar .guide-btn{background:#5a4230 !important;color:#f4ece0 !important;border-color:#5a4230 !important;font-weight:600 !important;padding:6px 16px !important;}
+.top-bar .guide-btn:hover{background:#6f5a3a !important;}
+
+/* Favoris chips with heart */
+.filter-bar .fav-chip{padding:0.32rem 0.9rem;border-radius:20px;font-size:0.82rem;font-weight:500;cursor:pointer;border:0.5px solid #5a4230;display:inline-flex;align-items:center;gap:5px;}
+.filter-bar .fav-chip.nos{background:#5a4230;color:#f4ece0;}
+.filter-bar .fav-chip.vos{background:transparent;color:#5a4230;}
+.filter-bar .fav-chip::before{content:'\2764';font-size:0.9em;}
+
+
+/* ── 2026-05-19 final pass ── */
+/* Standardize arrow size across Filtres/Itinéraire/Guide nav buttons */
+.top-bar .filter-toggle .arrow,.top-bar .nav-drop-btn .nav-drop-arrow{font-size:0.7rem !important;margin-left:4px;opacity:0.7;}
+
+/* Guide button — filled brown with orange icon prefix */
+.top-bar .guide-btn{background:#5a4230 !important;color:#f4ece0 !important;border:none !important;font-weight:600 !important;padding:6px 16px 6px 12px !important;display:inline-flex;align-items:center;gap:6px;}
+.top-bar .guide-btn::before{content:'i';display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;background:#ff8c42;color:#fff;border-radius:50%;font-style:italic;font-weight:700;font-size:0.7rem;}
+.top-bar .guide-btn:hover{background:#6f5a3a !important;}
+
+/* View toggle (Carte / Tous les fromages) — in brown band */
+.view-bar{background:#5a4230 !important;padding:0.5rem 1.5rem !important;border-bottom:none !important;}
+.view-bar .bar-label{color:#f4ece0 !important;opacity:0.7;}
+.view-bar .vtoggle{background:rgba(244,236,224,0.12);border-radius:6px;padding:3px;}
+.view-bar .vbtn{background:transparent;color:#f4ece0 !important;border:none !important;padding:5px 14px;font-size:0.82rem;font-weight:500;border-radius:4px;cursor:pointer;}
+.view-bar .vbtn.active{background:#f4ece0 !important;color:#5a4230 !important;}
+
+/* Filter dropdowns smaller, fit on one line desktop */
+@media(min-width:1100px){
+  .filter-bar{flex-wrap:nowrap !important;}
+  .filter-bar select{flex:1 1 0 !important;min-width:80px !important;max-width:120px !important;font-size:0.78rem !important;padding:0.3rem 0.5rem !important;}
+  .filter-bar .pill{font-size:0.78rem !important;padding:0.25rem 0.7rem !important;}
+  .filter-bar .fav-chip{font-size:0.78rem !important;padding:0.25rem 0.7rem !important;}
+}
+
+/* Logo — same Fraunces everywhere, optional logo.png "sticker" effect */
+.top-bar .logo,.brown-header .logo,header.site .site-logo,.page-nav .logo{font-family:'Fraunces',serif !important;font-weight:600 !important;letter-spacing:-0.01em !important;}
+
+/* Filter row background — beige (not brown) for separation */
+.filter-bar{background:#fbf3e6 !important;}
+
+
+/* ── 2026-05-19 — fixes per Claire ── */
+/* Guide button: BEIGE background (not brown), orange icon prefix */
+.top-bar .guide-btn{background:#fbf3e6 !important;color:#5a4230 !important;border:0.5px solid #d4c5a9 !important;font-weight:600 !important;padding:6px 14px 6px 10px !important;display:inline-flex;align-items:center;gap:6px;}
+.top-bar .guide-btn::before{content:'i';display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;background:#ff8c42;color:#fff;border-radius:50%;font-style:italic;font-weight:700;font-size:0.72rem;}
+.top-bar .guide-btn:hover{background:#f5e9d4 !important;}
+
+/* Group Filtres + Itinéraire + Guide on the left, tight */
+.top-bar header{align-items:center;}
+.top-bar header .filter-toggle#filterToggle,.top-bar header #navItin,.top-bar header .guide-btn{margin-right:6px !important;}
+
+/* Standardize all dropdown arrows */
+.top-bar .filter-toggle .arrow,.top-bar .nav-drop-btn .nav-drop-arrow,.top-bar .nav-drop-arrow{font-size:0.65rem !important;margin-left:5px;opacity:0.7;width:auto !important;display:inline-block !important;}
+
+/* Filter row: solid beige, no brown band */
+.filter-bar{background:#fbf3e6 !important;border-bottom:none !important;border-top:none !important;}
+.view-bar{border-bottom:none !important;}
+
+/* Favoris chips — remove brown bg on Nos, just text + heart */
+.filter-bar .fav-chip{padding:0.3rem 0.7rem;border-radius:20px;font-size:0.82rem;font-weight:500;cursor:pointer;border:0.5px solid #d4c5a9;display:inline-flex;align-items:center;gap:4px;background:transparent !important;color:#5a4230 !important;}
+.filter-bar .fav-chip.active{background:#5a4230 !important;color:#f4ece0 !important;border-color:#5a4230 !important;}
+.filter-bar .fav-chip::before{content:'\2764';font-size:0.85em;color:#a04830;}
+
+/* Side-by-side hero (Gazette + About) */
+.hero-split{display:grid;grid-template-columns:340px 1fr;gap:32px;max-width:1080px;margin:0 auto;padding:32px 22px 16px;}
+.hero-split img{width:100%;border-radius:8px;object-fit:cover;display:block;}
+.hero-split-text h1,.hero-split-content h1{font-family:'Fraunces',serif;font-size:2.2rem;color:#5a4230;margin-bottom:14px;letter-spacing:-0.015em;font-weight:700;}
+.hero-split-text .subtitle,.hero-split-content p{font-size:1rem;line-height:1.65;color:#6f6256;}
+@media(max-width:760px){.hero-split{grid-template-columns:1fr;gap:18px;padding:22px 18px;}.hero-split img{max-width:300px;margin:0 auto;}}
+
+/* Multi-select widget */
+.ms-wrap{position:relative;display:inline-block;}
+.ms-trigger{background:#fbf3e6;border:0.5px solid #e8dfce;color:#5a4230;font-family:inherit;font-size:0.82rem;padding:0.32rem 0.7rem;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;min-width:90px;}
+.ms-trigger:hover{background:#f5e9d4;}
+.ms-trigger .ms-count{background:#5a4230;color:#f4ece0;border-radius:10px;padding:0 6px;font-size:0.72rem;line-height:1.4;display:inline-block;min-width:18px;text-align:center;}
+.ms-trigger .ms-arrow{font-size:0.65rem;opacity:0.7;}
+.ms-panel{position:absolute;top:100%;left:0;background:#fff;border:0.5px solid #d4c5a9;border-radius:6px;padding:8px 0;min-width:200px;max-height:280px;overflow-y:auto;box-shadow:0 4px 16px rgba(90,66,48,0.12);z-index:200;display:none;margin-top:4px;}
+.ms-panel.open{display:block;}
+.ms-panel label{display:flex;align-items:center;gap:8px;padding:6px 14px;cursor:pointer;font-size:0.85rem;color:#3a3226;}
+.ms-panel label:hover{background:#fbf3e6;}
+.ms-panel input[type="checkbox"]{margin:0;cursor:pointer;accent-color:#5a4230;}
+/* Hide native select once widget exists */
+.filter-bar select[data-multi="1"]{display:none !important;}
+
+
+/* ── 2026-05-19 final polish ── */
+/* All dropdown arrows identical (Filtres uses ▼, others ▾ — make them all ▾ visually) */
+.top-bar .filter-toggle .arrow,
+.top-bar .nav-drop-arrow,
+.top-bar .nav-drop-btn .nav-drop-arrow,
+.top-bar header .arrow,
+.ms-trigger .ms-arrow{font-size:0.7rem !important;opacity:0.7;margin-left:5px;font-weight:normal;line-height:1;}
+
+/* FILTRES label readable: dark brown bold uppercase */
+.filter-bar .bar-label{color:#5a4230 !important;font-weight:700 !important;text-transform:uppercase;letter-spacing:0.8px;font-size:0.82rem;}
+
+/* Entire second-row (filter bar) beige */
+.filter-bar{background:#fbf3e6 !important;border:none !important;padding:0.65rem 1.5rem !important;}
+
+/* View bar (Carte / Tous les fromages) — beige too, no brown */
+.view-bar{background:#fbf3e6 !important;border:none !important;padding:0.5rem 1.5rem !important;}
+.view-bar .bar-label{color:#5a4230 !important;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;font-size:0.78rem;}
+.view-bar .vtoggle{background:#fff;border:0.5px solid #d4c5a9;}
+.view-bar .vbtn{color:#5a4230 !important;background:transparent;border:none;padding:5px 14px;border-radius:4px;font-weight:500;}
+.view-bar .vbtn.active{background:#5a4230 !important;color:#f4ece0 !important;}
+
+/* Equal spacing between top-bar buttons */
+.top-bar header{gap:14px;}
+.top-bar header .filter-toggle#filterToggle,
+.top-bar header #navItin,
+.top-bar header .guide-btn,
+.top-bar header .nav-drop-btn{margin-right:0 !important;margin-left:0 !important;}
+
+/* Nos / Vos chips — heart AFTER text */
+.filter-bar .fav-chip::before{content:none !important;}
+.filter-bar .fav-chip::after{content:' \2764';font-size:0.85em;color:#a04830;margin-left:4px;}
+.filter-bar .fav-chip.active::after{color:#f4ece0;}
+
+
+
+/* ── 2026-05-19 — push SPA top-bar below the brown row 1 ── */
+.brown-header + .top-bar{position:sticky;top:52px;}
+@media(max-width:760px){.brown-header + .top-bar{top:48px;}}
+
+/* Map row 1 brown header — guarantee visibility */
+.brown-header{z-index:60;}
+
+/* Footer two lines (links row + copyright) on all pages */
+footer .row + div, footer .footer-row + div{margin-top:10px !important;}
+
+
+/* ── 2026-05-19 — remove gray bands below map header ── */
+.top-bar{border-bottom:none !important;box-shadow:none !important;background:rgba(250,248,245,0) !important;}
+.top-bar header,.top-bar .filter-bar,.top-bar .view-bar{background:#fbf3e6 !important;border:none !important;box-shadow:none !important;}
+.filter-bar{margin-top:0 !important;padding-top:0.5rem !important;padding-bottom:0.5rem !important;}
+.view-bar{padding-top:0.5rem !important;padding-bottom:0.5rem !important;}
+/* No visible separator strip between header rows */
+.top-bar header + .view-bar,.top-bar header + .filter-bar,.top-bar .view-bar + .filter-bar{border-top:none !important;margin-top:0 !important;}
+
+
+/* ── 2026-05-19 — kill grey bands once and for all ── */
+/* Force the .brown-header at top of carte.html to actually show brown */
+header.brown-header{background:#5a4230 !important;}
+/* The .top-bar action row stays beige */
+.top-bar{background:#fbf3e6 !important;}
+.top-bar header{background:#fbf3e6 !important;}
+.top-bar .filter-bar{background:#fbf3e6 !important;}
+.top-bar .view-bar{background:#fbf3e6 !important;}
+/* No borders between bars */
+.top-bar > *{border:none !important;box-shadow:none !important;margin:0 !important;}
+.top-bar header,.top-bar .filter-bar,.top-bar .view-bar{padding-top:0.5rem !important;padding-bottom:0.5rem !important;}
+
+
+/* ── 2026-05-19 PM v2 — Carte: ONE brown header matching other pages ── */
+/* SPA .top-bar's first row (its inner <header>) = the brown bar.
+   Below it: .view-bar + .filter-bar stay beige.
+   Match font/sizing of brown-header on homepage (Fraunces 1.1rem, gap 24px, height ~52px). */
+
+/* Wrapper: transparent — the inner header paints brown */
+.top-bar{
+  background:transparent !important;
+  border:none !important;
+  box-shadow:none !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+
+/* Row 1: brown bar (logo + search + nav + lang) */
+.top-bar > header{
+  background:#5a4230 !important;
+  color:#f4ece0 !important;
+  padding:10px 22px !important;
+  min-height:52px;
+  border:none !important;
+  box-shadow:none !important;
+}
+.top-bar > header .logo{
+  font-family:'Fraunces',serif !important;
+  font-weight:600 !important;
+  font-size:1.1rem !important;
+  letter-spacing:-0.01em !important;
+  color:#f4ece0 !important;
+}
+.top-bar > header a,
+.top-bar > header .nav-drop-btn,
+.top-bar > header .filter-toggle,
+.top-bar > header .nav-fav-btn{
+  color:#f4ece0 !important;
+  font-size:0.86rem !important;
+}
+
+/* Search field: cream-on-brown */
+.top-bar > header .search-wrap input{
+  background:rgba(255,255,255,0.12) !important;
+  color:#f4ece0 !important;
+  border:0.5px solid rgba(244,236,224,0.3) !important;
+}
+.top-bar > header .search-wrap input::placeholder{color:rgba(244,236,224,0.6) !important;}
+.top-bar > header .search-wrap::before{filter:invert(1) opacity(0.7);}
+
+/* Filtres / Itinéraire / Guide / Gazette / À Propos / nav-fav: outline-on-brown */
+.top-bar > header .filter-toggle,
+.top-bar > header .nav-drop-btn,
+.top-bar > header .nav-fav-btn{
+  background:transparent !important;
+  border:0.5px solid rgba(244,236,224,0.3) !important;
+  color:#f4ece0 !important;
+  font-weight:500 !important;
+  padding:6px 12px !important;
+}
+.top-bar > header .filter-toggle:hover,
+.top-bar > header .nav-drop-btn:hover,
+.top-bar > header .nav-fav-btn:hover{background:rgba(244,236,224,0.1) !important;}
+
+/* Guide button: keep orange "i" icon prefix on brown bg */
+.top-bar > header .guide-btn,
+.top-bar > header .filter-toggle.guide-btn{
+  background:transparent !important;
+  color:#f4ece0 !important;
+  border:0.5px solid rgba(244,236,224,0.3) !important;
+  padding:6px 14px 6px 10px !important;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.top-bar > header .guide-btn::before{
+  content:'i';display:inline-flex;align-items:center;justify-content:center;
+  width:18px;height:18px;background:#ff8c42;color:#fff;border-radius:50%;
+  font-style:italic;font-weight:700;font-size:0.72rem;
+}
+
+/* Dropdown menus inside brown bar — white panel with brown text */
+.top-bar > header .nav-drop-menu{
+  background:#fff !important;
+  border:0.5px solid #e8dfce !important;
+  box-shadow:0 4px 16px rgba(90,66,48,0.12) !important;
+}
+.top-bar > header .nav-drop-menu a,
+.top-bar > header .nav-drop-menu button{color:#3a3226 !important;background:transparent !important;}
+.top-bar > header .nav-drop-menu a:hover,
+.top-bar > header .nav-drop-menu button:hover{background:#fbf3e6 !important;}
+
+/* Language pill: cream bg, brown text — matches other pages */
+.top-bar > header .lang-btn{
+  background:#f4ece0 !important;
+  color:#5a4230 !important;
+  border:none !important;
+  font-weight:600 !important;
+  font-size:0.74rem !important;
+  padding:3px 12px !important;
+  border-radius:5px !important;
+}
+
+/* Home button ← Page principale: cream outline on brown */
+.top-bar > header .home-btn{
+  background:transparent !important;
+  border:0.5px solid rgba(244,236,224,0.3) !important;
+  color:#f4ece0 !important;
+}
+
+/* Row 2: view-bar stays BEIGE */
+.top-bar .view-bar{
+  background:#fbf3e6 !important;
+  border:none !important;
+  box-shadow:none !important;
+  padding:0.5rem 1.5rem !important;
+}
+.top-bar .view-bar .bar-label{color:#5a4230 !important;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;font-size:0.78rem;}
+.top-bar .view-bar .vbtn{color:#5a4230 !important;background:transparent;border:none;padding:5px 14px;border-radius:4px;font-weight:500;}
+.top-bar .view-bar .vbtn.active{background:#5a4230 !important;color:#f4ece0 !important;}
+.top-bar .view-bar .vtoggle{background:#fff;border:0.5px solid #d4c5a9;}
+
+/* Row 3: filter-bar stays BEIGE */
+.top-bar .filter-bar{
+  background:#fbf3e6 !important;
+  border:none !important;
+  box-shadow:none !important;
+  padding:0.5rem 1.5rem !important;
+}
+.top-bar .filter-bar .bar-label{color:#5a4230 !important;font-weight:700 !important;text-transform:uppercase;letter-spacing:0.8px;font-size:0.82rem;}
+
+/* No grey separator strips anywhere */
+.top-bar > header + .view-bar,
+.top-bar > header + .filter-bar,
+.top-bar .view-bar + .filter-bar,
+.top-bar .filter-bar + .view-bar{border-top:none !important;margin-top:0 !important;}
+.top-bar::before,.top-bar::after,
+.top-bar > header::before,.top-bar > header::after,
+.top-bar .view-bar::before,.top-bar .view-bar::after,
+.top-bar .filter-bar::before,.top-bar .filter-bar::after{content:none !important;}
+
+/* Restore .app top padding (one brown row 52px + view-bar ~36px + filter-bar ~44px ≈ 132px = 8.25rem) */
+.app{padding-top:8.5rem !important;}
+@media(max-width:760px){.app{padding-top:7rem !important;}}
+
+/* ── Mobile carte.html: simplify brown top row ──
+   Hide Filtres / Itinéraire / Guide / Gazette / À Propos / nav-fav from the brown row on mobile.
+   They're available via the bottom tab bar + burger drawer + filter sheet. */
+@media(max-width:760px){
+  .top-bar > header .filter-toggle,
+  .top-bar > header #navItin,
+  .top-bar > header .guide-btn,
+  .top-bar > header #howItWorksBtn,
+  .top-bar > header #navGazette,
+  .top-bar > header #navApropos,
+  .top-bar > header .nav-links,
+  .top-bar > header .nav-fav-btn,
+  .top-bar > header .lang-btn,
+  .top-bar > header .home-btn{display:none !important;}
+  .top-bar > header{padding:8px 14px !important;min-height:52px;gap:10px !important;}
+  .top-bar > header .logo{font-size:0.96rem !important;flex-shrink:0;}
+  .top-bar > header .search-wrap{flex:1 1 auto !important;max-width:none !important;}
+  .top-bar > header .search-wrap input{font-size:16px;background:rgba(255,255,255,0.12) !important;color:#f4ece0 !important;border:0.5px solid rgba(244,236,224,0.3) !important;}
+  /* Burger (mob-menu-btn) — visible on mobile in brown bar */
+  .top-bar > header .mob-menu-btn{
+    display:flex !important;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    order:99 !important;
+    margin-left:auto !important;
+    background:transparent !important;
+    border:none !important;
+    padding:8px !important;
+    width:38px;height:38px;
+    cursor:pointer;
+  }
+  .top-bar > header .mob-menu-btn span,
+  .top-bar > header .mob-menu-btn span::before,
+  .top-bar > header .mob-menu-btn span::after{
+    display:block;
+    width:22px;height:2px;
+    background:#f4ece0 !important;
+    border-radius:1px;
+    content:'';
+  }
+  .top-bar > header .mob-menu-btn span{position:relative;}
+  .top-bar > header .mob-menu-btn span::before{position:absolute;left:0;top:-7px;}
+  .top-bar > header .mob-menu-btn span::after{position:absolute;left:0;top:7px;}
+  /* View-bar still visible — compact */
+  .top-bar .view-bar{padding:0.35rem 14px !important;}
+  .top-bar .view-bar .bar-label{display:none;}
+  .top-bar .view-bar .vtoggle{flex:1;display:flex;}
+  .top-bar .view-bar .vbtn{flex:1;text-align:center;}
+}
+
+/* ── Universal mobile drawer (matches root pages) ── */
+.mob-drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9998;}
+.mob-drawer-overlay.open{display:block;}
+.mob-drawer{position:fixed;top:0;right:-110%;width:310px;max-width:85vw;height:100vh;background:#fdfcf8;z-index:9999;transition:right 0.25s ease;display:flex;flex-direction:column;box-shadow:-4px 0 24px rgba(0,0,0,0.18);overflow-y:auto;font-family:'Inter',sans-serif;}
+.mob-drawer.open{right:0;}
+.mob-drawer-head{background:#5a4230;color:#f4ece0;padding:18px 20px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.mob-drawer-logo{font-family:'Fraunces',serif;font-size:1rem;font-weight:600;color:#f4ece0;text-decoration:none;letter-spacing:-0.01em;}
+.mob-drawer-close{background:none;border:none;color:#f4ece0;font-size:30px;cursor:pointer;line-height:1;padding:0;}
+.mob-drawer-nav{flex:1;padding:6px 0;}
+.mob-drawer-nav > a{display:block;padding:14px 22px;color:#3a3226;font-size:0.98rem;font-weight:500;text-decoration:none;border-bottom:1px solid #f0e8d6;}
+.mob-drawer-nav > a:active{background:#fbf3e6;}
+.mob-drawer-group{border-bottom:1px solid #f0e8d6;padding-bottom:6px;}
+.mob-drawer-label{padding:16px 22px 4px;color:#8a7a66;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;}
+.mob-drawer-group a{display:block;padding:10px 22px 10px 32px;color:#3a3226;font-size:0.92rem;text-decoration:none;}
+.mob-drawer-group a:active{background:#fbf3e6;}
+.mob-drawer-foot{padding:18px 22px 24px;border-top:1px solid #e8dfce;display:flex;flex-direction:column;gap:14px;flex-shrink:0;}
+.mob-drawer-support{color:#8B6F47;font-weight:600;text-decoration:none;font-size:0.95rem;display:flex;align-items:center;gap:6px;}
+.mob-drawer-insta{color:#5a4230;text-decoration:none;font-size:0.9rem;display:flex;align-items:center;gap:8px;}
+.mob-drawer-insta svg{width:18px;height:18px;}
+.mob-drawer-lang{background:#5a4230;color:#f4ece0;border:none;padding:10px 14px;border-radius:6px;font-size:0.85rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
+
+/* ── Filter pill ACTIVE state — must win over .filter-bar .pill base ── */
+.filter-bar .pill.active,
+.filter-bar .pill:has(input:checked),
+.top-bar .filter-bar .pill.active,
+.top-bar .filter-bar .pill:has(input:checked){
+  background:#5a4230 !important;
+  color:#f4ece0 !important;
+  border-color:#5a4230 !important;
+  font-weight:600 !important;
+}
+/* Bio pill: green when active (distinct semantic — organic) */
+.filter-bar #pillBio.active,
+.filter-bar #pillBio:has(input:checked),
+.top-bar .filter-bar #pillBio.active,
+.top-bar .filter-bar #pillBio:has(input:checked){
+  background:#43A047 !important;
+  color:#fff !important;
+  border-color:#43A047 !important;
+}
+/* Same active treatment for the mobile-sheet pills (pillBioM, etc.) */
+.fs-pills .pill.active,
+.fs-pills .pill:has(input:checked){
+  background:#5a4230 !important;
+  color:#f4ece0 !important;
+  border-color:#5a4230 !important;
+  font-weight:600 !important;
+}
+.fs-pills #pillBioM.active,
+.fs-pills #pillBioM:has(input:checked){
+  background:#43A047 !important;
+  color:#fff !important;
+  border-color:#43A047 !important;
+}
+/* Subtle checkmark hint */
+.filter-bar .pill.active::before,
+.fs-pills .pill.active::before{
+  content:'✓';
+  font-size:0.85em;
+  margin-right:3px;
+  font-weight:700;
+}
+
+/* ── Bottom tab bar: text-only labels ── */
+.mob-tab-bar.mob-tab-bar-text{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  background:#fdfcf8;
+  border-top:0.5px solid #e8dfce;
+  box-shadow:0 -2px 12px rgba(0,0,0,0.05);
+  padding:8px 0 calc(8px + env(safe-area-inset-bottom,0px));
+  z-index:480;
+  font-family:'Inter',sans-serif;
+}
+@media(max-width:768px){
+  .mob-tab-bar.mob-tab-bar-text{display:flex !important;}
+}
+.mob-tab-bar.mob-tab-bar-text .mob-tab{
+  flex:1;
+  background:none;
+  border:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:10px 4px;
+  font-size:0.82rem;
+  font-weight:500;
+  color:#8a7a66;
+  cursor:pointer;
+  font-family:'Inter',sans-serif;
+  position:relative;
+  min-height:44px;
+  -webkit-tap-highlight-color:transparent;
+}
+.mob-tab-bar.mob-tab-bar-text .mob-tab svg{display:none !important;}
+.mob-tab-bar.mob-tab-bar-text .mob-tab.active{
+  color:#5a4230;
+  font-weight:700;
+}
+.mob-tab-bar.mob-tab-bar-text .mob-tab.active::after{
+  content:'';
+  position:absolute;
+  bottom:0;left:25%;right:25%;
+  height:3px;
+  background:#5a4230;
+  border-radius:2px 2px 0 0;
+}
+.mob-tab-bar.mob-tab-bar-text .mob-tab .tab-badge{
+  display:none;
+  background:#C67A4A;
+  color:#fff;
+  font-size:0.65rem;
+  font-weight:700;
+  padding:1px 5px;
+  border-radius:8px;
+  margin-left:5px;
+  min-width:16px;
+  text-align:center;
+}
+.mob-tab-bar.mob-tab-bar-text .mob-tab .tab-badge.has-items{display:inline-block;}
+
