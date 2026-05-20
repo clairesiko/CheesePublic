@@ -1778,6 +1778,10 @@ function addLegend(){
 
 // ── WELCOME PROMPT (combined geoloc + itinerary) ──
 function showGeoPrompt(){
+    // Disabled: first-visit experience is now the auto-opening itinerary wizard
+    // (its first step already offers geolocation). Avoids a double popup.
+    return;
+    /* eslint-disable no-unreachable */
     // Skip if user already visited
     try{if(localStorage.getItem('lfb_welcome_seen'))return;}catch(e){}
     var overlay=document.createElement('div');overlay.className='geo-overlay';overlay.id='geoOverlay';
@@ -2110,9 +2114,15 @@ window._closeItinGen=function(){
         _saveItin();renderItin();drawRoute();updateItinBadge();
     }
 };
-// Auto-open itinerary: now handled by welcome prompt
+// Auto-open the itinerary wizard on a visitor's FIRST visit to the map page, then never again.
 window._maybeAutoOpenItin=function(){
-    // Combined into showGeoPrompt() — no separate popup
+    try{
+        if(localStorage.getItem('lfb_itin_seen'))return; // already shown before — skip
+        // Mark as seen immediately so it only ever auto-opens once (even on reload)
+        localStorage.setItem('lfb_itin_seen','1');
+    }catch(e){ return; }
+    // Open after the map has settled so it doesn't fight the initial render
+    setTimeout(function(){ if(window._openItinGen)window._openItinGen(); }, 700);
 };
 window._igSelectLoc=function(btn,type){
     document.querySelectorAll('#itinGenModal .ig-loc-btn').forEach(function(b){b.classList.remove('selected');});

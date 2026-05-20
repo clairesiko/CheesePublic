@@ -12,7 +12,8 @@ var translations = {
     'home_btn': '← Page principale',
     'search_placeholder': 'Chercher un fromage...',
     'filters': 'Filtres',
-    'filter_by': 'Filtrer par',
+    'guide': 'Guide',
+    'filter_by': 'Filtres',
     'view': 'Vue',
     'map': 'Carte',
     'all_cheeses': 'Tous les fromages',
@@ -26,11 +27,17 @@ var translations = {
 
     // Nav dropdown
     'itinerary': 'Itinéraire',
-    'learn_more': 'En savoir plus',
+    'learn_more': 'En savoir plus (legacy)',
+    'gazette_nav': 'Gazette',
+    'past_gazettes': 'Anciennes Gazettes',
+    'subscribe_gazette': "S'inscrire à la Gazette",
+    'about_nav': 'À Propos',
+    'our_story': 'Notre histoire',
+    'abc_cheese': 'ABC du Fromage',
+    'chroniques_nav': 'Gazette',
+    'definitions': 'ABC du Fromage',
     'about': 'À propos',
     'contact': 'Contact',
-    'definitions': 'Définitions',
-    'chroniques_nav': 'Chroniques',
     'suggest_cheese': 'Suggérer un fromage',
     'my_itinerary': 'Mon itinéraire',
     'create_itinerary': 'Créer un itinéraire',
@@ -68,8 +75,8 @@ var translations = {
     'comment': 'Commentaire',
     'producers': 'Producteurs',
     'click_producer_locate': 'Cliquez sur un producteur pour le localiser sur la carte',
-    'add_to_itinerary': '+Itinéraire',
-    'add_to_itinerary_long': '+ Ajouter à l\'itinéraire',
+    'add_to_itinerary': 'Itinéraire',
+    'add_to_itinerary_long': 'Ajouter à l\'itinéraire',
     'click_add_itinerary': 'Cliquez pour ajouter à l\'itinéraire',
     'eponymous_municipalities': 'Communes éponymes',
     'view_on_map': 'Voir sur la carte',
@@ -241,6 +248,7 @@ var translations = {
     'home_btn': '← Home',
     'search_placeholder': 'Search for a cheese...',
     'filters': 'Filters',
+    'guide': 'Guide',
     'filter_by': 'Filter by',
     'view': 'View',
     'map': 'Map',
@@ -256,9 +264,16 @@ var translations = {
     // Nav dropdown
     'itinerary': 'Itinerary',
     'learn_more': 'Learn more',
+    'gazette_nav': 'Gazette',
+    'past_gazettes': 'Past issues',
+    'subscribe_gazette': 'Subscribe to the Gazette',
+    'about_nav': 'About',
+    'our_story': 'Our story',
+    'abc_cheese': 'Cheese ABCs',
+    'chroniques_nav': 'Gazette',
     'about': 'About',
     'contact': 'Contact',
-    'definitions': 'Definitions',
+    'definitions': 'Cheese ABCs',
     'chroniques_nav': 'Newsletter',
     'suggest_cheese': 'Suggest a cheese',
     'my_itinerary': 'My itinerary',
@@ -296,9 +311,9 @@ var translations = {
     'production_seasonality': 'Production seasonality',
     'comment': 'Comment',
     'producers': 'Producers',
-    'click_producer_locate': 'Click a producer to locate them on the map',
-    'add_to_itinerary': '+Itinerary',
-    'add_to_itinerary_long': '+ Add to itinerary',
+    'click_producer_locate': 'Click on a producer to locate it on the map',
+    'add_to_itinerary': 'Itinerary',
+    'add_to_itinerary_long': 'Add to itinerary',
     'click_add_itinerary': 'Click to add to itinerary',
     'eponymous_municipalities': 'Eponymous municipalities',
     'view_on_map': 'View on map',
@@ -396,7 +411,7 @@ var translations = {
     'favorites_hint': 'Click the heart on a cheese to add it to your favorites.',
     'view_all_cheeses': 'View all cheeses',
     'no_cheese_found': 'No cheese found',
-    'try_modify_filters': 'Try modifying your filters or search to discover other cheeses.',
+    'try_modify_filters': 'Try changing your filters or search to discover other cheeses.',
 
     // Mobile tabs
     'tab_map': 'Map',
@@ -428,11 +443,11 @@ var translations = {
 
     // Pages
     'about_title': 'Les Fromages du Bonheur',
-    'about_p1': "I wanted to create the most comprehensive interactive map of French cheeses — to discover every cheese, find the producers, and create your own cheese itineraries to go taste them. By car, by bike, or on foot!",
-    'about_p2': "It all started from a simple desire — to discover French cheeses wherever I am. And from a fascination: how, with just three types of milk — cow, goat, sheep — do we end up with such an incredible variety of cheeses? Behind every cheese, there is also ancestral know-how carried on by passionate people. I've tried to highlight this, especially through the farmstead producers featured on the site.",
+    'about_p1': "I wanted to build the most exhaustive interactive map of French cheeses — to help you discover each cheese, find its producers, and plan your own cheese itineraries to go taste them. By car, by bike, or on foot!",
+    'about_p2': "It all started from a simple wish — to discover cheeses wherever I happened to be. And from a fascination: how can you get such a dazzling variety of cheeses with just three milks — cow, goat and sheep? Behind every cheese, there's also an ancestral know-how passed on by passionate people. I've tried to highlight all of that, especially through the farmstead producers featured on the site.",
     'about_subtitle': 'On the site',
-    'about_p3': "Each cheese page shows its paste type, aging, ideal season, taste, history — monastic origin, or eponymous municipality when applicable. There are also details on AOP, AOC, IGP designations. You can locate producers on the map and create exportable cheese itineraries.",
-    'about_p4': "The database will probably never be complete — neither for cheeses nor for producers! I started with mainland France, but I'd like to expand, and I'm certainly missing cheeses even in the mainland. A cheese that's missing? A producer to add? Don't hesitate to <a href=\"#\" onclick=\"event.preventDefault();window._goHome();window._openPage('suggest');\">suggest it</a>!",
+    'about_p3': "Each cheese page lists its paste type, aging, peak season, taste, and story — its monastic origin, or the village it's named after when there is one. You'll also find details about specific labels such as AOP/ AOC. You can locate producers on the map and build exportable cheese itineraries.",
+    'about_p4': "The database will probably never be complete — neither for cheeses nor producers! I started with mainland France, but I'd love to expand, and I'm certainly missing a few cheeses even there. You see a cheese missing? A producer to add? Please <a href=\"#\" onclick=\"event.preventDefault();window._goHome();window._openPage('suggest');\">suggest it</a>!",
     'about_signoff': '— Claire',
 
     'contact_title': 'Contact',
@@ -570,10 +585,15 @@ function applyTranslations() {
   for (var i = 0; i < els.length; i++) {
     var key = els[i].getAttribute('data-t');
     if (key) {
+      var val = T(key);
+      // If the key is missing from the dictionary, T() returns the key itself.
+      // In that case keep the element's existing hardcoded fallback text instead
+      // of showing the raw key (e.g. "gazette_nav").
+      if (val === key) continue;
       if (els[i].getAttribute('data-t-html') === 'true') {
-        els[i].innerHTML = T(key);
+        els[i].innerHTML = val;
       } else {
-        els[i].textContent = T(key);
+        els[i].textContent = val;
       }
     }
   }

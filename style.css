@@ -1,6 +1,6 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{height:100%;width:100%;overflow:hidden;overflow-x:hidden;overscroll-behavior:none;}
-body{font-family:'Inter',sans-serif;color:#3a3226;background:#F8F9FA;-webkit-text-size-adjust:100%;}
+body{font-family:'Inter',sans-serif;color:#3a3226;background:#fbf3e6;-webkit-text-size-adjust:100%;}
 a{color:#8B6F47;text-decoration:none;}
 
 /* ── HEADER ── */
@@ -422,6 +422,13 @@ select:focus{outline:none;border-color:#8B6F47;}
 .mleg-t{font-weight:600;color:#333;margin-bottom:0.2rem;font-size:0.75rem;}
 .mleg-i{display:flex;align-items:center;gap:0.35rem;}
 .mleg-d{width:14px;height:14px;border-radius:50%;border:1.5px solid #fff;box-shadow:0 0 0 0.5px #ddd;display:flex;align-items:center;justify-content:center;font-size:8px;line-height:0;}
+/* Lift the bottom-right legend off the viewport edge so it's never truncated */
+.leaflet-bottom.leaflet-right{margin-bottom:12px;margin-right:8px;}
+.mleg{max-width:calc(100vw - 24px);}
+@media(max-width:768px){
+  .leaflet-bottom.leaflet-right{margin-bottom:74px !important;}
+  .leaflet-bottom.leaflet-left{margin-bottom:74px !important;}
+}
 
 /* ── TOOLTIP ── */
 .cheese-mk{width:28px;height:28px;border-radius:50%;background:#8B6F47;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(139,111,71,0.35);border:2px solid #fff;font-size:14px;line-height:1;transition:background 0.15s,box-shadow 0.15s,transform 0.15s;}
@@ -1434,8 +1441,10 @@ header.brown-header{background:#5a4230 !important;}
 .top-bar .filter-bar::before,.top-bar .filter-bar::after{content:none !important;}
 
 /* Restore .app top padding (one brown row 52px + view-bar ~36px + filter-bar ~44px ≈ 132px = 8.25rem) */
-.app{padding-top:8.5rem !important;}
+.app{padding-top:8.5rem !important;background:#fbf3e6 !important;}
 @media(max-width:760px){.app{padding-top:7rem !important;}}
+/* The map fills the area below the headers — its own bg so no grey shows behind tiles while loading */
+#map{background:#dde5d4;}
 
 /* ── Mobile carte.html: simplify brown top row ──
    Hide Filtres / Itinéraire / Guide / Gazette / À Propos / nav-fav from the brown row on mobile.
