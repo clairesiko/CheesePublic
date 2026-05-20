@@ -46,7 +46,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css"/>
-    <link rel="stylesheet" href="style.css?v=20260519h">
+    <link rel="stylesheet" href="style.css?v=20260519i">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#8B6F47">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -474,9 +474,9 @@ window._toggleMobDrawer=function(){
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
-<script src="i18n.js?v=20260423b"></script>
+<script src="i18n.js?v=20260519i"></script>
 <script src="data.js?v=20260403c"></script>
-<script src="app.js?v=20260519f"></script>
+<script src="app.js?v=20260519i"></script>
 <script>
 // ── Service Worker Registration ──
 if ('serviceWorker' in navigator) {
@@ -591,88 +591,6 @@ if ('serviceWorker' in navigator) {
 })();
 </script>
 
-<!-- Itinerary generator wizard popup -->
-<div id="itinGenModal" style="display:none;position:fixed;inset:0;background:rgba(58,50,38,0.55);z-index:1000;align-items:center;justify-content:center;padding:20px;">
-  <div style="background:#fff;border-radius:14px;max-width:560px;width:100%;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.25);">
-    <!-- Brown wizard header -->
-    <div style="background:#8B6F47;color:#fff;padding:24px 28px 22px;position:relative;text-align:center;">
-      <button onclick="window._closeItinGen()" aria-label="Fermer" style="position:absolute;right:14px;top:14px;background:none;border:none;color:#fff;font-size:24px;cursor:pointer;padding:4px 8px;line-height:1;">×</button>
-      <h2 style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:700;margin-bottom:6px;color:#fff;letter-spacing:-0.01em;"><span class="lang-fr">Votre itinéraire fromager</span><span class="lang-en inline">Your cheese itinerary</span></h2>
-      <p style="font-size:0.95rem;opacity:0.92;font-weight:300;"><span class="lang-fr">En quelques clics, on vous prépare une tournée sur mesure</span><span class="lang-en inline">In a few clicks, we'll plan a custom tour</span></p>
-    </div>
-
-    <!-- Step indicator -->
-    <div style="padding:22px 0 14px;display:flex;justify-content:center;gap:6px;">
-      <span class="ig-step-dot" data-step="0" style="width:26px;height:6px;border-radius:3px;background:#8B6F47;display:inline-block;"></span>
-      <span class="ig-step-dot" data-step="1" style="width:8px;height:6px;border-radius:50%;background:#e8dfce;display:inline-block;"></span>
-      <span class="ig-step-dot" data-step="2" style="width:8px;height:6px;border-radius:50%;background:#e8dfce;display:inline-block;"></span>
-      <span class="ig-step-dot" data-step="3" style="width:8px;height:6px;border-radius:50%;background:#e8dfce;display:inline-block;"></span>
-    </div>
-
-    <!-- Step 0 (visible) -->
-    <div class="ig-step" data-step="0" style="padding:8px 36px 32px;text-align:center;overflow-y:auto;">
-      <h3 style="font-family:'Fraunces',serif;font-size:1.4rem;color:#3a3226;margin-bottom:24px;font-weight:600;"><span class="lang-fr">Où êtes-vous ?</span><span class="lang-en inline">Where are you?</span></h3>
-      <button type="button" class="ig-loc-btn" onclick="window._igSelectLoc(this,'geo')" style="width:100%;background:#fff;border:0.5px solid #d4c5a9;border-radius:10px;padding:18px 22px;text-align:left;display:flex;align-items:center;gap:16px;font-family:inherit;cursor:pointer;margin-bottom:12px;transition:border-color 0.15s,background 0.15s;">
-        <span style="font-size:1.8rem;flex-shrink:0;">📍</span>
-        <span><span style="display:block;font-size:1.02rem;font-weight:600;color:#3a3226;margin-bottom:2px;"><span class="lang-fr">Ma position actuelle</span><span class="lang-en inline">My current location</span></span><span style="display:block;font-size:0.86rem;color:#8a7a66;"><span class="lang-fr">Utiliser la géolocalisation</span><span class="lang-en inline">Use geolocation</span></span></span>
-      </button>
-      <button type="button" class="ig-loc-btn" onclick="window._igSelectLoc(this,'city')" style="width:100%;background:#fff;border:0.5px solid #d4c5a9;border-radius:10px;padding:18px 22px;text-align:left;display:flex;align-items:center;gap:16px;font-family:inherit;cursor:pointer;transition:border-color 0.15s,background 0.15s;">
-        <span style="font-size:1.8rem;flex-shrink:0;">🏙</span>
-        <span><span style="display:block;font-size:1.02rem;font-weight:600;color:#3a3226;margin-bottom:2px;"><span class="lang-fr">Entrer une ville</span><span class="lang-en inline">Enter a city</span></span><span style="display:block;font-size:0.86rem;color:#8a7a66;"><span class="lang-fr">Tapez votre point de départ</span><span class="lang-en inline">Type your starting point</span></span></span>
-      </button>
-      <input type="text" class="ig-city-input" id="igCityInput" list="igCityList" placeholder="Ex : Lyon, Dijon…" style="width:100%;margin-top:12px;padding:12px 16px;border:0.5px solid #d4c5a9;border-radius:8px;font-family:inherit;font-size:0.95rem;display:none;">
-      <datalist id="igCityList"></datalist>
-    </div>
-
-    <!-- Step 1 hidden -->
-    <div class="ig-step" data-step="1" style="display:none;padding:8px 36px 32px;text-align:center;">
-      <h3 style="font-family:'Fraunces',serif;font-size:1.4rem;color:#3a3226;margin-bottom:24px;font-weight:600;"><span class="lang-fr">Combien de temps ?</span><span class="lang-en inline">How long?</span></h3>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <button class="ig-dur-btn" data-dur="half" style="padding:14px;border:0.5px solid #d4c5a9;border-radius:8px;background:#fff;cursor:pointer;font-family:inherit;"><span class="lang-fr">Demi-journée</span><span class="lang-en inline">Half day</span></button>
-        <button class="ig-dur-btn" data-dur="full" style="padding:14px;border:0.5px solid #d4c5a9;border-radius:8px;background:#fff;cursor:pointer;font-family:inherit;"><span class="lang-fr">Journée</span><span class="lang-en inline">Full day</span></button>
-        <button class="ig-dur-btn" data-dur="weekend" style="padding:14px;border:0.5px solid #d4c5a9;border-radius:8px;background:#fff;cursor:pointer;font-family:inherit;"><span class="lang-fr">Week-end</span><span class="lang-en inline">Weekend</span></button>
-        <button class="ig-dur-btn" data-dur="vacation" style="padding:14px;border:0.5px solid #d4c5a9;border-radius:8px;background:#fff;cursor:pointer;font-family:inherit;"><span class="lang-fr">Vacances</span><span class="lang-en inline">Vacation</span></button>
-      </div>
-    </div>
-  </div>
-</div>
-<style>
-  #itinGenModal[style*="display:flex"]{display:flex !important;}
-  #itinGenModal .ig-loc-btn:hover{border-color:#5a4230 !important;background:#fbf3e6 !important;}
-  #itinGenModal .ig-loc-btn.selected{border-color:#5a4230 !important;background:#fbf3e6 !important;}
-  #itinGenModal .ig-city-input.visible{display:block !important;}
-  #itinGenModal .ig-step{display:none;}
-  #itinGenModal .ig-step[data-step="0"]{display:block;}
-</style>
-<script>
-// Helper to switch steps
-window._igShowStep = window._igShowStep || function(n){
-  document.querySelectorAll('#itinGenModal .ig-step').forEach(function(el){
-    el.style.display = (parseInt(el.dataset.step,10)===n) ? 'block' : 'none';
-  });
-  document.querySelectorAll('#itinGenModal .ig-step-dot').forEach(function(d){
-    var active = parseInt(d.dataset.step,10)===n;
-    d.style.width = active ? '26px' : '8px';
-    d.style.borderRadius = active ? '3px' : '50%';
-    d.style.background = active ? '#8B6F47' : '#e8dfce';
-  });
-};
-// Robust _openItinGen — always show as flex
-(function(){
-  var orig = window._openItinGen;
-  window._openItinGen = function(){
-    try{ if(typeof orig==='function') orig(); }catch(e){}
-    var el = document.getElementById('itinGenModal');
-    if(el){ el.style.display='flex'; window._igShowStep(0); }
-  };
-  var oc = window._closeItinGen;
-  window._closeItinGen = function(){
-    try{ if(typeof oc==='function') oc(); }catch(e){}
-    var el = document.getElementById('itinGenModal');
-    if(el) el.style.display='none';
-  };
-})();
-</script>
 
 </body>
 </html>
