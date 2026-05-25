@@ -418,10 +418,32 @@ function fetchDepts(){
     go(0);
 }
 
+// Private API (Cloudflare Worker backed by D1). Change here if the URL ever moves.
+var CHEESE_API_BASE = 'https://cheese-api.claire-sikorav.workers.dev';
+
 function loadData(){
-    try{var _b=atob(CHEESE_DATA_B64.trim());var _u8=new Uint8Array(_b.length);for(var _i=0;_i<_b.length;_i++)_u8[_i]=_b.charCodeAt(_i);S.data=JSON.parse(new TextDecoder('utf-8').decode(_u8));}
-    catch(e){console.error('JSON:',e);track('error_loading',{error:e.message});return;}
-    track('cheese_count_loaded',{count:S.data.cheeses.length});
+    // 1) Try the private API first. 2) Fall back to the embedded blob if it fails
+    //    (network, CORS, or bad response) so the site never goes blank mid-migration.
+    fetch(CHEESE_API_BASE + '/api/cheeses')
+        .then(function(r){ if(!r.ok) throw new Error('API HTTP '+r.status); return r.json(); })
+        .then(function(d){
+            if(!d || !d.cheeses || d.cheeses.length < 50) throw new Error('API returned too few cheeses');
+            S.data = d;
+            track('cheese_count_loaded',{count:S.data.cheeses.length, source:'api'});
+            _onDataReady();
+        })
+        .catch(function(err){
+            console.warn('Cheese API unavailable, using embedded fallback:', err && err.message);
+            try{
+                var _b=atob(CHEESE_DATA_B64.trim());var _u8=new Uint8Array(_b.length);
+                for(var _i=0;_i<_b.length;_i++)_u8[_i]=_b.charCodeAt(_i);
+                S.data=JSON.parse(new TextDecoder('utf-8').decode(_u8));
+                track('cheese_count_loaded',{count:S.data.cheeses.length, source:'fallback'});
+                _onDataReady();
+            }catch(e){console.error('JSON:',e);track('error_loading',{error:e.message});}
+        });
+}
+function _onDataReady(){
     popFilters();applyF();
     // Update favorites badge
     updateFavBadge();
