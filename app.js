@@ -429,18 +429,18 @@ function loadData(){
         .then(function(d){
             if(!d || !d.cheeses || d.cheeses.length < 50) throw new Error('API returned too few cheeses');
             S.data = d;
+            console.log('%c✅ Données chargées depuis l\'API privée ('+d.cheeses.length+' fromages)','color:#2e7d32;font-weight:bold;font-size:13px;');
             track('cheese_count_loaded',{count:S.data.cheeses.length, source:'api'});
             _onDataReady();
         })
         .catch(function(err){
-            console.warn('Cheese API unavailable, using embedded fallback:', err && err.message);
-            try{
-                var _b=atob(CHEESE_DATA_B64.trim());var _u8=new Uint8Array(_b.length);
-                for(var _i=0;_i<_b.length;_i++)_u8[_i]=_b.charCodeAt(_i);
-                S.data=JSON.parse(new TextDecoder('utf-8').decode(_u8));
-                track('cheese_count_loaded',{count:S.data.cheeses.length, source:'fallback'});
-                _onDataReady();
-            }catch(e){console.error('JSON:',e);track('error_loading',{error:e.message});}
+            console.error('Cheese API failed:', err && err.message);
+            track('error_loading',{error: err && err.message});
+            var m=document.getElementById('map');
+            if(m) m.innerHTML='<div style="padding:2.5rem 1.5rem;text-align:center;color:#6a5a4a;font-family:Inter,sans-serif;">'
+                +'<h2 style="font-family:Fraunces,serif;color:#5a4230;margin-bottom:0.5rem;">Oups…</h2>'
+                +'<p style="max-width:340px;margin:0 auto;line-height:1.6;"><span class="lang-fr">Impossible de charger les fromages pour le moment. Merci de réessayer dans un instant.</span>'
+                +'<span class="lang-en inline">Could not load the cheeses right now. Please try again shortly.</span></p></div>';
         });
 }
 function _onDataReady(){
