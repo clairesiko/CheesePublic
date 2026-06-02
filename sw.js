@@ -1,11 +1,10 @@
 // Service Worker — Les Fromages du Bonheur
-const CACHE_NAME = 'fromages-v6';
+const CACHE_NAME = 'fromages-v8';
 const ASSETS = [
   '/',
   '/index.html',
   '/app.js',
   '/i18n.js',
-  '/data.js',
   '/style.css',
   '/icon-192.png',
   '/icon-512.png',

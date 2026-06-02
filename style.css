@@ -1618,3 +1618,13 @@ header.brown-header{background:#5a4230 !important;}
 }
 .mob-tab-bar.mob-tab-bar-text .mob-tab .tab-badge.has-items{display:inline-block;}
 
+/* ── 2026-06-02 — Bilingual lang spans (FR/EN) ──
+   The map page (carte.html) renders its mobile drawer and support banner with
+   <span class="lang-fr"> / <span class="lang-en"> pairs but had no rule to hide
+   the inactive language, so BOTH showed concatenated ("Notre histoireOur story").
+   These mirror the inline rules already present on the content pages. */
+.lang-en{display:none;}
+html[lang="en"] .lang-fr{display:none;}
+html[lang="en"] .lang-en{display:block;}
+html[lang="en"] .lang-en.inline{display:inline;}
+

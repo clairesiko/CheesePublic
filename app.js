@@ -34,6 +34,7 @@ var PAGE_SIZE=50;
 
 // ── GA4 Custom Event Tracking ──
 function track(ev,params){
+    if(window.__noTrack)return; // suppressed during silent re-renders (e.g. language switch)
     try{if(typeof gtag==='function')gtag('event',ev,params||{});}catch(e){}
     try{if(typeof posthog!=='undefined'&&posthog.capture)posthog.capture(ev,params||{});}catch(e){}
 }
@@ -2579,4 +2580,14 @@ window._onLangChange = function(lang) {
     });
     // Refresh cluster labels (they update on next zoom/pan via T() calls)
     if (window.S && window.S.map) window.S.map.fire('moveend');
+    // Re-render the cheese grid if it's the active view, so cards switch language live
+    try { if (window.S && S.currentView === 'grid') renderGrid(); } catch(e){}
+    // Re-render an open cheese detail panel in the new language (without re-firing analytics)
+    try {
+        if (window.S && S.focus !== null && S.focus !== undefined && S.data && S.data.cheeses && S.data.cheeses[S.focus]) {
+            window.__noTrack = true;
+            window._focus(S.focus);
+            window.__noTrack = false;
+        }
+    } catch(e){ window.__noTrack = false; }
 };

@@ -27,7 +27,7 @@ var translations = {
 
     // Nav dropdown
     'itinerary': 'Itinéraire',
-    'learn_more': 'En savoir plus (legacy)',
+    'learn_more': 'En savoir plus',
     'gazette_nav': 'Gazette',
     'past_gazettes': 'Anciennes Gazettes',
     'subscribe_gazette': "S'inscrire à la Gazette",
@@ -274,7 +274,6 @@ var translations = {
     'about': 'About',
     'contact': 'Contact',
     'definitions': 'Cheese ABCs',
-    'chroniques_nav': 'Newsletter',
     'suggest_cheese': 'Suggest a cheese',
     'my_itinerary': 'My itinerary',
     'create_itinerary': 'Create an itinerary',
