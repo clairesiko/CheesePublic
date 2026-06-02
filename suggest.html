@@ -107,6 +107,14 @@ html[lang="en"] .lang-en.inline{display:inline;}
 }
 
 </style>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-130CX45T2T"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-130CX45T2T');</script>
+<!-- PostHog -->
+<script>
+!function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug getPageViewId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+posthog.init('phc_uEqHq5a2Y7LRwEAJjHCerAX6NckYcWmC9N5EpJyLMn3L',{api_host:'https://eu.i.posthog.com',person_profiles:'identified_only',defaults:'2025-05-24'});
+</script>
 </head>
 <body>
 
@@ -153,25 +161,67 @@ html[lang="en"] .lang-en.inline{display:inline;}
     <p class="intro">You know a cheese that's missing from the map? A farmstead producer worth featuring? A small AOP forgotten? Tell me with this form — every suggestion helps grow the database.</p>
   </div>
 
-  <form action="mailto:lesfromagesdubonheur@gmail.com" method="post" enctype="text/plain">
+  <form id="suggestForm" onsubmit="return submitSuggestion(event)">
     <label for="suggest-cheese"><span class="lang-fr">Nom du fromage <span class="required-mark">*</span></span><span class="lang-en inline">Cheese name <span class="required-mark">*</span></span></label>
-    <input type="text" id="suggest-cheese" name="Fromage" required placeholder="Ex : Tome des Bauges">
+    <input type="text" id="suggest-cheese" name="cheese_nm" required placeholder="Ex : Tome des Bauges">
 
     <label for="suggest-region"><span class="lang-fr">Région / Département</span><span class="lang-en inline">Region / Department</span></label>
-    <input type="text" id="suggest-region" name="Region" placeholder="Ex : Savoie">
+    <input type="text" id="suggest-region" name="region" placeholder="Ex : Savoie">
 
     <label for="suggest-producer"><span class="lang-fr">Producteur (si vous le connaissez)</span><span class="lang-en inline">Producer (if you know one)</span></label>
-    <input type="text" id="suggest-producer" name="Producteur" placeholder="Ex : GAEC de la Vallée">
+    <input type="text" id="suggest-producer" name="producer" placeholder="Ex : GAEC de la Vallée">
 
     <label for="suggest-details"><span class="lang-fr">Informations complémentaires</span><span class="lang-en inline">More details</span></label>
-    <textarea id="suggest-details" name="Details" placeholder="Type de lait, affinage, anecdotes, lien web…"></textarea>
+    <textarea id="suggest-details" name="details" placeholder="Type de lait, affinage, anecdotes, lien web…"></textarea>
 
     <label for="suggest-email"><span class="lang-fr">Votre email (si vous souhaitez une réponse)</span><span class="lang-en inline">Your email (optional, for a reply)</span></label>
-    <input type="email" id="suggest-email" name="Email" placeholder="votre@email.fr">
+    <input type="email" id="suggest-email" name="submitter_email" placeholder="votre@email.fr">
+
+    <!-- Honeypot: hidden from humans, bots fill it -->
+    <input type="text" id="suggest-website" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;">
 
     <button type="submit" class="submit-btn"><span class="lang-fr">Envoyer la suggestion</span><span class="lang-en inline">Send the suggestion</span></button>
-    <div class="note"><span class="lang-fr">En cliquant Envoyer, votre logiciel mail s'ouvre avec le message pré-rempli vers <a href="mailto:lesfromagesdubonheur@gmail.com">lesfromagesdubonheur@gmail.com</a>. Cliquez « Envoyer » dans votre client mail pour finaliser.</span><span class="lang-en">Clicking Send will open your mail app with a pre-filled message to <a href="mailto:lesfromagesdubonheur@gmail.com">lesfromagesdubonheur@gmail.com</a>. Then click Send in your mail client.</span></div>
+    <div class="note" id="suggest-note"><span class="lang-fr">Votre suggestion est envoyée directement et sera examinée avant publication. Merci&nbsp;!</span><span class="lang-en">Your suggestion is sent directly and will be reviewed before publishing. Thank you!</span></div>
   </form>
+  <div id="suggest-result" style="display:none;margin-top:18px;padding:14px 18px;border-radius:8px;font-size:0.95rem;"></div>
+  <script>
+  function submitSuggestion(e){
+    e.preventDefault();
+    var f=document.getElementById('suggestForm');
+    var btn=f.querySelector('.submit-btn');
+    var fr=(document.documentElement.lang||'fr')==='fr';
+    var payload={
+      cheese_nm:document.getElementById('suggest-cheese').value.trim(),
+      region:document.getElementById('suggest-region').value.trim(),
+      details:(document.getElementById('suggest-producer').value.trim()?('Producteur : '+document.getElementById('suggest-producer').value.trim()+'\n'):'')+document.getElementById('suggest-details').value.trim(),
+      submitter_email:document.getElementById('suggest-email').value.trim(),
+      website:document.getElementById('suggest-website').value
+    };
+    if(!payload.cheese_nm)return false;
+    btn.disabled=true;btn.style.opacity='0.6';
+    fetch('https://cheese-api.claire-sikorav.workers.dev/api/suggest',{
+      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)
+    }).then(function(r){return r.json().then(function(d){return {ok:r.ok,d:d};});})
+      .then(function(res){
+        var box=document.getElementById('suggest-result');
+        if(res.ok&&res.d.ok){
+          f.style.display='none';
+          box.style.display='block';box.style.background='#e8f5e9';box.style.color='#2e7d32';
+          box.textContent=fr?'✅ Merci ! Votre suggestion a bien été envoyée. Elle sera examinée avant publication.':'✅ Thank you! Your suggestion was sent and will be reviewed before publishing.';
+        }else{
+          btn.disabled=false;btn.style.opacity='1';
+          box.style.display='block';box.style.background='#fdecea';box.style.color='#c0392b';
+          box.textContent=fr?('Oups, envoi impossible'+(res.d.error?(' ('+res.d.error+')'):'')+'. Réessayez dans un instant.'):('Could not send'+(res.d.error?(' ('+res.d.error+')'):'')+'. Please try again shortly.');
+        }
+      }).catch(function(){
+        btn.disabled=false;btn.style.opacity='1';
+        var box=document.getElementById('suggest-result');
+        box.style.display='block';box.style.background='#fdecea';box.style.color='#c0392b';
+        box.textContent=fr?'Erreur réseau. Réessayez dans un instant.':'Network error. Please try again shortly.';
+      });
+    return false;
+  }
+  </script>
 </div>
 
 <footer>

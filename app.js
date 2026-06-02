@@ -35,6 +35,7 @@ var PAGE_SIZE=50;
 // ── GA4 Custom Event Tracking ──
 function track(ev,params){
     try{if(typeof gtag==='function')gtag('event',ev,params||{});}catch(e){}
+    try{if(typeof posthog!=='undefined'&&posthog.capture)posthog.capture(ev,params||{});}catch(e){}
 }
 // Haversine distance (km) for itinerary
 function _haversine(lat1,lon1,lat2,lon2){

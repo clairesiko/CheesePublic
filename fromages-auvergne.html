@@ -30,22 +30,22 @@
 
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
 body{font-family:'Inter',sans-serif;color:#3a3226;max-width:900px;margin:2rem auto;padding:0 1.5rem;line-height:1.7;background:#fdfcf8;}
 header.site{text-align:center;margin-bottom:2rem;}
-header.site a{text-decoration:none;color:#5a4230;font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;}
-h1{font-family:'Playfair Display',serif;color:#5a4230;font-size:2.2rem;margin-bottom:0.3rem;line-height:1.2;}
+header.site a{text-decoration:none;color:#5a4230;font-family:'Fraunces',serif;font-size:1.4rem;font-weight:700;}
+h1{font-family:'Fraunces',serif;color:#5a4230;font-size:2.2rem;margin-bottom:0.3rem;line-height:1.2;}
 .subtitle{color:#8B6F47;font-size:1.05rem;margin-bottom:2rem;}
 .breadcrumb{font-size:0.85rem;color:#999;margin-bottom:1rem;}
 .breadcrumb a{color:#8B6F47;text-decoration:none;}
 .intro{background:#f8f6f3;padding:1.25rem 1.5rem;border-radius:10px;margin-bottom:2rem;font-size:0.98rem;}
-.intro h2{font-family:'Playfair Display',serif;color:#8B6F47;font-size:1.1rem;margin:0 0 0.5rem;}
+.intro h2{font-family:'Fraunces',serif;color:#8B6F47;font-size:1.1rem;margin:0 0 0.5rem;}
 .intro p{margin:0.5rem 0;}
 .cta-map{display:inline-block;background:#8B6F47;color:#fff;padding:0.6rem 1.2rem;border-radius:8px;text-decoration:none;font-weight:600;margin:0.5rem 0 1rem;}
 .cta-map:hover{background:#6f5a3a;}
 section.list{margin-top:2rem;}
-section.list h2{font-family:'Playfair Display',serif;color:#5a4230;font-size:1.4rem;margin-bottom:0.5rem;border-bottom:2px solid #e8dfce;padding-bottom:0.4rem;}
+section.list h2{font-family:'Fraunces',serif;color:#5a4230;font-size:1.4rem;margin-bottom:0.5rem;border-bottom:2px solid #e8dfce;padding-bottom:0.4rem;}
 .count{color:#999;font-weight:400;font-size:0.95rem;}
 ul.cheeses{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:0.6rem 1.2rem;}
 ul.cheeses li{border-bottom:1px dotted #e8dfce;padding:0.5rem 0;}
@@ -53,7 +53,7 @@ ul.cheeses a{color:#5a4230;text-decoration:none;font-weight:500;display:block;}
 ul.cheeses a:hover{color:#8B6F47;text-decoration:underline;}
 ul.cheeses .meta{display:block;font-size:0.8rem;color:#8B6F47;font-weight:400;margin-top:0.15rem;}
 .related{margin-top:3rem;padding-top:1.5rem;border-top:1px solid #e8dfce;}
-.related h2{font-family:'Playfair Display',serif;color:#5a4230;font-size:1.2rem;margin-bottom:0.6rem;}
+.related h2{font-family:'Fraunces',serif;color:#5a4230;font-size:1.2rem;margin-bottom:0.6rem;}
 .related a{display:inline-block;margin:0.3rem 0.8rem 0.3rem 0;color:#8B6F47;text-decoration:none;padding:0.3rem 0.8rem;background:#f8f6f3;border-radius:20px;font-size:0.9rem;}
 .related a:hover{background:#e8dfce;}
 footer{margin-top:3rem;padding-top:1rem;border-top:1px solid #e8dfce;font-size:0.85rem;color:#999;text-align:center;}
@@ -65,8 +65,25 @@ html[lang="en"] .lang-fr{display:none;}
 html[lang="en"] .lang-en{display:block;}
 html[lang="en"] .lang-en.inline{display:inline;}
 </style>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-130CX45T2T"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-130CX45T2T');</script>
+<!-- PostHog -->
+<script>
+!function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug getPageViewId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+posthog.init('phc_uEqHq5a2Y7LRwEAJjHCerAX6NckYcWmC9N5EpJyLMn3L',{api_host:'https://eu.i.posthog.com',person_profiles:'identified_only',defaults:'2025-05-24'});
+</script>
 </head>
 <body>
+<!-- Support banner (dismissible, persists in localStorage 30d) -->
+<div id="supportBanner" style="display:none;background:#fbf3e6;border-bottom:1px solid #e8dfce;padding:9px 18px;font-size:0.82rem;color:#3a3226;line-height:1.5;font-family:'Inter',sans-serif;">
+  <div style="max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+    <span><span class="lang-fr">Les Fromages du Bonheur est un projet indépendant, si vous voulez le soutenir c'est <a href="https://ko-fi.com/lesfromagesdubonheur" target="_blank" rel="noopener" style="color:#5a4230;font-weight:500;text-decoration:underline;text-underline-offset:2px;">ici</a>&nbsp;!</span><span class="lang-en">Les Fromages du Bonheur is an independent project. If this site is useful to you, the price of a coffee helps keep it alive. <a href="https://ko-fi.com/lesfromagesdubonheur" target="_blank" rel="noopener" style="color:#5a4230;font-weight:500;text-decoration:underline;text-underline-offset:2px;">Support</a>.</span></span>
+    <button onclick="document.getElementById('supportBanner').style.display='none';try{localStorage.setItem('fdb_banner_dismissed',Date.now())}catch(e){}" aria-label="Fermer" style="background:none;border:none;color:#b8a888;font-size:18px;cursor:pointer;padding:0 4px;line-height:1;">×</button>
+  </div>
+</div>
+<script>(function(){try{var d=localStorage.getItem('fdb_banner_dismissed');var T=30*24*60*60*1000;if(!d||(Date.now()-parseInt(d,10))>T)document.getElementById('supportBanner').style.display='block';}catch(e){document.getElementById('supportBanner').style.display='block';}})();</script>
+
 
 <header class="site">
     <a href="/">Les Fromages du Bonheur</a>

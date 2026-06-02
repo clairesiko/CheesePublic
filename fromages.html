@@ -131,6 +131,14 @@ footer .footer-row,footer .row{display:flex;flex-wrap:wrap;justify-content:space
 }
 
 </style>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-130CX45T2T"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-130CX45T2T');</script>
+<!-- PostHog -->
+<script>
+!function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug getPageViewId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+posthog.init('phc_uEqHq5a2Y7LRwEAJjHCerAX6NckYcWmC9N5EpJyLMn3L',{api_host:'https://eu.i.posthog.com',person_profiles:'identified_only',defaults:'2025-05-24'});
+</script>
 </head>
 <body>
 <!-- Support banner (dismissible, persists in localStorage 30d) -->
@@ -190,16 +198,20 @@ footer .footer-row,footer .row{display:flex;flex-wrap:wrap;justify-content:space
     <div style="text-align:center;margin-top:12px;font-size:0.72rem;color:#a89878;">© 2025–2026 <a href="mailto:lesfromagesdubonheur@gmail.com" style="color:#5a4230;">Les Fromages du Bonheur</a> · <span class="lang-fr">Carte interactive des fromages de France</span><span class="lang-en inline">Interactive map of French cheeses</span></div>
 </footer>
 
-<script src="data.js"></script>
 <script>
 (function(){
+    var CHEESE_API_BASE='https://cheese-api.claire-sikorav.workers.dev';
+    var cheeses=[];
+    var letters='ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    var lastFiltered=null;
+
     // Language handling
     var stored = localStorage.getItem('fdh_lang') || 'fr';
     document.documentElement.lang = stored;
     function getLang(){ return document.documentElement.lang || 'fr'; }
     function updateBtn(lang){
         var b = document.getElementById('langToggleBtn');
-        if(b) b.textContent = lang === 'fr' ? '🇬🇧 EN' : '🇫🇷 FR';
+        if(b) b.textContent = lang === 'fr' ? '\uD83C\uDDEC\uDD27 EN' : '\uD83C\uDDEB\uDDF7 FR';
     }
     function updateSearchPlaceholder(){
         var sb = document.getElementById('searchBox');
@@ -208,8 +220,7 @@ footer .footer-row,footer .row{display:flex;flex-wrap:wrap;justify-content:space
     updateBtn(stored);
     updateSearchPlaceholder();
     window.toggleLang = function(){
-        var cur = getLang();
-        var next = cur === 'fr' ? 'en' : 'fr';
+        var next = getLang() === 'fr' ? 'en' : 'fr';
         document.documentElement.lang = next;
         localStorage.setItem('fdh_lang', next);
         updateBtn(next);
@@ -217,38 +228,10 @@ footer .footer-row,footer .row{display:flex;flex-wrap:wrap;justify-content:space
         rerender();
     };
 
-    var raw=JSON.parse(atob(CHEESE_DATA_B64));
-    var cheeses=raw.cheeses||raw;
-    cheeses.sort(function(a,b){return (a.nm||'').localeCompare(b.nm||'','fr');});
-
-    var byLetter={};
-    cheeses.forEach(function(c){
-        var first=(c.nm||'?')[0].toUpperCase();
-        if(first<'A'||first>'Z')first='#';
-        if(!byLetter[first])byLetter[first]=[];
-        byLetter[first].push(c);
-    });
-
     function countLabel(n){
-        if(getLang()==='en'){
-            return n + ' cheese' + (n>1?'s':'') + ' listed';
-        }
-        return n + ' fromage' + (n>1?'s':'') + ' répertorié' + (n>1?'s':'');
+        if(getLang()==='en'){ return n + ' cheese' + (n>1?'s':'') + ' listed'; }
+        return n + ' fromage' + (n>1?'s':'') + ' r\u00e9pertori\u00e9' + (n>1?'s':'');
     }
-
-    document.getElementById('countText').textContent = countLabel(cheeses.length);
-
-    // Letter nav
-    var navHtml='';
-    var letters='ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-    letters.forEach(function(l){
-        if(byLetter[l]){
-            navHtml+='<a href="#letter-'+l+'">'+l+'</a>';
-        }else{
-            navHtml+='<a class="empty">'+l+'</a>';
-        }
-    });
-    document.getElementById('letterNav').innerHTML=navHtml;
 
     function getBadges(c){
         var html='';
@@ -264,7 +247,6 @@ footer .footer-row,footer .row{display:flex;flex-wrap:wrap;justify-content:space
         return html;
     }
 
-    var lastFiltered = null;
     function renderList(filtered){
         lastFiltered = filtered;
         var grouped={};
@@ -274,7 +256,6 @@ footer .footer-row,footer .row{display:flex;flex-wrap:wrap;justify-content:space
             if(!grouped[first])grouped[first]=[];
             grouped[first].push(c);
         });
-
         var html='';
         letters.forEach(function(l){
             if(!grouped[l])return;
@@ -293,14 +274,43 @@ footer .footer-row,footer .row{display:flex;flex-wrap:wrap;justify-content:space
 
     function rerender(){ if(lastFiltered) renderList(lastFiltered); }
 
-    renderList(cheeses);
+    function buildLetterNav(){
+        var byLetter={};
+        cheeses.forEach(function(c){
+            var first=(c.nm||'?')[0].toUpperCase();
+            if(first<'A'||first>'Z')first='#';
+            if(!byLetter[first])byLetter[first]=[];
+            byLetter[first].push(c);
+        });
+        var navHtml='';
+        letters.forEach(function(l){
+            if(byLetter[l]){ navHtml+='<a href="#letter-'+l+'">'+l+'</a>'; }
+            else{ navHtml+='<a class="empty">'+l+'</a>'; }
+        });
+        document.getElementById('letterNav').innerHTML=navHtml;
+    }
 
-    document.getElementById('searchBox').addEventListener('input',function(){
+    var sb=document.getElementById('searchBox');
+    if(sb) sb.addEventListener('input',function(){
         var q=this.value.trim().toLowerCase();
         if(!q){renderList(cheeses);return;}
-        var filtered=cheeses.filter(function(c){return (c.nm||'').toLowerCase().indexOf(q)>=0;});
-        renderList(filtered);
+        renderList(cheeses.filter(function(c){return (c.nm||'').toLowerCase().indexOf(q)>=0;}));
     });
+
+    // Load from the private API (D1-backed Worker)
+    fetch(CHEESE_API_BASE+'/api/cheeses')
+        .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+        .then(function(d){
+            cheeses=(d.cheeses||d);
+            cheeses.sort(function(a,b){return (a.nm||'').localeCompare(b.nm||'','fr');});
+            buildLetterNav();
+            renderList(cheeses);
+        })
+        .catch(function(e){
+            var cl=document.getElementById('cheeseList');
+            if(cl) cl.innerHTML='<p style="text-align:center;color:#999;padding:2rem;">'+(getLang()==='en'?'Unable to load cheeses. Please try again shortly.':'Impossible de charger les fromages. R\u00e9essayez dans un instant.')+'</p>';
+            console.warn('fromages.html API load failed:',e&&e.message);
+        });
 })();
 </script>
 
